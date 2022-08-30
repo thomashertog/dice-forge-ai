@@ -1,0 +1,291 @@
+<html>
+
+    <head>
+
+        <link rel="stylesheet" type="text/css" href="bga_interface_files/diceforge.css">
+        <link rel="stylesheet" type="text/css" href="bga_interface_files/common.css">
+        <link rel="stylesheet" type="text/css" href="bga_interface_files/gameserver.css">
+        <link rel="stylesheet" type="text/css" href="bga_interface_files/libraries.css">
+    </head>
+
+<body>
+
+    <div id="commando_balk" style="width: 100%; text-align:center; height: 30px; padding-top: 10px; display: inline-block; position:fixed; z-index:100; background-color: #e0a82d;">
+        <span>test</span> 
+        <input type="button" value="test"/>
+    </div>
+
+    <div id="speler_blad_links" class="play-area" style="margin-top:40px;">
+        <h3>Speler 1</h3>
+        
+        <div id="flex_container" style="display:flex">
+            <div id="resources_speler_1">
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-gold"></div>
+                    <span id="goud_speler_1" style="font-size: 20px;">2/12</span>
+                </div>
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-fire"></div>
+                    <span id="rood_speler_1" style="font-size: 20px;">0/6</span>
+                </div>
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-moon"></div>
+                    <span id="blauw_speler_1" style="font-size: 20px;">0/6</span>
+                </div>
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-hammer"></div>
+                    <span id="hamer_speler_1" style="font-size: 20px;">0/0</span>
+                </div>
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-vp"></div>
+                    <span id="score_speler_1" style="font-size: 20px;">0</span>
+                </div>
+
+            </div>
+
+            <div id="dobbelstenen_speler_1" style="display: flex;">
+
+                <div id="dobbelsteen_links_speler_1"  style="display:block; margin: 10px;">
+
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_1-1" class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_1-2" class="bside side-g1"></div>
+                    <br>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_1-3" class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_1-4" class="bside side-g1"></div>
+                    <br>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_1-5" class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_1-6" class="bside side-fs1"></div>
+
+                </div>
+
+                <div  style="display:block; margin: 10px;">
+                    <div id="dobbelsteen_worp_links_speler_1" class="bside side-g1"></div>
+                </div>
+
+                <div  style="display:block; margin: 10px;">
+                    <div id="dobbelsteen_worp_rechts_speler_1" class="bside side-g1"></div>
+                </div>
+
+                <div id="dobbelsteen_rechts_speler_1" style="display:block; margin: 10px;">
+
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_1-1" class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_1-2"  class="bside side-g1"></div>
+                    <br>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_1-3"  class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_1-4" class="bside side-g1"></div>
+                    <br>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_1-5"  class="bside side-ms1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_1-6"  class="bside side-vp2"></div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="header-action">
+                <span class="ressources-icon ressources-type-cog"></span>
+            </div>
+            <div id="power_container_player_1">
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <div id="speler_blad_rechts" class="play-area" style="margin-top:40px;">
+        <h3>Speler 2</h3>
+        
+        <div id="flex_container" style="display:flex">
+            <div id="resources_speler_2">
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-gold"></div>
+                    <span id="goud_speler_2" style="font-size: 20px;">3/12</span>
+                </div>
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-fire"></div>
+                    <span id="rood_speler_2" style="font-size: 20px;">0/6</span>
+                </div>
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-moon"></div>
+                    <span id="blauw_speler_2" style="font-size: 20px;">0/6</span>
+                </div>
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-hammer"></div>
+                    <span id="hamer_speler_2" style="font-size: 20px;">0/0</span>
+                </div>
+
+                <div style="display: block">
+                    <div class="ressources-small ressources-vp"></div>
+                    <span id="score_speler_2" style="font-size: 20px;">0</span>
+                </div>
+
+            </div>
+
+            <div id="dobbelstenen_speler_2" style="display: flex;">
+
+                <div id="dobbelsteen_links_speler_2"  style="display:block; margin: 10px;">
+
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_2-1"  class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_2-2"  class="bside side-g1"></div>
+                    <br>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_2-3"  class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_2-4"  class="bside side-g1"></div>
+                    <br>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_2-5"  class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_links_speler_2-6"  class="bside side-fs1"></div>
+
+                </div>
+
+                <div style="display:block; margin: 10px;">
+                    <div id="dobbelsteen_worp_links_speler_2" class="bside side-g1"></div>
+                </div>
+
+                <div style="display:block; margin: 10px;">
+                    <div id="dobbelsteen_worp_rechts_speler_2" class="bside side-g1"></div>
+                </div>
+
+                <div id="dobbelsteen_rechts_speler_2" style="display:block; margin: 10px;"">
+
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_2-1"  class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_2-2"  class="bside side-g1"></div>
+                    <br>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_2-3"  class="bside side-g1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_2-4"  class="bside side-g1"></div>
+                    <br>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_2-5"  class="bside side-ms1"></div>
+                    <div onclick="klik_dobbelsteen(event)" style="cursor:pointer" id="dobbelsteen_rechts_speler_2-6"  class="bside side-vp2"></div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="action-bar">
+            <div class="header-action">
+                <span class="ressources-icon ressources-type-cog"></span>
+            </div>
+            <div id="power_container_player_1">
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <hr>
+
+    <div id="container">
+		<div class="board-left">
+			<div id="base-pools" class="pools">
+
+				<div id="pool-1" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)" id="pool-1_item_1" class="stockitem bside side-g3" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -100% 0%;"></div>
+                    <div onclick="klik_tegel(event)" id="pool-1_item_2" class="stockitem bside side-g3" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -100% 0%;"></div>
+                </div>
+				<div id="pool-2" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)" id="pool-2_item_5" class="stockitem bside side-ms1" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -600% 0%;"></div>
+                    <div onclick="klik_tegel(event)" id="pool-2_item_8" class="stockitem bside side-ms1" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -600% 0%;"></div>
+                </div>
+				<div id="pool-3" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)" id="pool-3_item_10" class="stockitem bside side-g4" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -200% 0%;"></div>
+                    <div onclick="klik_tegel(event)" id="pool-3_item_11" class="stockitem bside side-g4" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -200% 0%;"></div>
+                </div>
+				<div id="pool-4" class="pool">
+                    <div onclick="klik_tegel(event)" id="pool-4_item_12" class="stockitem bside side-fs1" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -200% 0%;"></div>
+                    <div onclick="klik_tegel(event)" id="pool-4_item_13" class="stockitem bside side-fs1" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -200% 0%;"></div>
+                </div>
+				<div id="pool-5" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)"  id="pool-5_item_17" class="stockitem   bside side-g2-plus-ms1" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -1300% 0%;"></div>
+                    <div onclick="klik_tegel(event)"  id="pool-5_item_19" class="stockitem   bside side-g1-or-fs1-or-ms1" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -1100% 0%;"></div></div>
+				<div id="pool-6" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)" id="pool-6_item_20" class="stockitem   bside side-g3-or-vp2" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -1500% 0%;"></div>
+                    <div onclick="klik_tegel(event)" id="pool-6_item_23" class="stockitem   bside side-g3-or-vp2" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -1500% 0%;"></div></div>
+				<div id="pool-7" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)" id="pool-7_item_24" class="stockitem   bside side-ms2" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -700% 0%;"></div>
+                    <div onclick="klik_tegel(event)" id="pool-7_item_26" class="stockitem   bside side-ms2" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -700% 0%;"></div></div>
+				<div id="pool-8" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)"  id="pool-8_item_29" class="stockitem   bside side-fs2" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -500% 0%;"></div>
+                    <div onclick="klik_tegel(event)" id="pool-8_item_30" class="stockitem   bside side-fs2" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -500% 0%;"></div></div>
+				<div id="pool-9" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)" id="pool-9_item_33" class="stockitem   bside side-vp3" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -900% 0%;"></div>
+                    <div onclick="klik_tegel(event)" id="pool-9_item_34" class="stockitem   bside side-vp3" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -900% 0%;"></div></div>
+				<div id="pool-10" class="pool" style="height: 45px;">
+                    <div onclick="klik_tegel(event)"  id="pool-10_item_37" class="stockitem   bside side-g1-plus-vp1-plus-fs1-plus-ms1" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -1600% 0%;"></div>
+                    <div onclick="klik_tegel(event)"  id="pool-10_item_38" class="stockitem   bside side-vp4" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -1000% 0%;"></div></div>
+				<div id="pool-11" class="pool" style="height: 90px;">
+                    <div id="pool-11_item_40" class="stockitem   bside side-mirror" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -1900% 0%;"></div>
+                    <div id="pool-11_item_41" class="stockitem   bside side-mirror" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -1900% 0%;"></div><div id="pool-11_item_42" class="stockitem   bside side-mirror" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -1900% 0%;"></div><div id="pool-11_item_43" class="stockitem   bside side-mirror" style="top: 45px; left: 45px; width: 45px; height: 45px; background-position: -1900% 0%;"></div></div>
+				<div id="pool-12" class="pool" style="height: 90px;"><div id="pool-12_item_44" class="stockitem   bside side-blue-shield" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -2600% 0%;"></div><div id="pool-12_item_45" class="stockitem   bside side-yellow-shield" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -2700% 0%;"></div><div id="pool-12_item_46" class="stockitem   bside side-green-shield" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -2800% 0%;"></div><div id="pool-12_item_47" class="stockitem   bside side-red-shield" style="top: 45px; left: 45px; width: 45px; height: 45px; background-position: -2900% 0%;"></div></div>
+				<div id="pool-13" class="pool" style="height: 90px;"><div id="pool-13_item_48" class="stockitem   bside side-ship" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -2000% 0%;"></div><div id="pool-13_item_49" class="stockitem   bside side-ship" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -2000% 0%;"></div><div id="pool-13_item_50" class="stockitem   bside side-ship" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -2000% 0%;"></div><div id="pool-13_item_51" class="stockitem   bside side-ship" style="top: 45px; left: 45px; width: 45px; height: 45px; background-position: -2000% 0%;"></div></div>
+				<div id="pool-14" class="pool" style="height: 90px;"><div id="pool-14_item_52" class="stockitem   bside side-red-boar" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -2400% 0%;"></div><div id="pool-14_item_53" class="stockitem   bside side-yellow-boar" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -2300% 0%;"></div><div id="pool-14_item_54" class="stockitem   bside side-blue-boar" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -2200% 0%;"></div><div id="pool-14_item_55" class="stockitem   bside side-green-boar" style="top: 45px; left: 45px; width: 45px; height: 45px; background-position: -2500% 0%;"></div></div>
+				<div id="pool-15" class="pool" style="height: 90px;"><div id="pool-15_item_56" class="stockitem   bside side-x3" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -1800% 0%;"></div><div id="pool-15_item_57" class="stockitem   bside side-x3" style="top: 0px; left: 45px; width: 45px; height: 45px; background-position: -1800% 0%;"></div><div id="pool-15_item_58" class="stockitem   bside side-x3" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -1800% 0%;"></div><div id="pool-15_item_59" class="stockitem   bside side-x3" style="top: 45px; left: 45px; width: 45px; height: 45px; background-position: -1800% 0%;"></div></div>
+			</div>
+
+			<div id="rebellion-pools" class="pools hide">
+				<div id="pool-16" class="pool" style="height: 180px;"><div id="pool-16_item_60" class="stockitem   bside side-yellow-misfortune" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -4100% 0%;"></div><div id="pool-16_item_61" class="stockitem   bside side-blue-misfortune" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -4000% 0%;"></div><div id="pool-16_item_62" class="stockitem   bside side-green-misfortune" style="top: 90px; left: 0px; width: 45px; height: 45px; background-position: -4200% 0%;"></div><div id="pool-16_item_63" class="stockitem   bside side-red-misfortune" style="top: 135px; left: 0px; width: 45px; height: 45px; background-position: -4300% 0%;"></div></div>
+				<div id="pool-17" class="pool" style="height: 180px;"><div id="pool-17_item_64" class="stockitem   bside side-sun-golem" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -4500% 0%;"></div><div id="pool-17_item_65" class="stockitem   bside side-sun-golem" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -4500% 0%;"></div><div id="pool-17_item_66" class="stockitem   bside side-sun-golem" style="top: 90px; left: 0px; width: 45px; height: 45px; background-position: -4500% 0%;"></div><div id="pool-17_item_67" class="stockitem   bside side-sun-golem" style="top: 135px; left: 0px; width: 45px; height: 45px; background-position: -4500% 0%;"></div></div>
+				<div id="pool-18" class="pool" style="height: 180px;"><div id="pool-18_item_68" class="stockitem   bside side-l1-plus-v1-plus-g2" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -3400% 0%;"></div><div id="pool-18_item_69" class="stockitem   bside side-l1-plus-v1-plus-g2" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -3400% 0%;"></div><div id="pool-18_item_70" class="stockitem   bside side-g3-plus-as1" style="top: 90px; left: 0px; width: 45px; height: 45px; background-position: -3500% 0%;"></div><div id="pool-18_item_71" class="stockitem   bside side-g3-plus-as1" style="top: 135px; left: 0px; width: 45px; height: 45px; background-position: -3500% 0%;"></div></div>
+				<div id="pool-19" class="pool" style="height: 180px;"><div id="pool-19_item_72" class="stockitem   bside side-moon-golem" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -4400% 0%;"></div><div id="pool-19_item_73" class="stockitem   bside side-moon-golem" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -4400% 0%;"></div><div id="pool-19_item_74" class="stockitem   bside side-moon-golem" style="top: 90px; left: 0px; width: 45px; height: 45px; background-position: -4400% 0%;"></div><div id="pool-19_item_75" class="stockitem   bside side-moon-golem" style="top: 135px; left: 0px; width: 45px; height: 45px; background-position: -4400% 0%;"></div></div>
+				<div id="pool-20" class="pool" style="height: 180px;"><div id="pool-20_item_76" class="stockitem   bside side-titan-yellow-shield" style="top: 0px; left: 0px; width: 45px; height: 45px; background-position: -3700% 0%;"></div><div id="pool-20_item_77" class="stockitem   bside side-titan-red-shield" style="top: 45px; left: 0px; width: 45px; height: 45px; background-position: -3800% 0%;"></div><div id="pool-20_item_78" class="stockitem   bside side-titan-green-shield" style="top: 90px; left: 0px; width: 45px; height: 45px; background-position: -3900% 0%;"></div><div id="pool-20_item_79" class="stockitem   bside side-titan-blue-shield" style="top: 135px; left: 0px; width: 45px; height: 45px; background-position: -3600% 0%;"></div></div>
+			</div>
+		</div>
+
+		<div class="board-right">
+			<div id="board">
+
+				<div id="exploit-M1" class="exploit-pool" data-costfire="0" data-costmoon="1" style="height: 144px;">
+                    <div class="card-counter white-text-shadowed" id="card-counter-M1">1</div>
+                    <div id="exploit-M1_item_2" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -600% -200%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-M2" class="exploit-pool" data-costfire="0" data-costmoon="1" style="height: 144px;">
+                    <div class="card-counter white-text-shadowed" id="card-counter-M2">2</div>
+                    <div id="exploit-M2_item_4" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -400% -200%; opacity: 1; left: 0px;"></div><div id="exploit-M2_item_3" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -400% -200%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-M3" class="exploit-pool" data-costfire="0" data-costmoon="2" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-M3">2</div><div id="exploit-M3_item_6" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -200% -200%; opacity: 1; left: 0px;"></div><div id="exploit-M3_item_5" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -200% -200%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-M4" class="exploit-pool" data-costfire="0" data-costmoon="3" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-M4">2</div><div id="exploit-M4_item_8" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: 0% -200%; opacity: 1; left: 0px;"></div><div id="exploit-M4_item_7" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: 0% -200%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-M5" class="exploit-pool" data-costfire="0" data-costmoon="4" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-M5">2</div><div id="exploit-M5_item_10" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -900% -100%; opacity: 1; left: 0px;"></div><div id="exploit-M5_item_9" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -900% -100%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-M6" class="exploit-pool" data-costfire="0" data-costmoon="5" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-M6">2</div><div id="exploit-M6_item_12" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -700% -100%; opacity: 1; left: 0px;"></div><div id="exploit-M6_item_11" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -700% -100%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-M7" class="exploit-pool" data-costfire="0" data-costmoon="6" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-M7">2</div><div id="exploit-M7_item_14" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -500% -100%; opacity: 1; left: 0px;"></div><div id="exploit-M7_item_13" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -500% -100%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-M8" class="exploit-pool" data-costfire="5" data-costmoon="5" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-M8">2</div><div id="exploit-M8_item_16" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -300% -100%; opacity: 1; left: 0px;"></div><div id="exploit-M8_item_15" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -300% -100%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-F1" class="exploit-pool" data-costfire="1" data-costmoon="0" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-F1">2</div><div id="exploit-F1_item_18" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); opacity: 1; left: 0px;"></div><div id="exploit-F1_item_17" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-F2" class="exploit-pool" data-costfire="1" data-costmoon="0" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-F2">2</div><div id="exploit-F2_item_20" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -200% 0%; opacity: 1; left: 0px;"></div><div id="exploit-F2_item_19" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -200% 0%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-F3" class="exploit-pool" data-costfire="2" data-costmoon="0" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-F3">2</div><div id="exploit-F3_item_22" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -400% 0%; opacity: 1; left: 0px;"></div><div id="exploit-F3_item_21" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -400% 0%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-F4" class="exploit-pool" data-costfire="3" data-costmoon="0" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-F4">2</div><div id="exploit-F4_item_24" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -600% 0%; opacity: 1; left: 0px;"></div><div id="exploit-F4_item_23" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -600% 0%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-F5" class="exploit-pool" data-costfire="4" data-costmoon="0" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-F5">2</div><div id="exploit-F5_item_26" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -800% 0%; opacity: 1; left: 0px;"></div><div id="exploit-F5_item_25" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -800% 0%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-F6" class="exploit-pool" data-costfire="5" data-costmoon="0" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-F6">2</div><div id="exploit-F6_item_28" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -1000% 0%; opacity: 1; left: 0px;"></div><div id="exploit-F6_item_27" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -1000% 0%; opacity: 1; left: 0px;"></div></div>
+				<div id="exploit-F7" class="exploit-pool" data-costfire="6" data-costmoon="0" style="height: 144px;"><div class="card-counter white-text-shadowed" id="card-counter-F7">2</div><div id="exploit-F7_item_30" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 2; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -100% -100%; opacity: 1; left: 0px;"></div><div id="exploit-F7_item_29" class="stockitem   exploit" style="top: 0px; width: 93px; height: 144px; z-index: 3; background-image: url('bga_interface_files/img/sprite-cards-reb.jpg'); background-position: -100% -100%; opacity: 1; left: 0px;"></div></div>
+			
+				<div class="turn3" id="turncount"></div>
+				
+				<div class="position" id="position-1"></div>
+				<div class="position" id="position-2"></div>
+				<div class="position" id="position-3"></div>
+				<div class="position" id="position-4"></div>
+				<div class="position" id="position-5"></div>
+				<div class="position" id="position-6"></div>
+				<div class="position" id="position-7"></div>
+
+				<div class="position" id="position-init-blue"></div>
+				<div class="position" id="position-init-green"></div>
+				<div class="position" id="position-init-black"><div class="pawn black" id="player_black"></div></div>
+				<div class="position" id="position-init-orange"><div class="pawn orange" id="player_orange"></div></div>
+			</div>
+		</div>
+	</div>
+
+</body>
+
+<script type="application/javascript" src="interface_interaction.js"></script>
+<script type="application/javascript" src="dobbelsteen_resources.js"></script>
+<script type="application/javascript" src="spelerAI.js"></script>
+<script type="application/javascript" src="spel_mechanics.js"></script>
+
+
+</html>
