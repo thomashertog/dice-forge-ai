@@ -187,8 +187,8 @@ var spel = {
     ],
 	ronde: 1,
 	actieve_speler: 1,
-	fases: init_ronde()
-
+	fases: init_ronde(),
+    beschikbare_kaarten: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 }
 
 // hemelse zegening

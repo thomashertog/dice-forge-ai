@@ -196,3 +196,60 @@ function klik_dobbelsteen(event) {
         ui_commando_balk_add_button("Be\u00EBindig beurt zonder extra zijdes te smeden", "einde actie")   
     }
 }
+
+function klik_kaart(event) {
+    // extraheer de kaart code
+    kaart = converteer_code_naar_kaart(event.target.id.split("exploit-")[1].split("_item")[0])
+
+    fase = spel.fases[0]
+
+     // momenteel geen speler interactie verwacht
+    if(fase.fase != "wacht op speler") {
+        return
+    }
+
+    // momenteel wordt er een andere input verwacht
+    if(fase.actie != 'kies actie') {
+        return
+    }
+
+    // speler heeft al gesmeden en kan daarom geen kaart meer kopen
+    if(fase.type == 'smeden') {
+        return
+    }
+
+    // controleer dat de kaart nog beschikbaar is
+    if(spel.beschikbare_kaarten[kaart.index] == 0) {
+        return
+    }
+
+    // speler heeft voldoende resources om de kaart te kopen
+    if(spel.spelers[spel.actieve_speler - 1].resources.rood >= kaart.kost_rood + (!fase.rood_betaald)*2 &
+    spel.spelers[spel.actieve_speler - 1].resources.blauw >= kaart.kost_blauw) {
+
+        // betaal kosten kaart
+        voeg_resource_toe(spel.actieve_speler, 'rood', -(kaart.kost_rood + (!fase.rood_betaald)*2))
+        voeg_resource_toe(spel.actieve_speler, 'blauw', -kaart.kost_blauw)
+
+        // ontvang punten voor aankoop kaart
+        voeg_resource_toe(spel.actieve_speler, 'score', kaart.punten)
+
+        // verminder de beschikbaarheid van de kaart
+        spel.beschikbare_kaarten[kaart.index] -= 1
+        ui_zet_beschikbaarheid_kaart(kaart.code, spel.beschikbare_kaarten[kaart.index])
+
+        // registreer eigendom van de kaart in het spelers object
+        spel.spelers[spel.actieve_speler - 1].kaarten[kaart.index] += 1
+
+        // verwijder de fase 
+        spel.fases.shift()
+        ui_commando_balk_reset()
+
+        // TODO: verdringing + beweeg pion --> voeg nieuwe fases hiervoor toe
+
+        // TODO kaart specifieke interactie --> voeg nieuwe fases hiervoor toe
+
+    }
+
+    
+}
