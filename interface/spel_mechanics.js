@@ -169,7 +169,53 @@ koop_kaart = function(speler_id, kaart) {
     spel.spelers[speler_id - 1].kaarten[kaart.index] += 1
 
     // TODO kaart specifieke interactie --> voeg nieuwe fases hiervoor toe
-    
+    ['hamer', 'kist', 'hinde', 'kobold', 'veerman', 'x3', 'kreef', 'hydra', 'sinfx', 'spiegel', 'gorgo', 'minotaur', 'uil', '3g+3b', 'oudere']
+    if(kaart.alias == "hamer") {
+        spel.spelers[speler_id - 1].resources_max.hamer += 30
+
+        // update UI
+        voeg_resource_toe(speler_id, 'hamer', 0)
+    } else if(kaart.alias == 'kist') {
+        spel.spelers[speler_id - 1].resources_max.goud += 4
+        spel.spelers[speler_id - 1].resources_max.rood += 3
+        spel.spelers[speler_id - 1].resources_max.blauw += 3
+
+        // update UI
+        voeg_resource_toe(speler_id, 'goud', 0)
+        voeg_resource_toe(speler_id, 'rood', 0)
+        voeg_resource_toe(speler_id, 'blauw', 0)
+    } else if(kaart.alias == 'hinde') {
+        // TODO    
+    } else if(kaart.alias == 'kobold') {
+        // TODO    
+    } else if(kaart.alias == 'x3') {
+        // TODO    
+    } else if(kaart.alias == 'kreeft') {
+        spel.fases.unshift(
+            {
+                fase: 'hemelse zegening',
+                speler: speler_id
+            },
+            {
+                fase: 'hemelse zegening',
+                speler: speler_id
+            }
+        )
+    } else if(kaart.alias == 'sfinx') {
+        // TODO            
+    } else if(kaart.alias == 'spiegel') {
+        // TODO
+    } else if(kaart.alias == 'minotaur') {
+        // TODO
+    } else if(kaart.alias == 'uil') {
+        // TODO
+    } else if(kaart.alias == '3g+3b') {
+        voeg_resource_toe(speler_id, 'goud', min(3, spel.spelers[speler_id - 1].resources_max.goud - spel.spelers[speler_id - 1].resources.goud))
+        voeg_resource_toe(speler_id, 'blauw', min(3, spel.spelers[speler_id - 1].resources_max.blauw - spel.spelers[speler_id - 1].resources.blauw))
+    } else if(kaart.alias == 'oudere') {
+        // TODO
+    }
+
     // verdringing
     // wordt uitgevoerd voor het kaart specifieke effect
     if(spel.spelers[3-speler_id].positie_pion == kaart.pool) {
