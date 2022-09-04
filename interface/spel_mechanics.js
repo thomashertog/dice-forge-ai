@@ -150,11 +150,28 @@ hemelse_zegening = function(speler_id) {
         worp1 = []
         worp2 = [gooi_dobbelsteen(2, 'links'), gooi_dobbelsteen(2, 'rechts')]
     }
-
-
-
 }
 
+koop_kaart = function(speler_id, kaart) {
+
+    // betaal kosten kaart
+    voeg_resource_toe(speler_id, 'rood', -(kaart.kost_rood + (!fase.rood_betaald)*2))
+    voeg_resource_toe(speler_id, 'blauw', -kaart.kost_blauw)
+
+    // ontvang punten voor aankoop kaart
+    voeg_resource_toe(speler_id, 'score', kaart.punten)
+
+    // verminder de beschikbaarheid van de kaart
+    spel.beschikbare_kaarten[kaart.index] -= 1
+    ui_zet_beschikbaarheid_kaart(kaart.code, spel.beschikbare_kaarten[kaart.index])
+
+    // registreer eigendom van de kaart in het spelers object
+    spel.spelers[speler_id - 1].kaarten[kaart.index] += 1
+
+    // TODO: verdringing + beweeg pion --> voeg nieuwe fases hiervoor toe
+
+    // TODO kaart specifieke interactie --> voeg nieuwe fases hiervoor toe
+}
 
 // start de volgende fase van het spel
 update_spel = function() {

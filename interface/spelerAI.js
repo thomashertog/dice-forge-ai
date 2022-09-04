@@ -37,7 +37,13 @@ function spelerAI(speler_id) {
             })
 
             ui_commando_balk_reset()
-            ui_commando_balk_add_text("Speler " + speler_id + ": Selecteer een actie ")   
+
+            if(first) {
+                ui_commando_balk_add_text("Speler " + speler_id + ": Selecteer een actie ")  
+            } else {
+                ui_commando_balk_add_text("Speler " + speler_id + ": Selecteer een tweede actie ")  
+            }
+
             ui_commando_balk_add_button("Be\u00EBindig beurt zonder actie", "einde actie")   
         }
 
@@ -227,28 +233,12 @@ function klik_kaart(event) {
     if(spel.spelers[spel.actieve_speler - 1].resources.rood >= kaart.kost_rood + (!fase.rood_betaald)*2 &
     spel.spelers[spel.actieve_speler - 1].resources.blauw >= kaart.kost_blauw) {
 
-        // betaal kosten kaart
-        voeg_resource_toe(spel.actieve_speler, 'rood', -(kaart.kost_rood + (!fase.rood_betaald)*2))
-        voeg_resource_toe(spel.actieve_speler, 'blauw', -kaart.kost_blauw)
-
-        // ontvang punten voor aankoop kaart
-        voeg_resource_toe(spel.actieve_speler, 'score', kaart.punten)
-
-        // verminder de beschikbaarheid van de kaart
-        spel.beschikbare_kaarten[kaart.index] -= 1
-        ui_zet_beschikbaarheid_kaart(kaart.code, spel.beschikbare_kaarten[kaart.index])
-
-        // registreer eigendom van de kaart in het spelers object
-        spel.spelers[spel.actieve_speler - 1].kaarten[kaart.index] += 1
-
         // verwijder de fase 
         spel.fases.shift()
         ui_commando_balk_reset()
 
-        // TODO: verdringing + beweeg pion --> voeg nieuwe fases hiervoor toe
-
-        // TODO kaart specifieke interactie --> voeg nieuwe fases hiervoor toe
-
+        // koop kaart
+        koop_kaart(spel.actieve_speler, kaart)
     }
 
     
