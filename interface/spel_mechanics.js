@@ -191,22 +191,8 @@ var spel = {
     beschikbare_kaarten: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 }
 
-// hemelse zegening
-update_spel()
-update_spel()
-update_spel()
+const interval = setInterval(function() {
+    update_spel()
+  }, 250);
 
-// hemelse zegening
-update_spel()
-update_spel()
-update_spel()
 
-// krachten
-update_spel()
-
-// actie1
-update_spel()
-//commando_button_clicked("einde actie")
-
-// actie2
-//update_spel()
