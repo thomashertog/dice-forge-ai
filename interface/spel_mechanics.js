@@ -168,9 +168,23 @@ koop_kaart = function(speler_id, kaart) {
     // registreer eigendom van de kaart in het spelers object
     spel.spelers[speler_id - 1].kaarten[kaart.index] += 1
 
-    // TODO: verdringing + beweeg pion --> voeg nieuwe fases hiervoor toe
-
     // TODO kaart specifieke interactie --> voeg nieuwe fases hiervoor toe
+    
+    // verdringing
+    // wordt uitgevoerd voor het kaart specifieke effect
+    if(spel.spelers[3-speler_id].positie_pion == kaart.pool) {
+
+        // plaats pion op start positie
+        ui_verplaats_pion(3-speler_id, 0)
+
+        // de verdrongen speler krijgt een extra dobbelsteen worp
+        spel.fases.unshift(
+            {
+                fase: 'hemelse zegening',
+                speler: 3 - speler_id
+            }
+        )
+    }   
 }
 
 // start de volgende fase van het spel
