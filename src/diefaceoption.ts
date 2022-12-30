@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+
 export enum DieFaceOption{
     GOLD_1 = "GOLD_1",
     GP_2 = "GP_2",

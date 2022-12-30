@@ -84,43 +84,63 @@ export class Player {
     }
 
     takeTurn = async () => {
-        // const question = util.promisify(terminal.question).bind(terminal);
         try {
-            const answer = await this.question("What do you want to do now? (F) Forge / (H) Heroic feat");
-            if(answer !== 'F' && answer !== 'H'){
-                console.log(`${answer} is an excellent choice, but it's not yet implemented`);
-            }else if(answer === 'F'){
+            let answer = await this.question("What do you want to do now? (F) Forge / (H) Heroic feat");
+            while(answer !== 'F' && answer !== 'H'){
+                console.log(`${answer} is not a valid option`);
+                answer = await this.question("What do you want to do now? (F) Forge / (H) Heroic feat");
+            }
+            if(answer === 'F'){
                 await this.forge();
             }else{
                 console.log(`allright, pick any heroic feat available, you have ${this.moon} moon shards and ${this.sun} sun shards available`);
             }
         } catch (err) {
             console.log("WTF, something is wrong here");
-            console.error(err);
-            console.log(process.versions);
         }
     }
 
     private async forge(): Promise<void>{
         let userEnd = false;
-        while(userEnd !== true || this.gold > 0){
-            console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
-            for(let dieFacePool of this.game.forge){
-                console.log(`${dieFacePool}`);
-            }
-            let pool = await this.question("out of which pool are you going to buy (1..10)?");
-            let poolNumber = parseInt(pool + "");
-            let buy = await this.question(`which dieface do you want? (1..${this.game.forge[poolNumber-1].dieFaces.length})`);
-            let buyNumber = parseInt(buy + "");
-            console.log(`congrats you bought ${this.game.forge[poolNumber-1].dieFaces[buyNumber-1]}`);
-            this.gold -= this.game.forge[poolNumber-1].cost;
-            this.game.forge[poolNumber-1].dieFaces = this.game.forge[poolNumber-1].dieFaces.slice(buyNumber-1, 1);
-            
+        let minimumCost = this.lowestAvailableCost();
+
+        while(userEnd !== true || (minimumCost !== -1 && this.gold > minimumCost)){
+            this.printForge();
+            await this.buyDieFace();
+            minimumCost = this.lowestAvailableCost();
+
             let continueForging = await this.question("do you want to keep forging? (Y/N)");
-            if(continueForging === 'N'){
+            if (continueForging === 'N') {
                 userEnd = true;
             }
         }
+
+    }
+
+    private lowestAvailableCost(): number{
+        for(let pool of this.game.forge){
+            if(pool.dieFaces.length > 0){
+                return pool.cost;
+            }
+        }
+        return -1;
+    }
+
+    private printForge() {
+        console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
+        for (let dieFacePool of this.game.forge) {
+            console.log(`${dieFacePool}`);
+        }
+    }
+
+    private async buyDieFace() {
+        let pool = await this.question("out of which pool are you going to buy (1..10)?");
+        let poolNumber = parseInt(pool + "");
+        let buy = await this.question(`which dieface do you want? (1..${this.game.forge[poolNumber - 1].dieFaces.length})`);
+        let buyNumber = parseInt(buy + "");
+        console.log(`congrats you bought ${this.game.forge[poolNumber - 1].dieFaces[buyNumber - 1]}`);
+        this.gold -= this.game.forge[poolNumber - 1].cost;
+        this.game.forge[poolNumber - 1].dieFaces = this.game.forge[poolNumber - 1].dieFaces.slice(buyNumber - 1, 1);
     }
 
     private async question(message: string) {
