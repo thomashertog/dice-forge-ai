@@ -2,14 +2,18 @@ import { shuffle } from './util';
 import { DieFaceOption } from './diefaceoption';
 import chalk from 'chalk';
 import * as readline from 'readline';
-import { stdin as input, stdout as output } from 'process';
+import { rawListeners, stdin as input, stdout as output } from 'process';
 import * as util from 'util';
+import { Game } from './game';
+import { DieFacePool } from './diefacepool';
 
-export class Player{
+const terminal = readline.createInterface(input, output);
+        
+export class Player {
 
     private MAX_GOLD = 12;
     private MAX_MOON_SUN = 6;
-    
+
     leftDie: Array<DieFaceOption>;
     rightDie: Array<DieFaceOption>;
 
@@ -18,12 +22,15 @@ export class Player{
     sun: number;
     gloryPoints: number;
 
-    constructor(initialGold : number){
+    game: Game;
+
+    constructor(initialGold: number, game: Game) {
+        this.game = game;
         this.gold = initialGold;
         this.sun = 0;
         this.moon = 0;
         this.gloryPoints = 0;
-        
+
         this.leftDie = new Array<DieFaceOption>(
             DieFaceOption.SUN_1,
             DieFaceOption.GOLD_1,
@@ -32,7 +39,7 @@ export class Player{
             DieFaceOption.GOLD_1,
             DieFaceOption.GOLD_1,
         );
-        
+
         this.rightDie = new Array<DieFaceOption>(
             DieFaceOption.MOON_1,
             DieFaceOption.GP_2,
@@ -47,14 +54,14 @@ export class Player{
         return chalk.yellow(this.gold) + "\t" + chalk.blue(this.moon) + "\t" + chalk.red(this.sun) + "\t" + chalk.green(this.gloryPoints);
     }
 
-    divineBlessing():void{
+    divineBlessing(): void {
         this.minorBlessing(this.leftDie);
         this.minorBlessing(this.rightDie);
     }
 
-    minorBlessing(die: Array<DieFaceOption>):void{
+    minorBlessing(die: Array<DieFaceOption>): void {
         let dieResult = this.rollDie(die);
-        switch(dieResult){
+        switch (dieResult) {
             case DieFaceOption.GOLD_1: this.addGold(1); break;
             case DieFaceOption.GOLD_2_MOON_1: this.addGold(2); this.addMoon(1); break;
             case DieFaceOption.GOLD_3: this.addGold(3); break;
@@ -71,45 +78,82 @@ export class Player{
             case DieFaceOption.PICK_GOLD_MOON_SUN_1: throw new Error("not yet implemented");
             case DieFaceOption.PICK_GOLD_MOON_SUN_2: throw new Error("not yet implemented");
             case DieFaceOption.SUN_1: this.addSun(1); break;
-            case DieFaceOption.SUN_1_GP_1: this.addSun(1); break; this.addGloryPoints(1);
+            case DieFaceOption.SUN_1_GP_1: this.addSun(1); this.addGloryPoints(1); break;
             case DieFaceOption.SUN_2: this.addSun(2); break;
         }
     }
 
-    async takeTurn(): Promise<void>{
-        const rl = readline.createInterface(input, output);
-        const question = util.promisify(rl.question).bind(rl);
-        let answer = await question("What do you want to do now? (F) Forge / (H) Heroic feat");
-        console.log(`${answer} is an excellent choice, but it's not yet implemented`);
+    takeTurn = async () => {
+        // const question = util.promisify(terminal.question).bind(terminal);
+        try {
+            const answer = await this.question("What do you want to do now? (F) Forge / (H) Heroic feat");
+            if(answer !== 'F' && answer !== 'H'){
+                console.log(`${answer} is an excellent choice, but it's not yet implemented`);
+            }else if(answer === 'F'){
+                await this.forge();
+            }else{
+                console.log(`allright, pick any heroic feat available, you have ${this.moon} moon shards and ${this.sun} sun shards available`);
+            }
+        } catch (err) {
+            console.log("WTF, something is wrong here");
+            console.error(err);
+            console.log(process.versions);
+        }
     }
 
-    private rollDie(die : Array<DieFaceOption>) : DieFaceOption{
+    private async forge(): Promise<void>{
+        let userEnd = false;
+        while(userEnd !== true || this.gold > 0){
+            console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
+            for(let dieFacePool of this.game.forge){
+                console.log(`${dieFacePool}`);
+            }
+            let pool = await this.question("out of which pool are you going to buy (1..10)?");
+            let poolNumber = parseInt(pool + "");
+            let buy = await this.question(`which dieface do you want? (1..${this.game.forge[poolNumber-1].dieFaces.length})`);
+            let buyNumber = parseInt(buy + "");
+            console.log(`congrats you bought ${this.game.forge[poolNumber-1].dieFaces[buyNumber-1]}`);
+            this.gold -= this.game.forge[poolNumber-1].cost;
+            this.game.forge[poolNumber-1].dieFaces = this.game.forge[poolNumber-1].dieFaces.slice(buyNumber-1, 1);
+            
+            let continueForging = await this.question("do you want to keep forging? (Y/N)");
+            if(continueForging === 'N'){
+                userEnd = true;
+            }
+        }
+    }
+
+    private async question(message: string) {
+        return new Promise(resolve => {terminal.question(message, resolve);});
+    }
+
+    private rollDie(die: Array<DieFaceOption>): DieFaceOption {
         shuffle(die);
         return die[0];
-    }   
+    }
 
-    private addGold(value: number):void{
+    private addGold(value: number): void {
         this.gold += value;
-        if(this.gold > this.MAX_GOLD){
+        if (this.gold > this.MAX_GOLD) {
             this.gold = this.MAX_GOLD;
         }
     }
 
-    private addSun(value: number):void{
+    private addSun(value: number): void {
         this.sun += value;
-        if(this.sun > this.MAX_MOON_SUN){
+        if (this.sun > this.MAX_MOON_SUN) {
             this.sun = this.MAX_MOON_SUN;
         }
     }
 
-    private addMoon(value: number):void{
+    private addMoon(value: number): void {
         this.moon += value;
-        if(this.moon > this.MAX_MOON_SUN){
+        if (this.moon > this.MAX_MOON_SUN) {
             this.moon = this.MAX_MOON_SUN;
         }
     }
 
-    private addGloryPoints(value: number):void{
+    private addGloryPoints(value: number): void {
         this.gloryPoints += value;
     }
 }

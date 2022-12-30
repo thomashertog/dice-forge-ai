@@ -1,4 +1,3 @@
-import { format } from 'path';
 import { AllForgeDieFaces } from './data';
 import { DieFacePool } from './diefacepool';
 import { Player } from './player';
@@ -17,13 +16,15 @@ export class Game {
     }
 
     start = async (playerCount: string) => {
+        console.log(`game started with ${playerCount} players`)
         const numberOfPlayers = parseInt(playerCount);
         if (numberOfPlayers === 3) {
+            console.log("warning, this game has an extra round");
             this.GAME_ROUNDS = 10;
         }
-        this.initializeForge();
+        this.initializeForge(numberOfPlayers);
         for (let i = 0; i < numberOfPlayers; i++) {
-            this.players.push(new Player(3 - i));
+            this.players.push(new Player(3 - i, this));
         }
 
         for (let round = 1; round <= this.GAME_ROUNDS; round++) {
@@ -32,7 +33,7 @@ export class Game {
     }
 
     private async playRound(round: number): Promise<void> {
-        for (let player of this.players) {
+        for await (let player of this.players) {
             await this.playTurn(player, round);
         }
     }
@@ -53,12 +54,12 @@ export class Game {
         }
     }
 
-    private initializeForge() {
+    private initializeForge(numberOfPlayers: number) {
         this.forge = new Array<DieFacePool>;
         for (let pool of AllForgeDieFaces) {
             shuffle(pool.dieFaces);
-            if (this.players.length === 2) {
-                pool.dieFaces.length = 2;
+            if (numberOfPlayers === 2) {
+                pool.dieFaces = pool.dieFaces.slice(2);
             }
             this.forge.push(pool);
         }
