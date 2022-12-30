@@ -138,7 +138,27 @@ export class Player {
         let poolNumber = parseInt(pool + "");
         let buy = await this.question(`which dieface do you want? (1..${this.game.forge[poolNumber - 1].dieFaces.length})`);
         let buyNumber = parseInt(buy + "");
+        
+        let bought = this.game.forge[poolNumber-1].dieFaces[buyNumber-1];
         console.log(`congrats you bought ${this.game.forge[poolNumber - 1].dieFaces[buyNumber - 1]}`);
+        let leftRight = await this.question("on which die you want to forge this lovely dieface? Left (L) or Right (R)");
+        while(leftRight !== 'R' && leftRight !== 'L'){
+            console.log(`${leftRight} is not a valid option`);
+            leftRight = await this.question("on which die you want to forge this lovely dieface? Left (L) or Right (R)");
+        }
+        if(leftRight === 'R'){
+            console.log(`you chose to forge it onto the following die\n${this.rightDie}`);
+        }else if(leftRight === 'L'){
+            console.log(`you chose to forge it onto the following die\n${this.leftDie}`);
+        }
+        let dieFaceToReplace = await this.question("which dieface you want to replace it with? (1..6)");
+        let dieFaceNumberToReplace = parseInt(dieFaceToReplace +"");
+        if(leftRight === 'R'){
+            this.rightDie[dieFaceNumberToReplace-1] = bought;
+        }else if(leftRight === 'L'){
+            this.leftDie[dieFaceNumberToReplace-1] = bought;
+        }
+
         this.gold -= this.game.forge[poolNumber - 1].cost;
         this.game.forge[poolNumber - 1].dieFaces = this.game.forge[poolNumber - 1].dieFaces.slice(buyNumber - 1, 1);
     }
