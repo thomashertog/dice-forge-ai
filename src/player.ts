@@ -85,11 +85,7 @@ export class Player {
 
     takeTurn = async () => {
         try {
-            let answer = await this.question("What do you want to do now? (F) Forge / (H) Heroic feat");
-            while(answer !== 'F' && answer !== 'H'){
-                console.log(`${answer} is not a valid option`);
-                answer = await this.question("What do you want to do now? (F) Forge / (H) Heroic feat");
-            }
+            let answer = await this.questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat", 'F', 'H');
             if(answer === 'F'){
                 await this.forge();
             }else{
@@ -106,10 +102,10 @@ export class Player {
 
         while(userEnd !== true || (minimumCost !== -1 && this.gold > minimumCost)){
             this.printForge();
-            await this.buyDieFace();
+            await this.buyAndReplaceDieFace();
             minimumCost = this.lowestAvailableCost();
 
-            let continueForging = await this.question("do you want to keep forging? (Y/N)");
+            let continueForging = await this.questionUntilValidAnswer("do you want to keep forging? (Y/N)", 'Y', 'N');
             if (continueForging === 'N') {
                 userEnd = true;
             }
@@ -126,6 +122,17 @@ export class Player {
         return -1;
     }
 
+    private highestAffordablePool(): number{
+        let reversedForge = [...this.game.forge].reverse();
+        
+        for(let pool of reversedForge){
+            if(pool.dieFaces.length > 0 && pool.cost < this.gold){
+                return this.game.forge.indexOf(pool);
+            }
+        }
+        return 0;
+    }
+
     private printForge() {
         console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
         for (let dieFacePool of this.game.forge) {
@@ -133,34 +140,54 @@ export class Player {
         }
     }
 
-    private async buyDieFace() {
-        let pool = await this.question("out of which pool are you going to buy (1..10)?");
-        let poolNumber = parseInt(pool + "");
-        let buy = await this.question(`which dieface do you want? (1..${this.game.forge[poolNumber - 1].dieFaces.length})`);
-        let buyNumber = parseInt(buy + "");
+    private async buyAndReplaceDieFace() {
+        let pool = parseInt(await this.questionUntilValidAnswer(`out of which pool are you going to buy (1..${this.highestAffordablePool()+1})?`, ...this.getArrayOfNumberStringsUpTo(this.highestAffordablePool())));
+        const numberOfOptionsInPool = this.game.forge[pool-1].dieFaces.length;
+
+        let buy = parseInt(await this.questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...this.getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
         
-        let bought = this.game.forge[poolNumber-1].dieFaces[buyNumber-1];
-        console.log(`congrats you bought ${this.game.forge[poolNumber - 1].dieFaces[buyNumber - 1]}`);
-        let leftRight = await this.question("on which die you want to forge this lovely dieface? Left (L) or Right (R)");
-        while(leftRight !== 'R' && leftRight !== 'L'){
-            console.log(`${leftRight} is not a valid option`);
-            leftRight = await this.question("on which die you want to forge this lovely dieface? Left (L) or Right (R)");
+        let bought = this.game.forge[pool-1].dieFaces[buy - 1];
+        console.log(`congrats you bought ${bought}`);
+
+        await this.replaceDieFace(bought);
+
+        this.gold -= this.game.forge[pool - 1].cost;
+        this.game.forge[pool - 1].dieFaces = this.game.forge[pool - 1].dieFaces.slice(buy - 1, 1);
+    }
+
+    private getArrayOfNumberStringsUpTo(maxOptions: number): Array<string> {
+        let options: string[] = new Array();
+        for (let i = 1; i <= maxOptions; i++) {
+            options.push(i + "");
         }
-        if(leftRight === 'R'){
+        return options;
+    }
+
+    private async replaceDieFace(bought: DieFaceOption) {
+        let leftRight = await this.questionUntilValidAnswer("on which die you want to forge this lovely dieface? Left (L) or Right (R)", 'R', 'L');
+        if (leftRight === 'R') {
             console.log(`you chose to forge it onto the following die\n${this.rightDie}`);
-        }else if(leftRight === 'L'){
+        } else if (leftRight === 'L') {
             console.log(`you chose to forge it onto the following die\n${this.leftDie}`);
         }
-        let dieFaceToReplace = await this.question("which dieface you want to replace it with? (1..6)");
-        let dieFaceNumberToReplace = parseInt(dieFaceToReplace +"");
-        if(leftRight === 'R'){
-            this.rightDie[dieFaceNumberToReplace-1] = bought;
-        }else if(leftRight === 'L'){
-            this.leftDie[dieFaceNumberToReplace-1] = bought;
-        }
 
-        this.gold -= this.game.forge[poolNumber - 1].cost;
-        this.game.forge[poolNumber - 1].dieFaces = this.game.forge[poolNumber - 1].dieFaces.slice(buyNumber - 1, 1);
+        let dieFaceToReplace = await this.questionUntilValidAnswer("which dieface you want to replace it with? (1..6)", ...this.getArrayOfNumberStringsUpTo(6));
+        let dieFaceNumberToReplace = parseInt(dieFaceToReplace + "");
+        if (leftRight === 'R') {
+            this.rightDie[dieFaceNumberToReplace - 1] = bought;
+        } else if (leftRight === 'L') {
+            this.leftDie[dieFaceNumberToReplace - 1] = bought;
+        }
+    }
+
+    async questionUntilValidAnswer(message: string, ...options: string[]): Promise<string>{
+        options.map(option => option.toUpperCase());
+        let answer = await this.question(message);
+        while(!options.includes((answer + "").toUpperCase())){
+            console.log(`sorry, ${answer} is not valid`);
+            answer = await this.question(message);
+        }
+        return answer + "";
     }
 
     private async question(message: string) {
