@@ -1,7 +1,7 @@
 import { DieFacePool } from "./diefacepool";
 import { DieFaceOption } from "./diefaceoption";
 
-export const AllForgeDieFaces: Array<DieFacePool> = new Array<DieFacePool>(
+export const AllSanctuaryDieFaces: Array<DieFacePool> = new Array<DieFacePool>(
     new DieFacePool(2, [DieFaceOption.GOLD_3, DieFaceOption.GOLD_3, DieFaceOption.GOLD_3, DieFaceOption.GOLD_3]),
     new DieFacePool(2, [DieFaceOption.MOON_1, DieFaceOption.MOON_1, DieFaceOption.MOON_1, DieFaceOption.MOON_1]),
     new DieFacePool(3, [DieFaceOption.GOLD_4, DieFaceOption.GOLD_4, DieFaceOption.GOLD_4, DieFaceOption.GOLD_4]),

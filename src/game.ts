@@ -1,17 +1,17 @@
-import { AllForgeDieFaces } from './data';
+import { AllSanctuaryDieFaces as AllSanctuaryDieFaces } from './data';
 import { DieFacePool } from './diefacepool';
 import { Player } from './player';
 import { shuffle } from './util';
 
 export class Game {
 
-    forge: Array<DieFacePool>;
+    sanctuary: Array<DieFacePool>;
     players: Array<Player>;
 
     GAME_ROUNDS: number = 9;
 
     constructor() {
-        this.forge = new Array();
+        this.sanctuary = new Array();
         this.players = new Array();
     }
 
@@ -22,7 +22,7 @@ export class Game {
             console.log("warning, this game has an extra round");
             this.GAME_ROUNDS = 10;
         }
-        this.initializeForge(numberOfPlayers);
+        this.initializeSanctuary(numberOfPlayers);
         for (let i = 0; i < numberOfPlayers; i++) {
             this.players.push(new Player(3 - i, this));
         }
@@ -54,14 +54,14 @@ export class Game {
         }
     }
 
-    private initializeForge(numberOfPlayers: number) {
-        this.forge = new Array<DieFacePool>;
-        for (let pool of AllForgeDieFaces) {
+    private initializeSanctuary(numberOfPlayers: number) {
+        this.sanctuary = new Array<DieFacePool>;
+        for (let pool of AllSanctuaryDieFaces) {
             shuffle(pool.dieFaces);
             if (numberOfPlayers === 2) {
                 pool.dieFaces = pool.dieFaces.slice(2);
             }
-            this.forge.push(pool);
+            this.sanctuary.push(pool);
         }
     }
 }

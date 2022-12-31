@@ -101,7 +101,7 @@ export class Player {
         let minimumCost = this.lowestAvailableCost();
 
         while(userEnd !== true || (minimumCost !== -1 && this.gold > minimumCost)){
-            this.printForge();
+            this.printSanctuary();
             await this.buyAndReplaceDieFace();
             minimumCost = this.lowestAvailableCost();
 
@@ -114,7 +114,7 @@ export class Player {
     }
 
     private lowestAvailableCost(): number{
-        for(let pool of this.game.forge){
+        for(let pool of this.game.sanctuary){
             if(pool.dieFaces.length > 0){
                 return pool.cost;
             }
@@ -123,36 +123,36 @@ export class Player {
     }
 
     private highestAffordablePool(): number{
-        let reversedForge = [...this.game.forge].reverse();
+        let reversedSanctuary = [...this.game.sanctuary].reverse();
         
-        for(let pool of reversedForge){
+        for(let pool of reversedSanctuary){
             if(pool.dieFaces.length > 0 && pool.cost < this.gold){
-                return this.game.forge.indexOf(pool);
+                return this.game.sanctuary.indexOf(pool);
             }
         }
         return 0;
     }
 
-    private printForge() {
+    private printSanctuary() {
         console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
-        for (let dieFacePool of this.game.forge) {
+        for (let dieFacePool of this.game.sanctuary) {
             console.log(`${dieFacePool}`);
         }
     }
 
     private async buyAndReplaceDieFace() {
         let pool = parseInt(await this.questionUntilValidAnswer(`out of which pool are you going to buy (1..${this.highestAffordablePool()+1})?`, ...this.getArrayOfNumberStringsUpTo(this.highestAffordablePool())));
-        const numberOfOptionsInPool = this.game.forge[pool-1].dieFaces.length;
+        const numberOfOptionsInPool = this.game.sanctuary[pool-1].dieFaces.length;
 
         let buy = parseInt(await this.questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...this.getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
         
-        let bought = this.game.forge[pool-1].dieFaces[buy - 1];
+        let bought = this.game.sanctuary[pool-1].dieFaces[buy - 1];
         console.log(`congrats you bought ${bought}`);
 
         await this.replaceDieFace(bought);
 
-        this.gold -= this.game.forge[pool - 1].cost;
-        this.game.forge[pool - 1].dieFaces = this.game.forge[pool - 1].dieFaces.slice(buy - 1, 1);
+        this.gold -= this.game.sanctuary[pool - 1].cost;
+        this.game.sanctuary[pool - 1].dieFaces = this.game.sanctuary[pool - 1].dieFaces.slice(buy - 1, 1);
     }
 
     private getArrayOfNumberStringsUpTo(maxOptions: number): Array<string> {
