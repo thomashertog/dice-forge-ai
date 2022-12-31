@@ -1,5 +1,7 @@
-import { AllSanctuaryDieFaces as AllSanctuaryDieFaces } from './data';
+import { off } from 'process';
+import { AllSanctuaryDieFaces, AllHeroicFeats } from './data';
 import { DieFacePool } from './diefacepool';
+import { HeroicFeatCard, HeroicFeatPortal } from './heroicfeatcard';
 import { Player } from './player';
 import { shuffle } from './util';
 
@@ -7,12 +9,14 @@ export class Game {
 
     sanctuary: Array<DieFacePool>;
     players: Array<Player>;
+    heroicFeats: Array<HeroicFeatPortal>;
 
     GAME_ROUNDS: number = 9;
 
     constructor() {
         this.sanctuary = new Array();
         this.players = new Array();
+        this.heroicFeats = new Array();
     }
 
     start = async (playerCount: string) => {
@@ -23,6 +27,7 @@ export class Game {
             this.GAME_ROUNDS = 10;
         }
         this.initializeSanctuary(numberOfPlayers);
+        this.initializeHeroicFeats(numberOfPlayers);
         for (let i = 0; i < numberOfPlayers; i++) {
             this.players.push(new Player(3 - i, this));
         }
@@ -62,6 +67,18 @@ export class Game {
                 pool.dieFaces = pool.dieFaces.slice(2);
             }
             this.sanctuary.push(pool);
+        }
+    }
+
+    private initializeHeroicFeats(numberOfPlayers: number){
+        for(let portal of AllHeroicFeats){
+            let cards = new Array<HeroicFeatCard>();
+            for(let card of portal.cards){
+                for(let i = 1; i<=numberOfPlayers; i++){
+                    cards.push(card);
+                }
+            }
+            this.heroicFeats.push(new HeroicFeatPortal(...cards));
         }
     }
 }

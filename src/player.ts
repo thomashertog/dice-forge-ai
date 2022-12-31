@@ -3,9 +3,7 @@ import { DieFaceOption } from './diefaceoption';
 import chalk from 'chalk';
 import * as readline from 'readline';
 import { rawListeners, stdin as input, stdout as output } from 'process';
-import * as util from 'util';
 import { Game } from './game';
-import { DieFacePool } from './diefacepool';
 
 const terminal = readline.createInterface(input, output);
         
@@ -90,6 +88,9 @@ export class Player {
                 await this.forge();
             }else{
                 console.log(`allright, pick any heroic feat available, you have ${this.moon} moon shards and ${this.sun} sun shards available`);
+                for(let portal of this.game.heroicFeats){
+                    console.log(`${portal}`);
+                }
             }
         } catch (err) {
             console.log("WTF, something is wrong here");
