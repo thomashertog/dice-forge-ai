@@ -29,7 +29,7 @@ export class Game {
         this.initializeSanctuary(numberOfPlayers);
         this.initializeHeroicFeats(numberOfPlayers);
         for (let i = 0; i < numberOfPlayers; i++) {
-            this.players.push(new Player(3 - i, this));
+            this.players.push(new Player(3 - i, this, `player ${i+1}`));
         }
 
         for (let round = 1; round <= this.GAME_ROUNDS; round++) {
@@ -44,17 +44,17 @@ export class Game {
     }
 
     private async playTurn(player: Player, round: number): Promise<void> {
-        this.startTurn();
+        await this.startTurn();
         console.log(`starting turn for player in round ${round}`);
         console.log("" + player);
         await player.takeTurn();
     }
 
-    private startTurn = () => {
+    private startTurn = async () => {
         for (let player of this.players) {
-            player.divineBlessing();
+            await player.divineBlessing();
             if (this.players.length === 2) {
-                player.divineBlessing();
+                await player.divineBlessing();
             }
         }
     }
