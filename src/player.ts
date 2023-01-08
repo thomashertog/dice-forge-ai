@@ -2,8 +2,10 @@ import { shuffle } from './util';
 import { DieFaceOption } from './diefaceoption';
 import chalk from 'chalk';
 import * as readline from 'readline';
-import { rawListeners, stdin as input, stdout as output } from 'process';
+import { stdin as input, stdout as output } from 'process';
 import { Game } from './game';
+import { HeroicFeatCard, HeroicFeatPortal } from './heroicfeatcard';
+import { CostType } from './heroicfeatcardtype';
 
 const terminal = readline.createInterface(input, output);
         
@@ -14,6 +16,7 @@ export class Player {
 
     leftDie: Array<DieFaceOption>;
     rightDie: Array<DieFaceOption>;
+    heroicFeats: Array<HeroicFeatCard>;
 
     name: string;
     gold: number;
@@ -48,11 +51,12 @@ export class Player {
             DieFaceOption.GOLD_1,
             DieFaceOption.GOLD_1
         );
+
+        this.heroicFeats = new Array();
     }
 
     toString = () => {
-        return this.name + `\t${this.leftDie}\t${this.rightDie}` +
-        "\n" + chalk.yellow(this.gold) + "\t" + chalk.blue(this.moon) + "\t" + chalk.red(this.sun) + "\t" + chalk.green(this.gloryPoints);
+        return `${this.name}\t${this.leftDie}\t${this.rightDie}\n${chalk.yellow(this.gold)}\t${chalk.blue(this.moon)}\t${chalk.red(this.sun)}\t${chalk.green(this.gloryPoints)}\n${this.heroicFeats}`;
     }
 
     async divineBlessing(): Promise<void> {
@@ -117,15 +121,69 @@ export class Player {
             let answer = await this.questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat", 'F', 'H');
             if(answer.toUpperCase() === 'F'){
                 await this.forge();
-            }else{
-                console.log(`allright, pick any heroic feat available, you have ${this.moon} moon shards and ${this.sun} sun shards available`);
-                for(let portal of this.game.heroicFeats){
-                    console.log(`${portal}`);
-                }
+            }else if(answer.toUpperCase() === 'H'){
+                await this.heroicFeat();
             }
         } catch (err) {
-            console.log("WTF, something is wrong here");
+            console.log(`WTF, something is wrong here\nerr: ${err}`);
         }
+    }
+
+    private async heroicFeat(): Promise<void>{
+        for(let portal of this.game.heroicFeats.entries()){
+            console.log(`${portal[0]}: ${portal[1]}`);
+        }
+
+        console.log(`available platforms: ${this.availablePlatforms()}`);
+        let platform = await this.questionUntilValidAnswer("To which platform do you want to jump?", ...this.availablePlatforms());
+
+        //NOTE: needed for use in filter function
+        let currentPlayer = this;
+
+        let cards = this.game.heroicFeats.get(platform)?.filter(
+            function(card: HeroicFeatCard){
+                switch(card.costType){
+                    case CostType.MOON: return currentPlayer.moon >= card.cost;
+                    case CostType.SUN: return currentPlayer.sun >= card.cost;
+                    case CostType.BOTH: return currentPlayer.moon >= card.cost && currentPlayer.sun >= card.cost;        
+                }
+            }
+        );
+
+        //TODO: validate if able to perform heroic feat based on resources
+        let chosenCardNumber = parseInt(await this.questionUntilValidAnswer(`Which card do you want to buy (1..${cards?.length})`, ...this.getArrayOfNumberStringsUpTo(cards?.length || 0)));
+        let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber - 1, 1)[0];
+        if(chosenCard === undefined){
+            return;
+        }
+        console.log(`${chosenCard}`);
+        this.heroicFeats.push(chosenCard);
+    }
+
+    private availablePlatforms(): Array<string>{
+        let platforms = new Array();
+        if(this.moon >= 1){
+            platforms.push("M1");
+        }
+        if(this.moon >= 2){
+            platforms.push("M2");
+        }
+        if(this.moon >= 4){
+            platforms.push("M3");
+        }
+        if(this.sun >= 1){
+            platforms.push("S1");
+        }
+        if(this.sun >= 2){
+            platforms.push("S2");
+        }
+        if(this.sun >= 4){
+            platforms.push("S3");
+        }
+        if((this.sun >= 5 && this.moon >= 5) || this.sun >= 6 || this.moon >= 6){
+            platforms.push("E");
+        }
+        return platforms;
     }
 
     private async forge(): Promise<void>{

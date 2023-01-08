@@ -1,4 +1,3 @@
-import { off } from 'process';
 import { AllSanctuaryDieFaces, AllHeroicFeats } from './data';
 import { DieFacePool } from './diefacepool';
 import { HeroicFeatCard, HeroicFeatPortal } from './heroicfeatcard';
@@ -9,14 +8,14 @@ export class Game {
 
     sanctuary: Array<DieFacePool>;
     players: Array<Player>;
-    heroicFeats: Array<HeroicFeatPortal>;
+    heroicFeats: Map<String, Array<HeroicFeatCard>>;
 
     GAME_ROUNDS: number = 9;
 
     constructor() {
         this.sanctuary = new Array();
         this.players = new Array();
-        this.heroicFeats = new Array();
+        this.heroicFeats = new Map();
     }
 
     start = async (playerCount: string) => {
@@ -78,7 +77,7 @@ export class Game {
                     cards.push(card);
                 }
             }
-            this.heroicFeats.push(new HeroicFeatPortal(...cards));
+            this.heroicFeats.set(portal.code, cards);
         }
     }
 }

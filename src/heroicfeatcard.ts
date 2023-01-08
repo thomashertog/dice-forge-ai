@@ -3,11 +3,13 @@ import chalk from 'chalk';
 
 export class HeroicFeatCard{
 
+    code: string;
     cost: number;
     costType: CostType;
     cardType: HeroicFeatCardType;
 
-    constructor(cost: number, costType: CostType, cardType: HeroicFeatCardType){
+    constructor(code: string, cost: number, costType: CostType, cardType: HeroicFeatCardType){
+        this.code = code;
         this.cost = cost;
         this.costType = costType;
         this.cardType = cardType;
@@ -26,16 +28,18 @@ export class HeroicFeatCard{
 
 export class HeroicFeatPortal{
 
+    code: string;
     cards: Array<HeroicFeatCard>;
 
-    constructor(...cards: Array<HeroicFeatCard>){
+    constructor(code: string, ...cards: Array<HeroicFeatCard>){
+        this.code = code;
         this.cards = cards;
     }
 
     toString = () => {
-        let result = "";
+        let result = `${this.code}: `;
         for(let card of this.cards){
-            result += `${card}`;
+            result += `\t${card};`;
         }
         return result;
     }
