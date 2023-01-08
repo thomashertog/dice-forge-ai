@@ -17,6 +17,7 @@ export class Player {
     leftDie: Array<DieFaceOption>;
     rightDie: Array<DieFaceOption>;
     heroicFeats: Array<HeroicFeatCard>;
+    currentPlatform: string;
 
     name: string;
     gold: number;
@@ -33,6 +34,7 @@ export class Player {
         this.sun = 0;
         this.moon = 0;
         this.gloryPoints = 0;
+        this.currentPlatform = "";
 
         this.leftDie = new Array<DieFaceOption>(
             DieFaceOption.SUN_1,
