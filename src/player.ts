@@ -68,6 +68,8 @@ export class Player {
 
     async minorBlessing(die: Array<DieFaceOption>): Promise<void> {
         let dieResult = this.rollDie(die);
+        //TODO: indien een keuze geworpen wordt, 
+        //alle resources en worpen van de speler laten zien vooraleer een keuze te laten maken
         switch (dieResult) {
             case DieFaceOption.GOLD_1: this.addGold(1); break;
             case DieFaceOption.GOLD_2_MOON_1: this.addGold(2); this.addMoon(1); break;
@@ -122,6 +124,7 @@ export class Player {
         try {
             let answer = await this.questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat", 'F', 'H');
             if(answer.toUpperCase() === 'F'){
+                //TODO: valideer geen dobbelsteenzijdes uit dezelfde bak tijdens 1 actie
                 await this.forge();
             }else if(answer.toUpperCase() === 'H'){
                 await this.heroicFeat();
@@ -136,6 +139,7 @@ export class Player {
             console.log(`${portal[0]}: ${portal[1]}`);
         }
 
+        //TODO: verdringing
         console.log(`available platforms: ${this.availablePlatforms()}`);
         let platform = await this.questionUntilValidAnswer("To which platform do you want to jump?", ...this.availablePlatforms());
 
@@ -160,6 +164,7 @@ export class Player {
         }
         console.log(`${chosenCard}`);
         this.heroicFeats.push(chosenCard);
+        //TODO: effecten implementeren
     }
 
     private availablePlatforms(): Array<string>{
