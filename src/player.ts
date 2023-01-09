@@ -1,5 +1,5 @@
 import { shuffle } from './util';
-import { DieFaceOption } from './diefaceoption';
+import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import chalk from 'chalk';
 import * as readline from 'readline';
 import { stdin as input, stdout as output } from 'process';
@@ -58,7 +58,7 @@ export class Player {
     }
 
     toString = () => {
-        return `${this.name}\t${this.leftDie}\t${this.rightDie}\n${chalk.yellow(this.gold)}\t${chalk.blue(this.moon)}\t${chalk.red(this.sun)}\t${chalk.green(this.gloryPoints)}\n${this.heroicFeats}`;
+        return `${this.name}\t${this.getDieFacesAsPrettyString("left", this.leftDie)}\t${this.getDieFacesAsPrettyString("right", this.rightDie)}\n${chalk.yellow(this.gold)}\t${chalk.blue(this.moon)}\t${chalk.red(this.sun)}\t${chalk.green(this.gloryPoints)}\n${this.heroicFeats}`;
     }
 
     async divineBlessing(): Promise<void> {
@@ -132,6 +132,7 @@ export class Player {
     }
 
     takeTurn = async () => {
+        console.log(`${this}`);
         try {
             let answer = await this.questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat", 'F', 'H');
             if(answer.toUpperCase() === 'F'){
@@ -263,8 +264,16 @@ export class Player {
     private printSanctuary() {
         console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
         for (let dieFacePool of this.game.sanctuary) {
-            console.log(`${dieFacePool}`);
+            console.log(`${chalk.yellow(dieFacePool.cost)}: ${this.getDieFacesAsPrettyString("", dieFacePool.dieFaces)}`);
         }
+    }
+
+    private getDieFacesAsPrettyString(name: string, dieFaces: Array<DieFaceOption>): string{
+        let print = `${name}: `;
+        for(let face of dieFaces){
+            print += `${printDieFaceOption(face)}, `;
+        }
+        return print;
     }
 
     private async buyAndReplaceDieFace(usedPools: Array<number>): Promise<number> {
