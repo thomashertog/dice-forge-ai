@@ -146,12 +146,27 @@ export class Player {
 
     private async heroicFeat(): Promise<void>{
         for(let portal of this.game.heroicFeats.entries()){
-            console.log(`${portal[0]}: ${portal[1]}`);
+            let platformName = portal[0];
+            for(let player of this.game.players){
+                if(player.currentPlatform === portal[0]){
+                    platformName += ` (${player.name})`;
+                }
+            }
+            console.log(`${platformName}: ${portal[1]}`);
         }
 
-        //TODO: verdringing
         console.log(`available platforms: ${this.availablePlatforms()}`);
         let platform = await this.questionUntilValidAnswer("To which platform do you want to jump?", ...this.availablePlatforms());
+
+        for(let player of this.game.players){
+            if(player.currentPlatform === platform){
+                console.log(`ousting ${player.name}`);
+                player.currentPlatform = "";
+                player.divineBlessing();
+            }
+        }
+
+        this.currentPlatform = platform;
 
         //NOTE: needed for use in filter function
         let currentPlayer = this;
@@ -173,6 +188,11 @@ export class Player {
         }
         console.log(`${chosenCard}`);
         this.heroicFeats.push(chosenCard);
+        switch(chosenCard.costType){
+            case CostType.MOON: this.moon -= chosenCard.cost; break;
+            case CostType.SUN: this.sun -= chosenCard.cost; break;
+            case CostType.BOTH: this.moon -= chosenCard.cost; this.sun -= chosenCard.cost; break;
+        }
         //TODO: effecten implementeren
     }
 
@@ -205,8 +225,6 @@ export class Player {
     private async forge(): Promise<void>{
         let userEnd = false;
         let minimumCost = this.lowestAvailableCost();
-//TODO: valideer geen dobbelsteenzijdes uit dezelfde bak tijdens 1 actie
-        
         let usedPools = new Array();
 
         while(userEnd !== true && (minimumCost !== -1 && this.gold >= minimumCost)){
