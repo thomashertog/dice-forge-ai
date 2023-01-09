@@ -62,62 +62,73 @@ export class Player {
     }
 
     async divineBlessing(): Promise<void> {
-        await this.minorBlessing(this.leftDie);
-        await this.minorBlessing(this.rightDie);
+        let rolls = new Array();
+        rolls.push(this.rollDie(this.leftDie));
+        rolls.push(this.rollDie(this.rightDie));
+        await this.resolveDieRolls(rolls);
     }
 
     async minorBlessing(die: Array<DieFaceOption>): Promise<void> {
-        let dieResult = this.rollDie(die);
-        //TODO: indien een keuze geworpen wordt, 
-        //alle resources en worpen van de speler laten zien vooraleer een keuze te laten maken
-        switch (dieResult) {
-            case DieFaceOption.GOLD_1: this.addGold(1); break;
-            case DieFaceOption.GOLD_2_MOON_1: this.addGold(2); this.addMoon(1); break;
-            case DieFaceOption.GOLD_3: this.addGold(3); break;
-            case DieFaceOption.GOLD_4: this.addGold(4); break;
-            case DieFaceOption.GOLD_6: this.addGold(6); break;
-            case DieFaceOption.GP_2: this.addGloryPoints(2); break;
-            case DieFaceOption.GP_3: this.addGloryPoints(3); break;
-            case DieFaceOption.GP_4: this.addGloryPoints(4); break;
-            case DieFaceOption.MOON_1: this.addMoon(1); break;
-            case DieFaceOption.MOON_2: this.addMoon(2); break;
-            case DieFaceOption.MOON_GP_2: this.addMoon(2); this.addGloryPoints(2);
-            case DieFaceOption.MOON_SUN_GOLD_GP_1: this.addMoon(1); this.addSun(1); this.addGold(1); this.addGloryPoints(1); break;
-            case DieFaceOption.PICK_GOLD_3_GP_2: 
-            console.log(`${this}`);
-            let pickGoldGP = await this.questionUntilValidAnswer("you want the gold (G) or glory points(P)?", 'G', 'P'); 
-            if(pickGoldGP.toUpperCase() === 'G'){
-                this.addGold(3);
-            }else if(pickGoldGP.toUpperCase() === 'P'){
-                this.addGloryPoints(2);
-            }
-            break;
-            case DieFaceOption.PICK_GOLD_MOON_SUN_1: 
-            console.log(`${this}`);
-            let pick1GoldMoonSun = await this.questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S');
-            if(pick1GoldMoonSun.toUpperCase() === 'G'){
-                this.addGold(1);
-            }else if(pick1GoldMoonSun.toUpperCase() === 'M'){
-                this.addMoon(1);
-            }else if(pick1GoldMoonSun.toUpperCase() === 'S'){
-                this.addSun(1);
-            }
-            break;
-            case DieFaceOption.PICK_GOLD_MOON_SUN_2: 
-            console.log(`${this}`);
-            let pick2GoldMoonSun = await this.questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S');
-            if(pick2GoldMoonSun.toUpperCase() === 'G'){
-                this.addGold(2);
-            }else if(pick2GoldMoonSun.toUpperCase() === 'M'){
-                this.addMoon(2);
-            }else if(pick2GoldMoonSun.toUpperCase() === 'S'){
-                this.addSun(2);
-            }
-            break;
-            case DieFaceOption.SUN_1: this.addSun(1); break;
-            case DieFaceOption.SUN_1_GP_1: this.addSun(1); this.addGloryPoints(1); break;
-            case DieFaceOption.SUN_2: this.addSun(2); break;
+        this.resolveDieRolls(new Array(this.rollDie(die)));
+    }
+
+    async resolveDieRolls(rolls: Array<DieFaceOption>): Promise<void>{
+        if(this.rollsWithChoice(rolls)){
+            console.log(`you rolled ${rolls}\ncurrent resources:\n${this}`);
         }
+        for(let roll of rolls){
+            switch (roll) {
+                case DieFaceOption.GOLD_1: this.addGold(1); break;
+                case DieFaceOption.GOLD_2_MOON_1: this.addGold(2); this.addMoon(1); break;
+                case DieFaceOption.GOLD_3: this.addGold(3); break;
+                case DieFaceOption.GOLD_4: this.addGold(4); break;
+                case DieFaceOption.GOLD_6: this.addGold(6); break;
+                case DieFaceOption.GP_2: this.addGloryPoints(2); break;
+                case DieFaceOption.GP_3: this.addGloryPoints(3); break;
+                case DieFaceOption.GP_4: this.addGloryPoints(4); break;
+                case DieFaceOption.MOON_1: this.addMoon(1); break;
+                case DieFaceOption.MOON_2: this.addMoon(2); break;
+                case DieFaceOption.MOON_GP_2: this.addMoon(2); this.addGloryPoints(2);
+                case DieFaceOption.MOON_SUN_GOLD_GP_1: this.addMoon(1); this.addSun(1); this.addGold(1); this.addGloryPoints(1); break;
+                case DieFaceOption.PICK_GOLD_3_GP_2: 
+                let pickGoldGP = await this.questionUntilValidAnswer("you want the gold (G) or glory points(P)?", 'G', 'P'); 
+                if(pickGoldGP.toUpperCase() === 'G'){
+                    this.addGold(3);
+                }else if(pickGoldGP.toUpperCase() === 'P'){
+                    this.addGloryPoints(2);
+                }
+                break;
+                case DieFaceOption.PICK_GOLD_MOON_SUN_1: 
+                let pick1GoldMoonSun = await this.questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S');
+                if(pick1GoldMoonSun.toUpperCase() === 'G'){
+                    this.addGold(1);
+                }else if(pick1GoldMoonSun.toUpperCase() === 'M'){
+                    this.addMoon(1);
+                }else if(pick1GoldMoonSun.toUpperCase() === 'S'){
+                    this.addSun(1);
+                }
+                break;
+                case DieFaceOption.PICK_GOLD_MOON_SUN_2: 
+                let pick2GoldMoonSun = await this.questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S');
+                if(pick2GoldMoonSun.toUpperCase() === 'G'){
+                    this.addGold(2);
+                }else if(pick2GoldMoonSun.toUpperCase() === 'M'){
+                    this.addMoon(2);
+                }else if(pick2GoldMoonSun.toUpperCase() === 'S'){
+                    this.addSun(2);
+                }
+                break;
+                case DieFaceOption.SUN_1: this.addSun(1); break;
+                case DieFaceOption.SUN_1_GP_1: this.addSun(1); this.addGloryPoints(1); break;
+                case DieFaceOption.SUN_2: this.addSun(2); break;
+            }
+        }
+    }
+
+    private rollsWithChoice(rolls: Array<DieFaceOption>): boolean{
+        return rolls.includes(DieFaceOption.PICK_GOLD_3_GP_2) || 
+                    rolls.includes(DieFaceOption.PICK_GOLD_MOON_SUN_1) ||
+                    rolls.includes(DieFaceOption.PICK_GOLD_MOON_SUN_2);
     }
 
     takeTurn = async () => {
@@ -156,7 +167,6 @@ export class Player {
             }
         );
 
-        //TODO: validate if able to perform heroic feat based on resources
         let chosenCardNumber = parseInt(await this.questionUntilValidAnswer(`Which card do you want to buy (1..${cards?.length})`, ...this.getArrayOfNumberStringsUpTo(cards?.length || 0)));
         let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber - 1, 1)[0];
         if(chosenCard === undefined){
