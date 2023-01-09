@@ -135,7 +135,6 @@ export class Player {
         try {
             let answer = await this.questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat", 'F', 'H');
             if(answer.toUpperCase() === 'F'){
-                //TODO: valideer geen dobbelsteenzijdes uit dezelfde bak tijdens 1 actie
                 await this.forge();
             }else if(answer.toUpperCase() === 'H'){
                 await this.heroicFeat();
@@ -206,10 +205,13 @@ export class Player {
     private async forge(): Promise<void>{
         let userEnd = false;
         let minimumCost = this.lowestAvailableCost();
+//TODO: valideer geen dobbelsteenzijdes uit dezelfde bak tijdens 1 actie
+        
+        let usedPools = new Array();
 
         while(userEnd !== true && (minimumCost !== -1 && this.gold >= minimumCost)){
             this.printSanctuary();
-            await this.buyAndReplaceDieFace();
+            usedPools.push(await this.buyAndReplaceDieFace(usedPools));
             minimumCost = this.lowestAvailableCost();
 
             let continueForging = await this.questionUntilValidAnswer("do you want to keep forging? (Y/N)", 'Y', 'N');
@@ -247,8 +249,16 @@ export class Player {
         }
     }
 
-    private async buyAndReplaceDieFace() {
-        let pool = parseInt(await this.questionUntilValidAnswer(`out of which pool are you going to buy (1..${this.highestAffordablePool()})?`, ...this.getArrayOfNumberStringsUpTo(this.highestAffordablePool())));
+    private async buyAndReplaceDieFace(usedPools: Array<number>): Promise<number> {
+        let maxPoolNumber = this.highestAffordablePool();
+        
+        let pool = parseInt(
+            await this.questionUntilValidAnswer(`out of which pool are you going to buy (1..${maxPoolNumber})?`, 
+            ...this.getArrayOfNumberStringsUpTo(maxPoolNumber).filter(
+                function(poolNumber){
+                    return !usedPools.includes(parseInt(poolNumber));
+                }
+            )));
         const numberOfOptionsInPool = this.game.sanctuary[pool-1].dieFaces.length;
 
         let buy = parseInt(await this.questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...this.getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
@@ -260,6 +270,7 @@ export class Player {
 
         this.gold -= this.game.sanctuary[pool - 1].cost;
         this.game.sanctuary[pool - 1].dieFaces.splice(buy - 1, 1);
+        return pool;
     }
 
     private getArrayOfNumberStringsUpTo(maxOptions: number): Array<string> {
