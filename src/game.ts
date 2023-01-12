@@ -1,6 +1,6 @@
 import { AllSanctuaryDieFaces, AllHeroicFeats } from './data';
 import { DieFacePool } from './diefacepool';
-import { HeroicFeatCard, HeroicFeatPortal } from './heroicfeatcard';
+import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { Player } from './player';
 import { shuffle } from './util';
 

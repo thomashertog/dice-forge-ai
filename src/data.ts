@@ -1,7 +1,21 @@
 import { DieFacePool } from "./diefacepool";
 import { DieFaceOption } from "./diefaceoption";
-import { HeroicFeatCard, HeroicFeatPortal } from "./heroicfeatcard";
-import { CostType, HeroicFeatCardType } from "./heroicfeatcardtype";
+import { BlacksmithsHammer } from "./heroicfeats/blacksmithsHammer";
+import { BlackmithsChest } from "./heroicfeats/BlacksmithsChest";
+import { Cancer } from "./heroicfeats/Cancer";
+import { Elder } from "./heroicfeats/Elder";
+import { FerryMan } from "./heroicfeats/Ferryman";
+import { Gorgon } from "./heroicfeats/Gorgon";
+import { GuardiansOwl } from "./heroicfeats/GuardiansOwl";
+import { HelmetOfInvisibility } from "./heroicfeats/HelmetOfInvisibility";
+import { HeroicFeatPortal } from "./heroicfeats/HeroicFeatPortal";
+import { Hydra } from "./heroicfeats/Hydra";
+import { Minotaur } from "./heroicfeats/Minotaur";
+import { MirrorOfTheAbyss } from "./heroicfeats/MirrorOfTheAbyss";
+import { Satyrs } from "./heroicfeats/Satyrs";
+import { SilverHind } from "./heroicfeats/SilverHind";
+import { Sphinx } from "./heroicfeats/Sphinx";
+import { WildSpirits } from "./heroicfeats/WildSpirits";
 
 export const AllSanctuaryDieFaces: Array<DieFacePool> = new Array<DieFacePool>(
     new DieFacePool(2, [DieFaceOption.GOLD_3, DieFaceOption.GOLD_3, DieFaceOption.GOLD_3, DieFaceOption.GOLD_3]),
@@ -21,25 +35,25 @@ export const AllSanctuaryDieFaces: Array<DieFacePool> = new Array<DieFacePool>(
 
 export const AllHeroicFeats: Array<HeroicFeatPortal> = new Array<HeroicFeatPortal>(
     new HeroicFeatPortal("M1",
-        new HeroicFeatCard("H", 1, CostType.MOON, HeroicFeatCardType.BLACKSMITHS_HAMMER), 
-        new HeroicFeatCard("C", 1, CostType.MOON, HeroicFeatCardType.BLACKSMITHS_CHEST)),
+        new BlacksmithsHammer(), 
+        new BlackmithsChest()),
     new HeroicFeatPortal("M2",
-        new HeroicFeatCard("H", 2, CostType.MOON, HeroicFeatCardType.SILVER_HIND),
-        new HeroicFeatCard("S", 3, CostType.MOON, HeroicFeatCardType.SATYRS)),
+        new SilverHind(),
+        new Satyrs()),
     new HeroicFeatPortal("M3",
-        new HeroicFeatCard("F", 4, CostType.MOON, HeroicFeatCardType.FERRYMAN),
-        new HeroicFeatCard("H", 5, CostType.MOON, HeroicFeatCardType.HELMET_OF_INVISIBILITY)),
+        new FerryMan(),
+        new HelmetOfInvisibility()),
     new HeroicFeatPortal("E",
-        new HeroicFeatCard("C", 6, CostType.MOON, HeroicFeatCardType.CANCER),
-        new HeroicFeatCard("H", 5, CostType.BOTH, HeroicFeatCardType.HYDRA),
-        new HeroicFeatCard("S", 6, CostType.SUN, HeroicFeatCardType.SPHINX)),
+        new Cancer(),
+        new Hydra(),
+        new Sphinx()),
     new HeroicFeatPortal("S1",
-        new HeroicFeatCard("E", 1, CostType.SUN, HeroicFeatCardType.THE_ELDER),
-        new HeroicFeatCard("W", 1, CostType.SUN, HeroicFeatCardType.WILD_SPIRITS)),
+        new Elder(),
+        new WildSpirits()),
     new HeroicFeatPortal("S2",
-        new HeroicFeatCard("O", 2, CostType.SUN, HeroicFeatCardType.GUARDIANS_OWL),
-        new HeroicFeatCard("M", 3, CostType.SUN, HeroicFeatCardType.MINOTAUR)),
+        new GuardiansOwl(),
+        new Minotaur),
     new HeroicFeatPortal("S3",
-        new HeroicFeatCard("G", 4, CostType.SUN, HeroicFeatCardType.GORGON),
-        new HeroicFeatCard("M", 5, CostType.SUN, HeroicFeatCardType.MIRROR_OF_THE_ABYSS))
+        new Gorgon(),
+        new MirrorOfTheAbyss())
 );

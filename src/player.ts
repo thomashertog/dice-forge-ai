@@ -4,8 +4,8 @@ import chalk from 'chalk';
 import * as readline from 'readline';
 import { stdin as input, stdout as output } from 'process';
 import { Game } from './game';
-import { HeroicFeatCard, HeroicFeatPortal } from './heroicfeatcard';
-import { CostType } from './heroicfeatcardtype';
+import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
+import { CostType } from './costType';
 
 const terminal = readline.createInterface(input, output);
         
@@ -174,10 +174,10 @@ export class Player {
 
         let cards = this.game.heroicFeats.get(platform)?.filter(
             function(card: HeroicFeatCard){
-                switch(card.costType){
-                    case CostType.MOON: return currentPlayer.moon >= card.cost;
-                    case CostType.SUN: return currentPlayer.sun >= card.cost;
-                    case CostType.BOTH: return currentPlayer.moon >= card.cost && currentPlayer.sun >= card.cost;        
+                switch(card.getCostType()){
+                    case CostType.MOON: return currentPlayer.moon >= card.getCost();
+                    case CostType.SUN: return currentPlayer.sun >= card.getCost();
+                    case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();        
                 }
             }
         );
@@ -189,12 +189,11 @@ export class Player {
         }
         console.log(`${chosenCard}`);
         this.heroicFeats.push(chosenCard);
-        switch(chosenCard.costType){
-            case CostType.MOON: this.moon -= chosenCard.cost; break;
-            case CostType.SUN: this.sun -= chosenCard.cost; break;
-            case CostType.BOTH: this.moon -= chosenCard.cost; this.sun -= chosenCard.cost; break;
+        switch(chosenCard.getCostType()){
+            case CostType.MOON: this.moon -= chosenCard.getCost(); break;
+            case CostType.SUN: this.sun -= chosenCard.getCost(); break;
+            case CostType.BOTH: this.moon -= chosenCard.getCost(); this.sun -= chosenCard.getCost(); break;
         }
-        //TODO: effecten implementeren
     }
 
     private availablePlatforms(): Array<string>{
