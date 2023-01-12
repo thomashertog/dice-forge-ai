@@ -1,8 +1,7 @@
 import { CostType } from "../costType";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
-import { HeroicFeatCard } from "./HeroicFeatCard";
 
-export class Gorgon extends AbstractHeroicFeatCard implements HeroicFeatCard{
+export class Gorgon extends AbstractHeroicFeatCard {
 
     constructor(){
         super(4, CostType.SUN);

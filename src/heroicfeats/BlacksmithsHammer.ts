@@ -3,7 +3,7 @@ import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { HeroicFeatCard } from "./HeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
-export class BlacksmithsHammer extends AbstractHeroicFeatCard implements HeroicFeatCard, InstantEffect{
+export class BlacksmithsHammer extends AbstractHeroicFeatCard implements InstantEffect{
 
     gold: number;
 

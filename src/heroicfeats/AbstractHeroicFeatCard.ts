@@ -1,7 +1,10 @@
 import chalk from "chalk";
 import { CostType } from "../costType";
+import { HeroicFeatCard } from "./HeroicFeatCard";
+import { InstantEffect } from "./InstantEffect";
+import { ReinforcementEffect } from "./ReinforcementEffect";
 
-export abstract class AbstractHeroicFeatCard{
+export abstract class AbstractHeroicFeatCard implements HeroicFeatCard{
 
     cost: number;
     costType: CostType;
@@ -10,6 +13,7 @@ export abstract class AbstractHeroicFeatCard{
         this.cost = cost;
         this.costType = costType;
     }
+    abstract getGloryPointsAtEndOfGame(): number;
 
     getCost(): number{
         return this.cost;
@@ -28,4 +32,5 @@ export abstract class AbstractHeroicFeatCard{
             }
         return result;
     }
+
 }

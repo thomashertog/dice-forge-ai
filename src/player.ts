@@ -1,4 +1,4 @@
-import { shuffle } from './util';
+import { isInstantEffect, isReinforcementEffect, shuffle } from './util';
 import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import chalk from 'chalk';
 import * as readline from 'readline';
@@ -193,6 +193,15 @@ export class Player {
             case CostType.MOON: this.moon -= chosenCard.getCost(); break;
             case CostType.SUN: this.sun -= chosenCard.getCost(); break;
             case CostType.BOTH: this.moon -= chosenCard.getCost(); this.sun -= chosenCard.getCost(); break;
+        }
+
+        if(isInstantEffect(chosenCard)){
+            console.log(chalk.bgGrey(`${chosenCard} has an instant effect`));
+            //TODO: handle instant effect
+        }
+        if(isReinforcementEffect(chosenCard)){
+            console.log(chalk.bgGrey(`${chosenCard} has a reinforcement effect`));
+            //TODO: add reinforcement to players reinforcements
         }
     }
 

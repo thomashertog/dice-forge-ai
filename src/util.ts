@@ -1,4 +1,6 @@
-import { DieFaceOption } from './diefaceoption'
+import { DieFaceOption } from './diefaceoption';
+import { InstantEffect } from './heroicfeats/InstantEffect';
+import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 
 export function shuffle(array: Array<DieFaceOption>) {
     let currentIndex = array.length, randomIndex;
@@ -16,4 +18,12 @@ export function shuffle(array: Array<DieFaceOption>) {
     }
 
     return array;
+}
+
+export function isInstantEffect(arg: any): arg is InstantEffect{
+    return (arg as InstantEffect).handleEffect !== undefined;
+}
+
+export function isReinforcementEffect(arg: any): arg is ReinforcementEffect{
+    return (arg as ReinforcementEffect).handleReinforcement !== undefined;
 }

@@ -3,7 +3,7 @@ import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { HeroicFeatCard } from "./HeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
-export class HelmetOfInvisibility extends AbstractHeroicFeatCard implements HeroicFeatCard, InstantEffect{
+export class HelmetOfInvisibility extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
         super(5, CostType.MOON);

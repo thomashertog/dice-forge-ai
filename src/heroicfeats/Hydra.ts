@@ -1,8 +1,7 @@
 import { CostType } from "../costType";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
-import { HeroicFeatCard } from "./HeroicFeatCard";
 
-export class Hydra extends AbstractHeroicFeatCard implements HeroicFeatCard{
+export class Hydra extends AbstractHeroicFeatCard{
 
     constructor(){
         super(5, CostType.BOTH);
