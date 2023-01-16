@@ -1,18 +1,22 @@
 import chalk from 'chalk';
+import { reject } from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
+import { resolve } from 'path';
 import { CostType } from './costType';
-import { DieFaceOption } from './diefaceoption';
+import { Die } from './Die';
+import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import { Game } from './game';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
-import { getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer, shuffle } from './util';
+import { getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer, shuffle } from './util';
         
 export class Player {
+    
     private MAX_GOLD = 12;
     private MAX_MOON_SUN = 6;
 
-    leftDie: Array<DieFaceOption>;
-    rightDie: Array<DieFaceOption>;
+    leftDie: Die;
+    rightDie: Die;
     heroicFeats: Array<HeroicFeatCard>;
     currentPlatform: string;
 
@@ -30,105 +34,32 @@ export class Player {
         this.name = name;
         this.game = game;
         this.gold = initialGold;
-        this.sun = 1;
+        this.sun = 0;
         this.moon = 0;
         this.gloryPoints = 0;
         this.currentPlatform = "";
         this.reinforcements = new Array();
 
-        this.leftDie = new Array<DieFaceOption>(
-            DieFaceOption.SUN_1,
-            DieFaceOption.GOLD_1,
-            DieFaceOption.GOLD_1,
-            DieFaceOption.GOLD_1,
-            DieFaceOption.GOLD_1,
-            DieFaceOption.GOLD_1,
-        );
+        this.leftDie = new Die(DieFaceOption.SUN_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1);
 
-        this.rightDie = new Array<DieFaceOption>(
-            DieFaceOption.MOON_1,
-            DieFaceOption.GP_2,
-            DieFaceOption.GOLD_1,
-            DieFaceOption.GOLD_1,
-            DieFaceOption.GOLD_1,
-            DieFaceOption.GOLD_1
-        );
+        this.rightDie = new Die(DieFaceOption.MOON_1, DieFaceOption.GP_2, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1);
 
         this.heroicFeats = new Array();
     }
 
     toString = () => {
-        return `${this.name}\t${getDieFacesAsPrettyString("left", this.leftDie)}\t${getDieFacesAsPrettyString("right", this.rightDie)}\nReinforcements: ${this.reinforcements}\n${chalk.yellow(this.gold)}\t${chalk.blue(this.moon)}\t${chalk.red(this.sun)}\t${chalk.green(this.gloryPoints)}\n${this.heroicFeats}`;
+        return `${this.name}\t${getDieFacesAsPrettyString("left", this.leftDie.faces)}\t${getDieFacesAsPrettyString("right", this.rightDie.faces)}\nReinforcements: ${this.reinforcements}\n${this.getResourcesString()}\n${this.heroicFeats}`;
     }
 
     async divineBlessing(): Promise<void> {
-        let rolls = new Array();
-        rolls.push(this.rollDie(this.leftDie));
-        rolls.push(this.rollDie(this.rightDie));
-        await this.resolveDieRolls(rolls);
+        let rolls = new Array<DieFaceOption>();
+        rolls.push(this.leftDie.roll());
+        rolls.push(this.rightDie.roll());
+        await Game.resolveDieRolls(this, rolls);
     }
 
-    async minorBlessing(die: Array<DieFaceOption>): Promise<void> {
-        this.resolveDieRolls(new Array(this.rollDie(die)));
-    }
-
-    async resolveDieRolls(rolls: Array<DieFaceOption>): Promise<void>{
-        if(this.rollsWithChoice(rolls)){
-            console.log(`you rolled ${rolls}\ncurrent resources:\n${this}`);
-        }
-        for(let roll of rolls){
-            switch (roll) {
-                case DieFaceOption.GOLD_1: this.addGold(1); break;
-                case DieFaceOption.GOLD_2_MOON_1: this.addGold(2); this.addMoon(1); break;
-                case DieFaceOption.GOLD_3: this.addGold(3); break;
-                case DieFaceOption.GOLD_4: this.addGold(4); break;
-                case DieFaceOption.GOLD_6: this.addGold(6); break;
-                case DieFaceOption.GP_2: this.addGloryPoints(2); break;
-                case DieFaceOption.GP_3: this.addGloryPoints(3); break;
-                case DieFaceOption.GP_4: this.addGloryPoints(4); break;
-                case DieFaceOption.MOON_1: this.addMoon(1); break;
-                case DieFaceOption.MOON_2: this.addMoon(2); break;
-                case DieFaceOption.MOON_GP_2: this.addMoon(2); this.addGloryPoints(2);
-                case DieFaceOption.MOON_SUN_GOLD_GP_1: this.addMoon(1); this.addSun(1); this.addGold(1); this.addGloryPoints(1); break;
-                case DieFaceOption.PICK_GOLD_3_GP_2: 
-                let pickGoldGP = await (await questionUntilValidAnswer("you want the gold (G) or glory points(P)?", 'G', 'P')).toUpperCase(); 
-                if(pickGoldGP === 'G'){
-                    this.addGold(3);
-                }else if(pickGoldGP === 'P'){
-                    this.addGloryPoints(2);
-                }
-                break;
-                case DieFaceOption.PICK_GOLD_MOON_SUN_1: 
-                let pick1GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
-                if(pick1GoldMoonSun === 'G'){
-                    this.addGold(1);
-                }else if(pick1GoldMoonSun === 'M'){
-                    this.addMoon(1);
-                }else if(pick1GoldMoonSun === 'S'){
-                    this.addSun(1);
-                }
-                break;
-                case DieFaceOption.PICK_GOLD_MOON_SUN_2: 
-                let pick2GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
-                if(pick2GoldMoonSun === 'G'){
-                    this.addGold(2);
-                }else if(pick2GoldMoonSun === 'M'){
-                    this.addMoon(2);
-                }else if(pick2GoldMoonSun === 'S'){
-                    this.addSun(2);
-                }
-                break;
-                case DieFaceOption.SUN_1: this.addSun(1); break;
-                case DieFaceOption.SUN_1_GP_1: this.addSun(1); this.addGloryPoints(1); break;
-                case DieFaceOption.SUN_2: this.addSun(2); break;
-            }
-        }
-    }
-
-    private rollsWithChoice(rolls: Array<DieFaceOption>): boolean{
-        return rolls.includes(DieFaceOption.PICK_GOLD_3_GP_2) || 
-                    rolls.includes(DieFaceOption.PICK_GOLD_MOON_SUN_1) ||
-                    rolls.includes(DieFaceOption.PICK_GOLD_MOON_SUN_2);
+    async minorBlessing(die: Die): Promise<void> {
+        await Game.resolveDieRolls(this, new Array(die.roll()));
     }
 
     takeTurn = async () => {
@@ -185,7 +116,7 @@ export class Player {
             }
         );
 
-        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (1..${cards?.length})`, ...this.getArrayOfNumberStringsUpTo(cards?.length || 0)));
+        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (1..${cards?.length})`, ...getArrayOfNumberStringsUpTo(cards?.length || 0)));
         let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber - 1, 1)[0];
         if(chosenCard === undefined){
             return;
@@ -200,12 +131,11 @@ export class Player {
 
         if(isInstantEffect(chosenCard)){
             console.log(chalk.bgGrey(`${chosenCard} has an instant effect`));
-            //TODO: handle instant effect
+            chosenCard.handleEffect(this);
         }
         if(isReinforcementEffect(chosenCard)){
             console.log(chalk.bgGrey(`${chosenCard} has a reinforcement effect`));
             chosenCard.addToListOfReinforcements(currentPlayer);
-            //TODO: add reinforcement to players reinforcements
         }
     }
 
@@ -239,7 +169,7 @@ export class Player {
         let reinforcementsLeftForTurn = cloneDeep(this.reinforcements) as Array<ReinforcementEffect>;
         while(reinforcementsLeftForTurn.length !== 0){
             let restring = reinforcementsLeftForTurn.map(reinforcement => reinforcement.toString()).join(',');
-            let answer = await questionUntilValidAnswer(`you currently have these reinforcements available\n${restring}\nWhich one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`, ...this.getArrayOfNumberStringsUpTo(reinforcementsLeftForTurn.length), 'P');
+            let answer = await questionUntilValidAnswer(`${this.getResourcesString()}\nyou currently have these reinforcements available\n${restring}\nWhich one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`, ...getArrayOfNumberStringsUpTo(reinforcementsLeftForTurn.length), 'P');
 
             if(answer.toUpperCase() === 'P'){
                 return;
@@ -262,7 +192,7 @@ export class Player {
             usedPools.push(await this.buyAndReplaceDieFace(usedPools));
             minimumCost = this.lowestAvailableCost();
 
-            let continueForging = await questionUntilValidAnswer("do you want to keep forging? (Y/N)", 'Y', 'N');
+            let continueForging = await questionUntilValidAnswer(`You have ${chalk.yellow(this.gold)}\nDo you want to keep forging? (Y/N)`, 'Y', 'N');
             if (continueForging.toUpperCase() === 'N') {
                 userEnd = true;
             }
@@ -302,54 +232,35 @@ export class Player {
         
         let pool = parseInt(
             await questionUntilValidAnswer(`out of which pool are you going to buy (1..${maxPoolNumber})?`, 
-            ...this.getArrayOfNumberStringsUpTo(maxPoolNumber).filter(
+            ...getArrayOfNumberStringsUpTo(maxPoolNumber).filter(
                 function(poolNumber){
                     return !usedPools.includes(parseInt(poolNumber));
                 }
             )));
         const numberOfOptionsInPool = this.game.sanctuary[pool-1].dieFaces.length;
 
-        let buy = parseInt(await questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...this.getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
+        let buy = parseInt(await questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
         
         let bought = this.game.sanctuary[pool-1].dieFaces[buy - 1];
-        console.log(`congrats you bought ${bought}`);
+        console.log(`congrats you bought ${printDieFaceOption(bought)}`);
 
-        await this.replaceDieFace(bought);
+        let die = await this.chooseDieToReplaceDieFace(bought);
+        await die.replaceFace(bought);
 
         this.gold -= this.game.sanctuary[pool - 1].cost;
         this.game.sanctuary[pool - 1].dieFaces.splice(buy - 1, 1);
         return pool;
     }
 
-    private getArrayOfNumberStringsUpTo(maxOptions: number): Array<string> {
-        let options: string[] = new Array();
-        for (let i = 1; i <= maxOptions; i++) {
-            options.push(i + "");
-        }
-        return options;
-    }
-
-    private async replaceDieFace(bought: DieFaceOption) {
-        let leftRight = await (await questionUntilValidAnswer("on which die you want to forge this lovely dieface? Left (L) or Right (R)", 'R', 'L')).toUpperCase();
+    async chooseDieToReplaceDieFace(bought: DieFaceOption): Promise<Die> {
+        let leftRight = await (await questionUntilValidAnswer(`${getDieFacesAsPrettyString('left', this.leftDie.faces)}\t${getDieFacesAsPrettyString('right', this.rightDie.faces)}\non which die you want to forge ${printDieFaceOption(bought)}? Left (L) or Right (R)`, 'R', 'L')).toUpperCase();
         if (leftRight === 'R') {
-            console.log(`you chose to forge it onto the following die\n${this.rightDie}`);
+            return new Promise(resolve => resolve(this.rightDie));
         } else if (leftRight === 'L') {
-            console.log(`you chose to forge it onto the following die\n${this.leftDie}`);
+            return new Promise(resolve => resolve(this.leftDie));
+        } else {
+            return new Promise((resolve, reject) => reject);
         }
-
-        let dieFaceToReplace = parseInt(await questionUntilValidAnswer("which dieface you want to replace it with? (1..6)", ...this.getArrayOfNumberStringsUpTo(6)));
-        if (leftRight === 'R') {
-            this.rightDie[dieFaceToReplace - 1] = bought;
-            console.log(`new die: ${this.rightDie}`);
-        } else if (leftRight === 'L') {
-            this.leftDie[dieFaceToReplace - 1] = bought;
-            console.log(`new die: ${this.leftDie}`);
-        }
-    }
-
-    private rollDie(die: Array<DieFaceOption>): DieFaceOption {
-        shuffle(die);
-        return die[0];
     }
 
     addGold(value: number): void {
@@ -375,5 +286,14 @@ export class Player {
 
     addGloryPoints(value: number): void {
         this.gloryPoints += value;
+    }
+
+    getResourcesString() {
+        return `${chalk.yellow(this.gold)}, ${chalk.blue(this.moon)}, ${chalk.red(this.sun)}, ${chalk.green(this.gloryPoints)}`;
+    }
+
+    extraChest(){
+        this.MAX_GOLD += 4;
+        this.MAX_MOON_SUN += 3;
     }
 }

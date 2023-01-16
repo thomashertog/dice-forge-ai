@@ -1,6 +1,7 @@
 import { CostType } from "../costType";
+import { DieFaceOption } from "../diefaceoption";
+import { Player } from "../player";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
-import { HeroicFeatCard } from "./HeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
 export class HelmetOfInvisibility extends AbstractHeroicFeatCard implements InstantEffect{
@@ -9,8 +10,9 @@ export class HelmetOfInvisibility extends AbstractHeroicFeatCard implements Inst
         super(5, CostType.MOON);
     }
 
-    handleEffect(): void {
-        //TODO
+    async handleEffect(currentPlayer: Player): Promise<void> {
+        let die = await currentPlayer.chooseDieToReplaceDieFace(DieFaceOption.HELMET);
+        die.replaceFace(DieFaceOption.HELMET);
     }
 
     getGloryPointsAtEndOfGame(): number {

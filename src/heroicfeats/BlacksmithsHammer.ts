@@ -1,6 +1,5 @@
 import { CostType } from "../costType";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
-import { HeroicFeatCard } from "./HeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
 export class BlacksmithsHammer extends AbstractHeroicFeatCard implements InstantEffect{

@@ -54,3 +54,11 @@ export function getDieFacesAsPrettyString(name: string, dieFaces: Array<DieFaceO
 async function question(message: string) {
     return new Promise(resolve => {terminal.question(message, resolve);});
 }
+
+export function getArrayOfNumberStringsUpTo(maxOptions: number): Array<string> {
+    let options: string[] = new Array();
+    for (let i = 1; i <= maxOptions; i++) {
+        options.push(i + "");
+    }
+    return options;
+}

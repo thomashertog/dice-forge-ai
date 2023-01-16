@@ -1,4 +1,6 @@
+import { Player } from "../player";
+
 export interface InstantEffect{
 
-    handleEffect(): void;
+    handleEffect(currentPlayer: Player): void;
 }

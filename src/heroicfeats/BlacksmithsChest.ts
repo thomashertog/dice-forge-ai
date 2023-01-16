@@ -1,4 +1,5 @@
 import { CostType } from "../costType";
+import { Player } from "../player";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
@@ -8,8 +9,8 @@ export class BlackmithsChest extends AbstractHeroicFeatCard implements InstantEf
         super(1, CostType.MOON);
     }
 
-    handleEffect(): void {
-        //TODO
+    handleEffect(currentPlayer: Player): void {
+        currentPlayer.extraChest();
     }
 
     getGloryPointsAtEndOfGame(): number {

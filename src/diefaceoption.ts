@@ -18,7 +18,9 @@ export enum DieFaceOption{
     PICK_GOLD_MOON_SUN_2 = "PICK_GOLD_MOON_SUN_2",
     GP_4 = "GP_4",
     MOON_SUN_GOLD_GP_1 = "MOON_SUN_GOLD_GP_1",
-    MOON_GP_2 = "MOON_GP_2"
+    MOON_GP_2 = "MOON_GP_2",
+    HELMET = "HELMET",
+    MIRROR = "MIRROR"
 }
 
 export function printDieFaceOption(option: DieFaceOption): string{
@@ -41,6 +43,8 @@ export function printDieFaceOption(option: DieFaceOption): string{
         case DieFaceOption.GP_4: return chalk.green(4);
         case DieFaceOption.MOON_SUN_GOLD_GP_1: return `${chalk.yellow(1)}+${chalk.blue(1)}+${chalk.red(1)}+${chalk.green(1)}`;
         case DieFaceOption.MOON_GP_2: return `${chalk.green(2)}+${chalk.blue(2)}`;
+        case DieFaceOption.HELMET: return `${chalk.bgGray('x3')}`;
+        case DieFaceOption.MIRROR: return `${chalk.bgCyan(' ')}`;
         default: return option;
     }
 }
