@@ -1,16 +1,13 @@
-import { isInstantEffect, isReinforcementEffect, shuffle } from './util';
-import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import chalk from 'chalk';
-import * as readline from 'readline';
-import { stdin as input, stdout as output } from 'process';
+import cloneDeep from 'lodash/cloneDeep';
+import { CostType } from './costType';
+import { DieFaceOption } from './diefaceoption';
 import { Game } from './game';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
-import { CostType } from './costType';
-
-const terminal = readline.createInterface(input, output);
+import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
+import { getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer, shuffle } from './util';
         
 export class Player {
-
     private MAX_GOLD = 12;
     private MAX_MOON_SUN = 6;
 
@@ -18,6 +15,8 @@ export class Player {
     rightDie: Array<DieFaceOption>;
     heroicFeats: Array<HeroicFeatCard>;
     currentPlatform: string;
+
+    reinforcements: Array<ReinforcementEffect>;
 
     name: string;
     gold: number;
@@ -31,10 +30,11 @@ export class Player {
         this.name = name;
         this.game = game;
         this.gold = initialGold;
-        this.sun = 0;
+        this.sun = 1;
         this.moon = 0;
         this.gloryPoints = 0;
         this.currentPlatform = "";
+        this.reinforcements = new Array();
 
         this.leftDie = new Array<DieFaceOption>(
             DieFaceOption.SUN_1,
@@ -58,7 +58,7 @@ export class Player {
     }
 
     toString = () => {
-        return `${this.name}\t${this.getDieFacesAsPrettyString("left", this.leftDie)}\t${this.getDieFacesAsPrettyString("right", this.rightDie)}\n${chalk.yellow(this.gold)}\t${chalk.blue(this.moon)}\t${chalk.red(this.sun)}\t${chalk.green(this.gloryPoints)}\n${this.heroicFeats}`;
+        return `${this.name}\t${getDieFacesAsPrettyString("left", this.leftDie)}\t${getDieFacesAsPrettyString("right", this.rightDie)}\nReinforcements: ${this.reinforcements}\n${chalk.yellow(this.gold)}\t${chalk.blue(this.moon)}\t${chalk.red(this.sun)}\t${chalk.green(this.gloryPoints)}\n${this.heroicFeats}`;
     }
 
     async divineBlessing(): Promise<void> {
@@ -91,30 +91,30 @@ export class Player {
                 case DieFaceOption.MOON_GP_2: this.addMoon(2); this.addGloryPoints(2);
                 case DieFaceOption.MOON_SUN_GOLD_GP_1: this.addMoon(1); this.addSun(1); this.addGold(1); this.addGloryPoints(1); break;
                 case DieFaceOption.PICK_GOLD_3_GP_2: 
-                let pickGoldGP = await this.questionUntilValidAnswer("you want the gold (G) or glory points(P)?", 'G', 'P'); 
-                if(pickGoldGP.toUpperCase() === 'G'){
+                let pickGoldGP = await (await questionUntilValidAnswer("you want the gold (G) or glory points(P)?", 'G', 'P')).toUpperCase(); 
+                if(pickGoldGP === 'G'){
                     this.addGold(3);
-                }else if(pickGoldGP.toUpperCase() === 'P'){
+                }else if(pickGoldGP === 'P'){
                     this.addGloryPoints(2);
                 }
                 break;
                 case DieFaceOption.PICK_GOLD_MOON_SUN_1: 
-                let pick1GoldMoonSun = await this.questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S');
-                if(pick1GoldMoonSun.toUpperCase() === 'G'){
+                let pick1GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
+                if(pick1GoldMoonSun === 'G'){
                     this.addGold(1);
-                }else if(pick1GoldMoonSun.toUpperCase() === 'M'){
+                }else if(pick1GoldMoonSun === 'M'){
                     this.addMoon(1);
-                }else if(pick1GoldMoonSun.toUpperCase() === 'S'){
+                }else if(pick1GoldMoonSun === 'S'){
                     this.addSun(1);
                 }
                 break;
                 case DieFaceOption.PICK_GOLD_MOON_SUN_2: 
-                let pick2GoldMoonSun = await this.questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S');
-                if(pick2GoldMoonSun.toUpperCase() === 'G'){
+                let pick2GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
+                if(pick2GoldMoonSun === 'G'){
                     this.addGold(2);
-                }else if(pick2GoldMoonSun.toUpperCase() === 'M'){
+                }else if(pick2GoldMoonSun === 'M'){
                     this.addMoon(2);
-                }else if(pick2GoldMoonSun.toUpperCase() === 'S'){
+                }else if(pick2GoldMoonSun === 'S'){
                     this.addSun(2);
                 }
                 break;
@@ -134,10 +134,10 @@ export class Player {
     takeTurn = async () => {
         console.log(`${this}`);
         try {
-            let answer = await this.questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat", 'F', 'H');
-            if(answer.toUpperCase() === 'F'){
+            let answer = await (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat", 'F', 'H')).toUpperCase();
+            if(answer === 'F'){
                 await this.forge();
-            }else if(answer.toUpperCase() === 'H'){
+            }else if(answer === 'H'){
                 await this.heroicFeat();
             }
         } catch (err) {
@@ -157,10 +157,13 @@ export class Player {
         }
 
         console.log(`available platforms: ${this.availablePlatforms()}`);
-        let platform = await this.questionUntilValidAnswer("To which platform do you want to jump?", ...this.availablePlatforms());
+        let platform = await (await questionUntilValidAnswer("To which platform do you want to jump?", ...this.availablePlatforms())).toUpperCase();
 
         for(let player of this.game.players){
-            if(player.currentPlatform === platform){
+            if(player === this){
+                continue;
+            }
+            if(player.currentPlatform.toUpperCase() === platform){
                 console.log(`ousting ${player.name}`);
                 player.currentPlatform = "";
                 player.divineBlessing();
@@ -182,7 +185,7 @@ export class Player {
             }
         );
 
-        let chosenCardNumber = parseInt(await this.questionUntilValidAnswer(`Which card do you want to buy (1..${cards?.length})`, ...this.getArrayOfNumberStringsUpTo(cards?.length || 0)));
+        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (1..${cards?.length})`, ...this.getArrayOfNumberStringsUpTo(cards?.length || 0)));
         let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber - 1, 1)[0];
         if(chosenCard === undefined){
             return;
@@ -201,6 +204,7 @@ export class Player {
         }
         if(isReinforcementEffect(chosenCard)){
             console.log(chalk.bgGrey(`${chosenCard} has a reinforcement effect`));
+            chosenCard.addToListOfReinforcements(currentPlayer);
             //TODO: add reinforcement to players reinforcements
         }
     }
@@ -231,6 +235,23 @@ export class Player {
         return platforms;
     }
 
+    async doReinforcements(): Promise<void> {
+        let reinforcementsLeftForTurn = cloneDeep(this.reinforcements) as Array<ReinforcementEffect>;
+        while(reinforcementsLeftForTurn.length !== 0){
+            let restring = reinforcementsLeftForTurn.map(reinforcement => reinforcement.toString()).join(',');
+            let answer = await questionUntilValidAnswer(`you currently have these reinforcements available\n${restring}\nWhich one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`, ...this.getArrayOfNumberStringsUpTo(reinforcementsLeftForTurn.length), 'P');
+
+            if(answer.toUpperCase() === 'P'){
+                return;
+            }
+
+            let chosenReinforcment = parseInt(answer);
+            if(await reinforcementsLeftForTurn[chosenReinforcment-1].handleReinforcement(this)){
+                reinforcementsLeftForTurn.splice(chosenReinforcment-1, 1);
+            }
+        }
+    }
+
     private async forge(): Promise<void>{
         let userEnd = false;
         let minimumCost = this.lowestAvailableCost();
@@ -241,7 +262,7 @@ export class Player {
             usedPools.push(await this.buyAndReplaceDieFace(usedPools));
             minimumCost = this.lowestAvailableCost();
 
-            let continueForging = await this.questionUntilValidAnswer("do you want to keep forging? (Y/N)", 'Y', 'N');
+            let continueForging = await questionUntilValidAnswer("do you want to keep forging? (Y/N)", 'Y', 'N');
             if (continueForging.toUpperCase() === 'N') {
                 userEnd = true;
             }
@@ -272,23 +293,15 @@ export class Player {
     private printSanctuary() {
         console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
         for (let dieFacePool of this.game.sanctuary) {
-            console.log(`${chalk.yellow(dieFacePool.cost)}: ${this.getDieFacesAsPrettyString("", dieFacePool.dieFaces)}`);
+            console.log(`${chalk.yellow(dieFacePool.cost)}: ${getDieFacesAsPrettyString("", dieFacePool.dieFaces)}`);
         }
-    }
-
-    private getDieFacesAsPrettyString(name: string, dieFaces: Array<DieFaceOption>): string{
-        let print = `${name}: `;
-        for(let face of dieFaces){
-            print += `${printDieFaceOption(face)}, `;
-        }
-        return print;
     }
 
     private async buyAndReplaceDieFace(usedPools: Array<number>): Promise<number> {
         let maxPoolNumber = this.highestAffordablePool();
         
         let pool = parseInt(
-            await this.questionUntilValidAnswer(`out of which pool are you going to buy (1..${maxPoolNumber})?`, 
+            await questionUntilValidAnswer(`out of which pool are you going to buy (1..${maxPoolNumber})?`, 
             ...this.getArrayOfNumberStringsUpTo(maxPoolNumber).filter(
                 function(poolNumber){
                     return !usedPools.includes(parseInt(poolNumber));
@@ -296,7 +309,7 @@ export class Player {
             )));
         const numberOfOptionsInPool = this.game.sanctuary[pool-1].dieFaces.length;
 
-        let buy = parseInt(await this.questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...this.getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
+        let buy = parseInt(await questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...this.getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
         
         let bought = this.game.sanctuary[pool-1].dieFaces[buy - 1];
         console.log(`congrats you bought ${bought}`);
@@ -317,35 +330,21 @@ export class Player {
     }
 
     private async replaceDieFace(bought: DieFaceOption) {
-        let leftRight = await this.questionUntilValidAnswer("on which die you want to forge this lovely dieface? Left (L) or Right (R)", 'R', 'L');
-        if (leftRight.toUpperCase() === 'R') {
+        let leftRight = await (await questionUntilValidAnswer("on which die you want to forge this lovely dieface? Left (L) or Right (R)", 'R', 'L')).toUpperCase();
+        if (leftRight === 'R') {
             console.log(`you chose to forge it onto the following die\n${this.rightDie}`);
-        } else if (leftRight.toUpperCase() === 'L') {
+        } else if (leftRight === 'L') {
             console.log(`you chose to forge it onto the following die\n${this.leftDie}`);
         }
 
-        let dieFaceToReplace = parseInt(await this.questionUntilValidAnswer("which dieface you want to replace it with? (1..6)", ...this.getArrayOfNumberStringsUpTo(6)));
-        if (leftRight.toUpperCase() === 'R') {
+        let dieFaceToReplace = parseInt(await questionUntilValidAnswer("which dieface you want to replace it with? (1..6)", ...this.getArrayOfNumberStringsUpTo(6)));
+        if (leftRight === 'R') {
             this.rightDie[dieFaceToReplace - 1] = bought;
             console.log(`new die: ${this.rightDie}`);
-        } else if (leftRight.toUpperCase() === 'L') {
+        } else if (leftRight === 'L') {
             this.leftDie[dieFaceToReplace - 1] = bought;
             console.log(`new die: ${this.leftDie}`);
         }
-    }
-
-    async questionUntilValidAnswer(message: string, ...options: string[]): Promise<string>{
-        options.map(option => option.toUpperCase());
-        let answer = await this.question(message);
-        while(!options.includes((answer + "").toUpperCase())){
-            console.log(`sorry, ${answer} is not valid`);
-            answer = await this.question(message);
-        }
-        return answer + "";
-    }
-
-    private async question(message: string) {
-        return new Promise(resolve => {terminal.question(message, resolve);});
     }
 
     private rollDie(die: Array<DieFaceOption>): DieFaceOption {
@@ -353,28 +352,28 @@ export class Player {
         return die[0];
     }
 
-    private addGold(value: number): void {
+    addGold(value: number): void {
         this.gold += value;
         if (this.gold > this.MAX_GOLD) {
             this.gold = this.MAX_GOLD;
         }
     }
 
-    private addSun(value: number): void {
+    addSun(value: number): void {
         this.sun += value;
         if (this.sun > this.MAX_MOON_SUN) {
             this.sun = this.MAX_MOON_SUN;
         }
     }
 
-    private addMoon(value: number): void {
+    addMoon(value: number): void {
         this.moon += value;
         if (this.moon > this.MAX_MOON_SUN) {
             this.moon = this.MAX_MOON_SUN;
         }
     }
 
-    private addGloryPoints(value: number): void {
+    addGloryPoints(value: number): void {
         this.gloryPoints += value;
     }
 }

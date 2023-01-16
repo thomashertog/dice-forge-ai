@@ -1,8 +1,6 @@
 import chalk from "chalk";
 import { CostType } from "../costType";
 import { HeroicFeatCard } from "./HeroicFeatCard";
-import { InstantEffect } from "./InstantEffect";
-import { ReinforcementEffect } from "./ReinforcementEffect";
 
 export abstract class AbstractHeroicFeatCard implements HeroicFeatCard{
 

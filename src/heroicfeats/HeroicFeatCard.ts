@@ -1,6 +1,4 @@
 import { CostType } from "../costType";
-import { InstantEffect } from "./InstantEffect";
-import { ReinforcementEffect } from "./ReinforcementEffect";
 
 export interface HeroicFeatCard{
 

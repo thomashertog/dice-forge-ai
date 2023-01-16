@@ -1,4 +1,10 @@
+import { Player } from "../player";
+
 export interface ReinforcementEffect{
 
-    handleReinforcement(): void;
+    toString(): string;
+
+    addToListOfReinforcements(currentPlayer: Player): void;
+
+    handleReinforcement(currentPlayer: Player): Promise<boolean>;
 }

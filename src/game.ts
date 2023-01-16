@@ -1,8 +1,8 @@
-import { AllSanctuaryDieFaces, AllHeroicFeats } from './data';
+import { AllHeroicFeats, AllSanctuaryDieFaces } from './data';
 import { DieFacePool } from './diefacepool';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { Player } from './player';
-import { shuffle } from './util';
+import { questionUntilValidAnswer, shuffle } from './util';
 
 export class Game {
 
@@ -45,10 +45,12 @@ export class Game {
     private async playTurn(player: Player, round: number): Promise<void> {
         await this.startTurn();
         console.log(`starting turn for player in round ${round}`);
+        await player.doReinforcements();
         await player.takeTurn();
         if(player.sun >= 2){
-            let extraTurn = await player.questionUntilValidAnswer(`${player}\nWould you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`, "Y", "N");
+            let extraTurn = await (await questionUntilValidAnswer(`${player}\nWould you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`, "Y", "N")).toUpperCase();
             if(extraTurn === "Y"){
+                player.addSun(-2);
                 await player.takeTurn();
             }
         }
