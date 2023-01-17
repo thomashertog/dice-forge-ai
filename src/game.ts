@@ -90,6 +90,7 @@ export class Game {
     }
 
     static async resolveDieRolls(player: Player, rolls: Array<DieFaceOption>): Promise<void> {
+        console.log(`resolving ${rolls.map(roll => printDieFaceOption(roll))}\ncurrent resources: ${player.getResourcesString()}`)
         if (this.rollsWithChoice(rolls)) {
             console.log(`you rolled ${rolls.map(roll => printDieFaceOption(roll))}\ncurrent resources:\n${player.getResourcesString()}`);
         }
@@ -109,6 +110,8 @@ export class Game {
         for (let roll of rolls) {
             await this.resolveDieRoll(player, roll, helmetActive);
         }
+
+        console.log(`current resources: ${player.getResourcesString()}`)
     }
 
     private static async resolveDieRoll(player: Player, roll: DieFaceOption, helmetActive: boolean) {

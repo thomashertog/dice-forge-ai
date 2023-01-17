@@ -1,14 +1,12 @@
 import chalk from 'chalk';
-import { reject } from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
-import { resolve } from 'path';
 import { CostType } from './costType';
 import { Die } from './Die';
 import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import { Game } from './game';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
-import { getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer, shuffle } from './util';
+import { getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer } from './util';
         
 export class Player {
     
@@ -35,7 +33,7 @@ export class Player {
         this.game = game;
         this.gold = initialGold;
         this.sun = 0;
-        this.moon = 0;
+        this.moon = 5;
         this.gloryPoints = 0;
         this.currentPlatform = "";
         this.reinforcements = new Array();
@@ -90,16 +88,7 @@ export class Player {
         console.log(`available platforms: ${this.availablePlatforms()}`);
         let platform = await (await questionUntilValidAnswer("To which platform do you want to jump?", ...this.availablePlatforms())).toUpperCase();
 
-        for(let player of this.game.players){
-            if(player === this){
-                continue;
-            }
-            if(player.currentPlatform.toUpperCase() === platform){
-                console.log(`ousting ${player.name}`);
-                player.currentPlatform = "";
-                player.divineBlessing();
-            }
-        }
+        this.handleEventualOusting(platform);
 
         this.currentPlatform = platform;
 
@@ -130,12 +119,23 @@ export class Player {
         }
 
         if(isInstantEffect(chosenCard)){
-            console.log(chalk.bgGrey(`${chosenCard} has an instant effect`));
-            chosenCard.handleEffect(this);
+            await chosenCard.handleEffect(this);
         }
         if(isReinforcementEffect(chosenCard)){
-            console.log(chalk.bgGrey(`${chosenCard} has a reinforcement effect`));
             chosenCard.addToListOfReinforcements(currentPlayer);
+        }
+    }
+
+    private handleEventualOusting(platform: string) {
+        for (let player of this.game.players) {
+            if (player === this) {
+                continue;
+            }
+            if (player.currentPlatform.toUpperCase() === platform) {
+                console.log(`ousting ${player.name}`);
+                player.currentPlatform = "";
+                player.divineBlessing();
+            }
         }
     }
 
@@ -175,9 +175,9 @@ export class Player {
                 return;
             }
 
-            let chosenReinforcment = parseInt(answer);
-            if(await reinforcementsLeftForTurn[chosenReinforcment-1].handleReinforcement(this)){
-                reinforcementsLeftForTurn.splice(chosenReinforcment-1, 1);
+            let chosenReinforcement = parseInt(answer);
+            if(await reinforcementsLeftForTurn[chosenReinforcement-1].handleReinforcement(this)){
+                reinforcementsLeftForTurn.splice(chosenReinforcement-1, 1);
             }
         }
     }
