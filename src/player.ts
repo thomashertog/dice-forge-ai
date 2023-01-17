@@ -32,8 +32,8 @@ export class Player {
         this.name = name;
         this.game = game;
         this.gold = initialGold;
-        this.sun = 0;
-        this.moon = 5;
+        this.sun = 5;
+        this.moon = 0;
         this.gloryPoints = 0;
         this.currentPlatform = "";
         this.reinforcements = new Array();
@@ -49,15 +49,22 @@ export class Player {
         return `${this.name}\t${getDieFacesAsPrettyString("left", this.leftDie.faces)}\t${getDieFacesAsPrettyString("right", this.rightDie.faces)}\nReinforcements: ${this.reinforcements}\n${this.getResourcesString()}\n${this.heroicFeats}`;
     }
 
-    async divineBlessing(): Promise<void> {
-        let rolls = new Array<DieFaceOption>();
+    async receiveDivineBlessing(): Promise<void> {
+        let rolls = this.divineBlessing();
+        await this.game.resolveDieRolls(this, rolls);
+    }
+
+    divineBlessing(): Array<DieFaceOption>{
+        let rolls = new Array<DieFaceOption>;
+
         rolls.push(this.leftDie.roll());
         rolls.push(this.rightDie.roll());
-        await Game.resolveDieRolls(this, rolls);
+
+        return rolls;
     }
 
     async minorBlessing(die: Die): Promise<void> {
-        await Game.resolveDieRolls(this, new Array(die.roll()));
+        await this.game.resolveDieRolls(this, new Array(die.roll()));
     }
 
     takeTurn = async () => {
@@ -134,7 +141,7 @@ export class Player {
             if (player.currentPlatform.toUpperCase() === platform) {
                 console.log(`ousting ${player.name}`);
                 player.currentPlatform = "";
-                player.divineBlessing();
+                player.receiveDivineBlessing();
             }
         }
     }

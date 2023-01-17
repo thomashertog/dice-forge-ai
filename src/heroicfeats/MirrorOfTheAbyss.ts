@@ -10,8 +10,9 @@ export class MirrorOfTheAbyss extends AbstractHeroicFeatCard implements InstantE
         super(5, CostType.SUN);
     }
 
-    handleEffect(currentPlayer: Player): void {
-        currentPlayer.chooseDieToReplaceDieFace(DieFaceOption.MIRROR);
+    async handleEffect(currentPlayer: Player): Promise<void> {
+        let die = await currentPlayer.chooseDieToReplaceDieFace(DieFaceOption.MIRROR);
+        await die.replaceFace(DieFaceOption.MIRROR);
     }
 
     getGloryPointsAtEndOfGame(): number {

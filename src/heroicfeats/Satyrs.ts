@@ -30,7 +30,7 @@ export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
         let rollsToResolve = new Array<DieFaceOption>;
         rollsToResolve.push(rolls[parseInt(first)-1]);
         rollsToResolve.push(rolls[parseInt(second)-1]);
-        Game.resolveDieRolls(currentPlayer, rollsToResolve); 
+        currentPlayer.game.resolveDieRolls(currentPlayer, rollsToResolve); 
     }
 
     getGloryPointsAtEndOfGame(): number {

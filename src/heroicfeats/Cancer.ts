@@ -10,8 +10,8 @@ export class Cancer extends AbstractHeroicFeatCard implements InstantEffect{
     }
 
     handleEffect(currentPlayer: Player): void {
-        currentPlayer.divineBlessing();
-        currentPlayer.divineBlessing();
+        currentPlayer.receiveDivineBlessing();
+        currentPlayer.receiveDivineBlessing();
     }
 
     getGloryPointsAtEndOfGame(): number {
