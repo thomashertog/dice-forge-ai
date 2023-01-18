@@ -2,6 +2,7 @@ import { CostType } from "../costType";
 import { DieFaceOption, printDieFaceOption } from "../diefaceoption";
 import { Game } from "../game";
 import { Player } from "../player";
+import { ResolveMode } from "../ResolveMode";
 import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
@@ -30,7 +31,7 @@ export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
         let rollsToResolve = new Array<DieFaceOption>;
         rollsToResolve.push(rolls[parseInt(first)-1]);
         rollsToResolve.push(rolls[parseInt(second)-1]);
-        currentPlayer.game.resolveDieRolls(currentPlayer, rollsToResolve); 
+        currentPlayer.game.resolveDieRolls(currentPlayer, rollsToResolve, ResolveMode.ADD); 
     }
 
     getGloryPointsAtEndOfGame(): number {

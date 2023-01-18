@@ -3,6 +3,7 @@ import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import { DieFacePool } from './diefacepool';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { Player } from './player';
+import { ResolveMode } from './ResolveMode';
 import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer, shuffle } from './util';
 
 export class Game {
@@ -76,7 +77,7 @@ export class Game {
         }
 
         for (let rollsForPlayer of rollsForPlayers.entries()) {
-            await this.resolveDieRolls(rollsForPlayer[0], rollsForPlayer[1]);
+            await this.resolveDieRolls(rollsForPlayer[0], rollsForPlayer[1], ResolveMode.ADD);
         }
         return rollsForPlayers;
     }
@@ -132,12 +133,13 @@ export class Game {
         }
     }
 
-    async resolveDieRolls(player: Player, rolls: Array<DieFaceOption>): Promise<void> {
+    async resolveDieRolls(player: Player, rolls: Array<DieFaceOption>, mode: ResolveMode): Promise<void> {
         if (this.rollsWithChoice(rolls)) {
             console.log(`you rolled ${rolls.map(roll => printDieFaceOption(roll))}\ncurrent resources:\n${player.getResourcesString()}`);
             await this.handleMirrorRolls(rolls, player);
         }
 
+        let multiplier = 1;
         let helmetActive = false;
 
         for (let roll of rolls) {
@@ -148,10 +150,15 @@ export class Game {
 
         if (helmetActive) {
             rolls.splice(rolls.indexOf(DieFaceOption.HELMET), 1);
+            multiplier = 3;
+        }
+
+        if(mode === ResolveMode.SUBTRACT){
+            multiplier *= -1;
         }
 
         for (let roll of rolls) {
-            await this.resolveDieRoll(player, roll, helmetActive);
+            await this.resolveDieRoll(player, roll, multiplier);
         }
 
         if(this.rollsWithChoice(rolls)){
@@ -159,51 +166,52 @@ export class Game {
         }
     }
 
-    private async resolveDieRoll(currentPlayer: Player, roll: DieFaceOption, helmetActive: boolean) {
+    private async resolveDieRoll(currentPlayer: Player, roll: DieFaceOption, multiplier: number) {
         switch (roll) {
-            case DieFaceOption.GOLD_1: currentPlayer.addGold(helmetActive ? 3 : 1); break;
-            case DieFaceOption.GOLD_2_MOON_1: currentPlayer.addGold(2); currentPlayer.addMoon(helmetActive ? 3 : 1); break;
-            case DieFaceOption.GOLD_3: currentPlayer.addGold(helmetActive ? 9 : 3); break;
-            case DieFaceOption.GOLD_4: currentPlayer.addGold(helmetActive ? 12 : 4); break;
-            case DieFaceOption.GOLD_6: currentPlayer.addGold(helmetActive ? 18 : 6); break;
-            case DieFaceOption.GP_2: currentPlayer.addGloryPoints(helmetActive ? 6 : 2); break;
-            case DieFaceOption.GP_3: currentPlayer.addGloryPoints(helmetActive ? 9 : 3); break;
-            case DieFaceOption.GP_4: currentPlayer.addGloryPoints(helmetActive ? 12 : 4); break;
-            case DieFaceOption.MOON_1: currentPlayer.addMoon(helmetActive ? 3 : 1); break;
-            case DieFaceOption.MOON_2: currentPlayer.addMoon(helmetActive ? 6 : 2); break;
-            case DieFaceOption.MOON_GP_2: currentPlayer.addMoon(helmetActive ? 6 : 2); currentPlayer.addGloryPoints(helmetActive ? 6 : 2); break;
-            case DieFaceOption.MOON_SUN_GOLD_GP_1: currentPlayer.addMoon(helmetActive ? 3 : 1); currentPlayer.addSun(helmetActive ? 3 : 1); currentPlayer.addGold(helmetActive ? 3 : 1); currentPlayer.addGloryPoints(helmetActive ? 3 : 1); break;
+            case DieFaceOption.GOLD_1: 
+            currentPlayer.addGold(multiplier * 1); break;
+            case DieFaceOption.GOLD_2_MOON_1: currentPlayer.addGold(multiplier * 2); currentPlayer.addMoon(multiplier * 1); break;
+            case DieFaceOption.GOLD_3: currentPlayer.addGold(multiplier * 3); break;
+            case DieFaceOption.GOLD_4: currentPlayer.addGold(multiplier * 4); break;
+            case DieFaceOption.GOLD_6: currentPlayer.addGold(multiplier * 6); break;
+            case DieFaceOption.GP_2: currentPlayer.addGloryPoints(multiplier * 2); break;
+            case DieFaceOption.GP_3: currentPlayer.addGloryPoints(multiplier * 3); break;
+            case DieFaceOption.GP_4: currentPlayer.addGloryPoints(multiplier * 4); break;
+            case DieFaceOption.MOON_1: currentPlayer.addMoon(multiplier * 1); break;
+            case DieFaceOption.MOON_2: currentPlayer.addMoon(multiplier * 2); break;
+            case DieFaceOption.MOON_GP_2: currentPlayer.addMoon(multiplier * 2); currentPlayer.addGloryPoints(multiplier * 2); break;
+            case DieFaceOption.MOON_SUN_GOLD_GP_1: currentPlayer.addMoon(multiplier * 1); currentPlayer.addSun(multiplier * 1); currentPlayer.addGold(multiplier * 1); currentPlayer.addGloryPoints(multiplier * 1); break;
             case DieFaceOption.PICK_GOLD_3_GP_2:
                 let pickGoldGP = await (await questionUntilValidAnswer(`current resources: ${currentPlayer.getResourcesString()} you want the gold (G) or glory points(P)?`, 'G', 'P')).toUpperCase();
                 if (pickGoldGP === 'G') {
-                    currentPlayer.addGold(helmetActive ? 9 : 3);
+                    currentPlayer.addGold(multiplier * 3);
                 } else if (pickGoldGP === 'P') {
-                    currentPlayer.addGloryPoints(helmetActive ? 6 : 2);
+                    currentPlayer.addGloryPoints(multiplier * 2);
                 }
                 break;
             case DieFaceOption.PICK_GOLD_MOON_SUN_1:
                 let pick1GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
                 if (pick1GoldMoonSun === 'G') {
-                    currentPlayer.addGold(helmetActive ? 3 : 1);
+                    currentPlayer.addGold(multiplier * 1);
                 } else if (pick1GoldMoonSun === 'M') {
-                    currentPlayer.addMoon(helmetActive ? 3 : 1);
+                    currentPlayer.addMoon(multiplier * 1);
                 } else if (pick1GoldMoonSun === 'S') {
-                    currentPlayer.addSun(helmetActive ? 3 : 1);
+                    currentPlayer.addSun(multiplier * 1);
                 }
                 break;
             case DieFaceOption.PICK_GOLD_MOON_SUN_2:
                 let pick2GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
                 if (pick2GoldMoonSun === 'G') {
-                    currentPlayer.addGold(helmetActive ? 6 : 2);
+                    currentPlayer.addGold(multiplier * 2);
                 } else if (pick2GoldMoonSun === 'M') {
-                    currentPlayer.addMoon(helmetActive ? 6 : 2);
+                    currentPlayer.addMoon(multiplier * 2);
                 } else if (pick2GoldMoonSun === 'S') {
-                    currentPlayer.addSun(helmetActive ? 6 : 2);
+                    currentPlayer.addSun(multiplier * 2);
                 }
                 break;
-            case DieFaceOption.SUN_1: currentPlayer.addSun(helmetActive ? 3 : 1); break;
-            case DieFaceOption.SUN_1_GP_1: currentPlayer.addSun(helmetActive ? 3 : 1); currentPlayer.addGloryPoints(helmetActive ? 3 : 1); break;
-            case DieFaceOption.SUN_2: currentPlayer.addSun(helmetActive ? 6 : 2); break;
+            case DieFaceOption.SUN_1: currentPlayer.addSun(multiplier * 1); break;
+            case DieFaceOption.SUN_1_GP_1: currentPlayer.addSun(multiplier * 1); currentPlayer.addGloryPoints(multiplier * 1); break;
+            case DieFaceOption.SUN_2: currentPlayer.addSun(multiplier * 2); break;
         }
     }
 

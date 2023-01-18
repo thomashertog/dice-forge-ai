@@ -1,4 +1,6 @@
 import { CostType } from "../costType";
+import { Player } from "../player";
+import { ResolveMode } from "../ResolveMode";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
@@ -8,8 +10,14 @@ export class Minotaur extends AbstractHeroicFeatCard implements InstantEffect{
         super(3, CostType.SUN);
     }
 
-    handleEffect(): void {
-        //TODO
+    async handleEffect(currentPlayer: Player): Promise<void> {
+        for(let player of currentPlayer.game.players){
+            if(player === currentPlayer){
+                continue;
+            }
+            let rolls = player.divineBlessing();
+            await player.game.resolveDieRolls(player, rolls, ResolveMode.SUBTRACT);
+        }
     }
 
     getGloryPointsAtEndOfGame(): number {

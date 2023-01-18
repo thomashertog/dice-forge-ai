@@ -6,6 +6,7 @@ import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import { Game } from './game';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
+import { ResolveMode } from './ResolveMode';
 import { getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer } from './util';
         
 export class Player {
@@ -32,8 +33,8 @@ export class Player {
         this.name = name;
         this.game = game;
         this.gold = initialGold;
-        this.sun = 0;
-        this.moon = 1;
+        this.sun = 3;
+        this.moon = 0;
         this.gloryPoints = 0;
         this.currentPlatform = "";
         this.reinforcements = new Array();
@@ -51,7 +52,7 @@ export class Player {
 
     async receiveDivineBlessing(): Promise<void> {
         let rolls = this.divineBlessing();
-        await this.game.resolveDieRolls(this, rolls);
+        await this.game.resolveDieRolls(this, rolls, ResolveMode.ADD);
     }
 
     divineBlessing(): Array<DieFaceOption>{
@@ -64,7 +65,7 @@ export class Player {
     }
 
     async minorBlessing(die: Die): Promise<void> {
-        await this.game.resolveDieRolls(this, new Array(die.roll()));
+        await this.game.resolveDieRolls(this, new Array(die.roll()), ResolveMode.ADD);
     }
 
     takeTurn = async () => {
