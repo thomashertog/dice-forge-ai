@@ -32,8 +32,8 @@ export class Player {
         this.name = name;
         this.game = game;
         this.gold = initialGold;
-        this.sun = 5;
-        this.moon = 0;
+        this.sun = 0;
+        this.moon = 1;
         this.gloryPoints = 0;
         this.currentPlatform = "";
         this.reinforcements = new Array();
@@ -296,7 +296,7 @@ export class Player {
     }
 
     getResourcesString() {
-        return `${chalk.yellow(this.gold)}, ${chalk.blue(this.moon)}, ${chalk.red(this.sun)}, ${chalk.green(this.gloryPoints)}`;
+        return `${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}, ${chalk.blue(this.moon)}/${chalk.blue(this.MAX_MOON_SUN)}, ${chalk.red(this.sun)}/${chalk.red(this.MAX_MOON_SUN)}, ${chalk.green(this.gloryPoints)}`;
     }
 
     extraChest(){

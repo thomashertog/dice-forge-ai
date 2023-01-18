@@ -1,4 +1,3 @@
-import { format } from 'path';
 import { AllHeroicFeats, AllSanctuaryDieFaces } from './data';
 import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import { DieFacePool } from './diefacepool';
