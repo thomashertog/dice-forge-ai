@@ -4,6 +4,7 @@ import { CostType } from './costType';
 import { Die } from './Die';
 import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import { Game } from './game';
+import { AbstractHeroicFeatCard } from './heroicfeats/AbstractHeroicFeatCard';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 import { ResolveMode } from './ResolveMode';
@@ -33,7 +34,7 @@ export class Player {
         this.name = name;
         this.game = game;
         this.gold = initialGold;
-        this.sun = 0;
+        this.sun = 6;
         this.moon = 0;
         this.gloryPoints = 0;
         this.currentPlatform = "";
@@ -103,8 +104,8 @@ export class Player {
         //NOTE: needed for use in filter function
         let currentPlayer = this;
 
-        //TODO: filtering/validation of buyable cards
-        let cards = this.game.heroicFeats.get(platform)?.filter(
+        let allCardsOfPlatform = cloneDeep(this.game.heroicFeats.get(platform)) || [];
+        let firstIndex = allCardsOfPlatform?.findIndex(
             function(card: HeroicFeatCard){
                 switch(card.getCostType()){
                     case CostType.MOON: return currentPlayer.moon >= card.getCost();
@@ -114,8 +115,30 @@ export class Player {
             }
         );
 
-        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (1..${cards?.length})`, ...getArrayOfNumberStringsUpTo(cards?.length || 0)));
-        let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber - 1, 1)[0];
+        let lastIndex = allCardsOfPlatform?.length -1 - allCardsOfPlatform?.reverse().findIndex(
+            function(card: HeroicFeatCard){
+                switch(card.getCostType()){
+                    case CostType.MOON: return currentPlayer.moon >= card.getCost();
+                    case CostType.SUN: return currentPlayer.sun >= card.getCost();
+                    case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();        
+                }
+            }
+        );
+    
+        //TODO: filtering/validation of buyable cards
+        // let cards = this.game.heroicFeats.get(platform)?.filter(
+        //     function(card: HeroicFeatCard){
+        //         switch(card.getCostType()){
+        //             case CostType.MOON: return currentPlayer.moon >= card.getCost();
+        //             case CostType.SUN: return currentPlayer.sun >= card.getCost();
+        //             case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();        
+        //         }
+        //     }
+        // );
+
+        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (${firstIndex + 1}..${lastIndex + 1})`, ...getArrayOfNumberStringsUpTo(lastIndex - firstIndex || 0, firstIndex)));
+        
+        let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber -1, 1)[0];
         if(chosenCard === undefined){
             return;
         }
