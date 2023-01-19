@@ -36,6 +36,17 @@ export class Game {
         for (let round = 1; round <= this.GAME_ROUNDS; round++) {
             await this.playRound(round);
         }
+
+        let playersWithScores = new Map<string, number>;
+
+        for(let player of this.players){
+            for(let heroicFeat of player.heroicFeats){
+                player.addGloryPoints(heroicFeat.getGloryPointsAtEndOfGame());
+            }
+            playersWithScores.set(player.name, player.gloryPoints);            
+        }
+
+        console.log(playersWithScores);
     }
 
     private async playRound(round: number): Promise<void> {

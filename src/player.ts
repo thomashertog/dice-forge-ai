@@ -33,7 +33,7 @@ export class Player {
         this.name = name;
         this.game = game;
         this.gold = initialGold;
-        this.sun = 3;
+        this.sun = 0;
         this.moon = 0;
         this.gloryPoints = 0;
         this.currentPlatform = "";
@@ -103,6 +103,7 @@ export class Player {
         //NOTE: needed for use in filter function
         let currentPlayer = this;
 
+        //TODO: filtering/validation of buyable cards
         let cards = this.game.heroicFeats.get(platform)?.filter(
             function(card: HeroicFeatCard){
                 switch(card.getCostType()){
@@ -276,12 +277,18 @@ export class Player {
         if (this.gold > this.MAX_GOLD) {
             this.gold = this.MAX_GOLD;
         }
+        if (this.gold < 0){
+            this.gold = 0;
+        }
     }
 
     addSun(value: number): void {
         this.sun += value;
         if (this.sun > this.MAX_MOON_SUN) {
             this.sun = this.MAX_MOON_SUN;
+        }
+        if (this.sun < 0){
+            this.sun = 0
         }
     }
 
@@ -290,10 +297,16 @@ export class Player {
         if (this.moon > this.MAX_MOON_SUN) {
             this.moon = this.MAX_MOON_SUN;
         }
+        if(this.moon < 0){
+            this.moon = 0;
+        }
     }
 
     addGloryPoints(value: number): void {
         this.gloryPoints += value;
+        if(this.gloryPoints < 0){
+            this.gloryPoints = 0;
+        }
     }
 
     getResourcesString() {
