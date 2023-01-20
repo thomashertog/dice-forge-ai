@@ -180,22 +180,22 @@ export class Game {
     private async resolveDieRoll(currentPlayer: Player, roll: DieFaceOption, multiplier: number) {
         switch (roll) {
             case DieFaceOption.GOLD_1: 
-            currentPlayer.addGold(multiplier * 1); break;
-            case DieFaceOption.GOLD_2_MOON_1: currentPlayer.addGold(multiplier * 2); currentPlayer.addMoon(multiplier * 1); break;
-            case DieFaceOption.GOLD_3: currentPlayer.addGold(multiplier * 3); break;
-            case DieFaceOption.GOLD_4: currentPlayer.addGold(multiplier * 4); break;
-            case DieFaceOption.GOLD_6: currentPlayer.addGold(multiplier * 6); break;
+            await currentPlayer.addGold(multiplier * 1); break;
+            case DieFaceOption.GOLD_2_MOON_1: await currentPlayer.addGold(multiplier * 2); currentPlayer.addMoon(multiplier * 1); break;
+            case DieFaceOption.GOLD_3: await currentPlayer.addGold(multiplier * 3); break;
+            case DieFaceOption.GOLD_4: await currentPlayer.addGold(multiplier * 4); break;
+            case DieFaceOption.GOLD_6: await currentPlayer.addGold(multiplier * 6); break;
             case DieFaceOption.GP_2: currentPlayer.addGloryPoints(multiplier * 2); break;
             case DieFaceOption.GP_3: currentPlayer.addGloryPoints(multiplier * 3); break;
             case DieFaceOption.GP_4: currentPlayer.addGloryPoints(multiplier * 4); break;
             case DieFaceOption.MOON_1: currentPlayer.addMoon(multiplier * 1); break;
             case DieFaceOption.MOON_2: currentPlayer.addMoon(multiplier * 2); break;
             case DieFaceOption.MOON_GP_2: currentPlayer.addMoon(multiplier * 2); currentPlayer.addGloryPoints(multiplier * 2); break;
-            case DieFaceOption.MOON_SUN_GOLD_GP_1: currentPlayer.addMoon(multiplier * 1); currentPlayer.addSun(multiplier * 1); currentPlayer.addGold(multiplier * 1); currentPlayer.addGloryPoints(multiplier * 1); break;
+            case DieFaceOption.MOON_SUN_GOLD_GP_1: currentPlayer.addMoon(multiplier * 1); currentPlayer.addSun(multiplier * 1); await currentPlayer.addGold(multiplier * 1); currentPlayer.addGloryPoints(multiplier * 1); break;
             case DieFaceOption.PICK_GOLD_3_GP_2:
                 let pickGoldGP = await (await questionUntilValidAnswer(`current resources: ${currentPlayer.getResourcesString()} you want the gold (G) or glory points(P)?`, 'G', 'P')).toUpperCase();
                 if (pickGoldGP === 'G') {
-                    currentPlayer.addGold(multiplier * 3);
+                    await currentPlayer.addGold(multiplier * 3);
                 } else if (pickGoldGP === 'P') {
                     currentPlayer.addGloryPoints(multiplier * 2);
                 }
@@ -203,7 +203,7 @@ export class Game {
             case DieFaceOption.PICK_GOLD_MOON_SUN_1:
                 let pick1GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
                 if (pick1GoldMoonSun === 'G') {
-                    currentPlayer.addGold(multiplier * 1);
+                    await currentPlayer.addGold(multiplier * 1);
                 } else if (pick1GoldMoonSun === 'M') {
                     currentPlayer.addMoon(multiplier * 1);
                 } else if (pick1GoldMoonSun === 'S') {
@@ -213,7 +213,7 @@ export class Game {
             case DieFaceOption.PICK_GOLD_MOON_SUN_2:
                 let pick2GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
                 if (pick2GoldMoonSun === 'G') {
-                    currentPlayer.addGold(multiplier * 2);
+                    await currentPlayer.addGold(multiplier * 2);
                 } else if (pick2GoldMoonSun === 'M') {
                     currentPlayer.addMoon(multiplier * 2);
                 } else if (pick2GoldMoonSun === 'S') {

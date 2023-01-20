@@ -1,4 +1,5 @@
 import { CostType } from "../costType";
+import { Player } from "../player";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
@@ -11,8 +12,8 @@ export class BlacksmithsHammer extends AbstractHeroicFeatCard implements Instant
         this.gold = 0;
     }
 
-    handleEffect(): void {
-        //TODO
+    async handleEffect(currentPlayer: Player): Promise<void> {
+        currentPlayer.activeHammerCount += 1;
     }
 
     getGloryPointsAtEndOfGame(): number {

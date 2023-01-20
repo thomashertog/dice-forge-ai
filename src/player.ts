@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { max } from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
 import { CostType } from './costType';
 import { Die } from './Die';
@@ -23,6 +24,8 @@ export class Player {
     reinforcements: Array<ReinforcementEffect>;
 
     name: string;
+    activeHammerCount: number;
+    goldForHammer: number;
     gold: number;
     moon: number;
     sun: number;
@@ -33,8 +36,10 @@ export class Player {
     constructor(initialGold: number, game: Game, name: string) {
         this.name = name;
         this.game = game;
+        this.activeHammerCount = 0;
+        this.goldForHammer = 0;
         this.gold = initialGold;
-        this.sun = 6;
+        this.sun = 0;
         this.moon = 0;
         this.gloryPoints = 0;
         this.currentPlatform = "";
@@ -72,7 +77,7 @@ export class Player {
     takeTurn = async () => {
         console.log(`${this}`);
         try {
-            let answer = await (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat", 'F', 'H')).toUpperCase();
+            let answer = await (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
             if(answer === 'F'){
                 await this.forge();
             }else if(answer === 'H'){
@@ -125,18 +130,7 @@ export class Player {
             }
         );
     
-        //TODO: filtering/validation of buyable cards
-        // let cards = this.game.heroicFeats.get(platform)?.filter(
-        //     function(card: HeroicFeatCard){
-        //         switch(card.getCostType()){
-        //             case CostType.MOON: return currentPlayer.moon >= card.getCost();
-        //             case CostType.SUN: return currentPlayer.sun >= card.getCost();
-        //             case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();        
-        //         }
-        //     }
-        // );
-
-        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (${firstIndex + 1}..${lastIndex + 1})`, ...getArrayOfNumberStringsUpTo(lastIndex - firstIndex || 0, firstIndex)));
+        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (${firstIndex + 1}..${lastIndex + 1})`, ...getArrayOfNumberStringsUpTo(lastIndex - firstIndex || 1, firstIndex)));
         
         let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber -1, 1)[0];
         if(chosenCard === undefined){
@@ -295,8 +289,24 @@ export class Player {
         }
     }
 
-    addGold(value: number): void {
-        this.gold += value;
+    async addGold(value: number): Promise<void> {
+        if(this.activeHammerCount > 0 && value < 0){
+            let goldForHammerBeforeAdding = this.goldForHammer;
+            let maxGoldForHammer = 30 - this.goldForHammer;
+
+            let answer = parseInt(await questionUntilValidAnswer(`you have ${value} gold to distribute\nyour hammer already contains ${this.goldForHammer%30}\nyour current treasure contains ${this.gold}/${this.MAX_GOLD}\nhow much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})\nEverything else will go to your regular gold resource`, '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
+            this.gold += value - answer;
+            this.goldForHammer += value;
+            if(answer > 0 && this.goldForHammer%30 === 0){
+                this.activeHammerCount -= 1;
+                this.addGloryPoints(15);
+            }
+            if(goldForHammerBeforeAdding < 15 && this.goldForHammer > 15){
+                this.addGloryPoints(10);
+            }
+        }else{
+            this.gold += value;
+        }
         if (this.gold > this.MAX_GOLD) {
             this.gold = this.MAX_GOLD;
         }

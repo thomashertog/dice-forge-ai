@@ -36,7 +36,7 @@ export async function questionUntilValidAnswer(message: string, ...options: stri
     options.map(option => option.toUpperCase());
     let answer = await question(message);
     while(!options.includes((answer + "").toUpperCase())){
-        console.log(`sorry, ${answer} is not valid`);
+        console.log(`sorry, ${answer} is not valid\nit should be one of ${options.map(option => option.toUpperCase())}`);
         answer = await question(message);
     }
     return answer + "";
@@ -55,9 +55,9 @@ async function question(message: string) {
     return new Promise(resolve => {terminal.question(message, resolve);});
 }
 
-export function getArrayOfNumberStringsUpTo(maxOptions: number, offset?: number): Array<string> {    
+export function getArrayOfNumberStringsUpTo(optionCount: number, offset?: number): Array<string> {    
     let options: string[] = new Array();
-    for (let i = 1; i <= maxOptions; i++) {
+    for (let i = 1; i <= optionCount; i++) {
         if (offset !== undefined && offset > 0){
             options.push(i + offset + "");
         }else{
