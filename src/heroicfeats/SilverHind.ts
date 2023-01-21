@@ -25,10 +25,10 @@ export class SilverHind extends AbstractHeroicFeatCard implements ReinforcementE
         if(answer === 'C'){
             return new Promise((resolve) => {resolve(false)});
         }else if(answer === 'L'){
-            currentPlayer.minorBlessing(currentPlayer.leftDie);
+            await currentPlayer.minorBlessing(currentPlayer.leftDie);
             return new Promise((resolve) => {resolve(true)});
         }else{
-            currentPlayer.minorBlessing(currentPlayer.rightDie);
+            await currentPlayer.minorBlessing(currentPlayer.rightDie);
             return new Promise((resolve) => {resolve(true)});
         }
     }

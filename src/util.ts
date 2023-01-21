@@ -55,14 +55,10 @@ async function question(message: string) {
     return new Promise(resolve => {terminal.question(message, resolve);});
 }
 
-export function getArrayOfNumberStringsUpTo(optionCount: number, offset?: number): Array<string> {    
+export function getArrayOfNumberStringsUpTo(maxNumber: number, offset:number=1): Array<string> {    
     let options: string[] = new Array();
-    for (let i = 1; i <= optionCount; i++) {
-        if (offset !== undefined && offset > 0){
-            options.push(i + offset + "");
-        }else{
-            options.push(i + "");
-        }
+    for (let i = offset; i <= maxNumber; i++) {
+        options.push(i + "");
     }
     return options;
 }

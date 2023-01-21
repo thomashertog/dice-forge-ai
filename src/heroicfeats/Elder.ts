@@ -25,7 +25,7 @@ export class Elder extends AbstractHeroicFeatCard implements ReinforcementEffect
             if(answer === "N"){
                 return new Promise((resolve) => {resolve(false)});
             }else{
-                currentPlayer.addGold(-3);
+                await currentPlayer.addGold(-3);
                 currentPlayer.addGloryPoints(4);
             }
         }

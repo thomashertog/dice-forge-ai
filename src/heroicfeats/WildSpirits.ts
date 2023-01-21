@@ -9,8 +9,8 @@ export class WildSpirits extends AbstractHeroicFeatCard implements InstantEffect
         super(1, CostType.SUN);
     }
 
-    handleEffect(currentPlayer: Player): void {
-        currentPlayer.addGold(3);
+    async handleEffect(currentPlayer: Player): Promise<void> {
+        await currentPlayer.addGold(3);
         currentPlayer.addMoon(3);
     }
 

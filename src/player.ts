@@ -1,11 +1,9 @@
 import chalk from 'chalk';
-import { max } from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
 import { CostType } from './costType';
 import { Die } from './Die';
 import { DieFaceOption, printDieFaceOption } from './diefaceoption';
 import { Game } from './game';
-import { AbstractHeroicFeatCard } from './heroicfeats/AbstractHeroicFeatCard';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 import { ResolveMode } from './ResolveMode';
@@ -102,7 +100,7 @@ export class Player {
         console.log(`available platforms: ${this.availablePlatforms()}`);
         let platform = await (await questionUntilValidAnswer("To which platform do you want to jump?", ...this.availablePlatforms())).toUpperCase();
 
-        this.handleEventualOusting(platform);
+        await this.handleEventualOusting(platform);
 
         this.currentPlatform = platform;
 
@@ -130,7 +128,7 @@ export class Player {
             }
         );
     
-        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (${firstIndex + 1}..${lastIndex + 1})`, ...getArrayOfNumberStringsUpTo(lastIndex - firstIndex || 1, firstIndex)));
+        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (${firstIndex + 1}..${lastIndex + 1})`, ...getArrayOfNumberStringsUpTo(lastIndex +1, firstIndex +1)));
         
         let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber -1, 1)[0];
         if(chosenCard === undefined){
@@ -152,7 +150,7 @@ export class Player {
         }
     }
 
-    private handleEventualOusting(platform: string) {
+    private async handleEventualOusting(platform: string) {
         for (let player of this.game.players) {
             if (player === this) {
                 continue;
@@ -160,12 +158,13 @@ export class Player {
             if (player.currentPlatform.toUpperCase() === platform) {
                 console.log(`ousting ${player.name}`);
                 player.currentPlatform = "";
-                player.receiveDivineBlessing();
+                await player.receiveDivineBlessing();
             }
         }
     }
 
     private availablePlatforms(): Array<string>{
+        //NOTE: filter platforms that aren't available because all the cheapest cards are sold out
         let platforms = new Array();
         if(this.moon >= 1){
             platforms.push("M1");
@@ -290,20 +289,21 @@ export class Player {
     }
 
     async addGold(value: number): Promise<void> {
-        if(this.activeHammerCount > 0 && value < 0){
+        if(this.activeHammerCount > 0 && value > 0){
             let goldForHammerBeforeAdding = this.goldForHammer;
-            let maxGoldForHammer = 30 - this.goldForHammer;
+            let maxGoldForHammer = this.activeHammerCount * 30 - this.goldForHammer;
 
             let answer = parseInt(await questionUntilValidAnswer(`you have ${value} gold to distribute\nyour hammer already contains ${this.goldForHammer%30}\nyour current treasure contains ${this.gold}/${this.MAX_GOLD}\nhow much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})\nEverything else will go to your regular gold resource`, '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
             this.gold += value - answer;
-            this.goldForHammer += value;
-            if(answer > 0 && this.goldForHammer%30 === 0){
-                this.activeHammerCount -= 1;
-                this.addGloryPoints(15);
-            }
-            if(goldForHammerBeforeAdding < 15 && this.goldForHammer > 15){
-                this.addGloryPoints(10);
-            }
+            this.goldForHammer += value - (value - answer);
+                if(answer > 0 && this.goldForHammer%30 === 0){
+                    this.activeHammerCount -= 1;
+                    this.goldForHammer-=30;
+                    this.addGloryPoints(15);
+                }
+                if(goldForHammerBeforeAdding < 15 && this.goldForHammer > 15){
+                    this.addGloryPoints(10);
+                }
         }else{
             this.gold += value;
         }

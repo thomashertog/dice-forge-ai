@@ -9,9 +9,9 @@ export class Cancer extends AbstractHeroicFeatCard implements InstantEffect{
         super(6, CostType.MOON);
     }
 
-    handleEffect(currentPlayer: Player): void {
-        currentPlayer.receiveDivineBlessing();
-        currentPlayer.receiveDivineBlessing();
+    async handleEffect(currentPlayer: Player): Promise<void> {
+        await currentPlayer.receiveDivineBlessing();
+        await currentPlayer.receiveDivineBlessing();
     }
 
     getGloryPointsAtEndOfGame(): number {

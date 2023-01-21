@@ -11,18 +11,18 @@ export class Sphinx extends AbstractHeroicFeatCard implements InstantEffect{
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {
-        let leftRight = await (await questionUntilValidAnswer(`you have these resources available ${currentPlayer.getResourcesString()}\n${getDieFacesAsPrettyString('left', currentPlayer.leftDie.faces)}\t${getDieFacesAsPrettyString('right', currentPlayer.rightDie.faces)}\ndo you want to roll your Left die (L) or your Right die (R)`), 'L', 'R').toUpperCase();
+        let leftRight = await (await questionUntilValidAnswer(`you have these resources available ${currentPlayer.getResourcesString()}\n${getDieFacesAsPrettyString('left', currentPlayer.leftDie.faces)}\t${getDieFacesAsPrettyString('right', currentPlayer.rightDie.faces)}\ndo you want to roll your Left die (L) or your Right die (R)`, 'L', 'R')).toUpperCase();
 
         if(leftRight === 'L'){
-            currentPlayer.minorBlessing(currentPlayer.leftDie);
-            currentPlayer.minorBlessing(currentPlayer.leftDie);
-            currentPlayer.minorBlessing(currentPlayer.leftDie);
-            currentPlayer.minorBlessing(currentPlayer.leftDie);
+            await currentPlayer.minorBlessing(currentPlayer.leftDie);
+            await currentPlayer.minorBlessing(currentPlayer.leftDie);
+            await currentPlayer.minorBlessing(currentPlayer.leftDie);
+            await currentPlayer.minorBlessing(currentPlayer.leftDie);
         }else if(leftRight === 'R'){
-            currentPlayer.minorBlessing(currentPlayer.rightDie);
-            currentPlayer.minorBlessing(currentPlayer.rightDie);
-            currentPlayer.minorBlessing(currentPlayer.rightDie);
-            currentPlayer.minorBlessing(currentPlayer.rightDie);
+            await currentPlayer.minorBlessing(currentPlayer.rightDie);
+            await currentPlayer.minorBlessing(currentPlayer.rightDie);
+            await currentPlayer.minorBlessing(currentPlayer.rightDie);
+            await currentPlayer.minorBlessing(currentPlayer.rightDie);
         }
     }
 
