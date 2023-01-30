@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { CostType } from "../costType";
-import { Player } from "../player";
+import { CostType } from "../CostType";
+import { Player } from "../Player";
 import { questionUntilValidAnswer } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { ReinforcementEffect } from "./ReinforcementEffect";

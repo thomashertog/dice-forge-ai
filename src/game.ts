@@ -1,8 +1,8 @@
 import { AllHeroicFeats, AllSanctuaryDieFaces } from './data';
-import { DieFaceOption, printDieFaceOption } from './diefaceoption';
-import { DieFacePool } from './diefacepool';
+import { DieFaceOption, printDieFaceOption } from './DieFaceOption';
+import { DieFacePool } from './DieFacePool';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
-import { Player } from './player';
+import { Player } from './Player';
 import { ResolveMode } from './ResolveMode';
 import { Sanctuary } from './Sanctuary';
 import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer, shuffle } from './util';

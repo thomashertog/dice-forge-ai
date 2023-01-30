@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { shuffle } from "lodash";
 import { AllSanctuaryDieFaces } from "./data";
-import { DieFacePool } from "./diefacepool";
+import { DieFacePool } from "./DieFacePool";
 import { getDieFacesAsPrettyString } from "./util";
 
 export class Sanctuary {

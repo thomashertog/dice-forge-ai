@@ -1,5 +1,5 @@
-import { CostType } from "../costType";
-import { Player } from "../player";
+import { CostType } from "../CostType";
+import { Player } from "../Player";
 import { getDieFacesAsPrettyString, questionUntilValidAnswer } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";

@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { CostType } from "../costType";
+import { CostType } from "../CostType";
 import { HeroicFeatCard } from "./HeroicFeatCard";
 
 export abstract class AbstractHeroicFeatCard implements HeroicFeatCard{

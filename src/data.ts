@@ -1,5 +1,5 @@
-import { DieFacePool } from "./diefacepool";
-import { DieFaceOption } from "./diefaceoption";
+import { DieFacePool } from "./DieFacePool";
+import { DieFaceOption } from "./DieFaceOption";
 import { BlacksmithsHammer } from "./heroicfeats/blacksmithsHammer";
 import { BlackmithsChest } from "./heroicfeats/BlacksmithsChest";
 import { Cancer } from "./heroicfeats/Cancer";

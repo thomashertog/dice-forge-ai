@@ -1,4 +1,4 @@
-import { DieFaceOption, printDieFaceOption } from './diefaceoption';
+import { DieFaceOption, printDieFaceOption } from './DieFaceOption';
 import { InstantEffect } from './heroicfeats/InstantEffect';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 import * as readline from 'readline';

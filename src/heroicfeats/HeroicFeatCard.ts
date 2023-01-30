@@ -1,4 +1,4 @@
-import { CostType } from "../costType";
+import { CostType } from "../CostType";
 
 export interface HeroicFeatCard{
 

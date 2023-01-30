@@ -1,4 +1,4 @@
-import { CostType } from "../costType";
+import { CostType } from "../CostType";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 
 export class Gorgon extends AbstractHeroicFeatCard {

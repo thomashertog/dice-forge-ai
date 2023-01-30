@@ -1,5 +1,5 @@
-import { CostType } from "../costType";
-import { Player } from "../player";
+import { CostType } from "../CostType";
+import { Player } from "../Player";
 import { ResolveMode } from "../ResolveMode";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";

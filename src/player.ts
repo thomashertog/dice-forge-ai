@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 import cloneDeep from 'lodash/cloneDeep';
-import { CostType } from './costType';
+import { CostType } from './CostType';
 import { Die } from './Die';
-import { DieFaceOption, printDieFaceOption } from './diefaceoption';
-import { Game } from './game';
+import { DieFaceOption, printDieFaceOption } from './DieFaceOption';
+import { Game } from './Game';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 import { ResolveMode } from './ResolveMode';

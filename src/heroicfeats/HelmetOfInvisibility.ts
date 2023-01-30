@@ -1,6 +1,6 @@
-import { CostType } from "../costType";
-import { DieFaceOption } from "../diefaceoption";
-import { Player } from "../player";
+import { CostType } from "../CostType";
+import { DieFaceOption } from "../DieFaceOption";
+import { Player } from "../Player";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 

@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import { clear } from 'console';
 import figlet from 'figlet';
 import { exit } from 'process';
-import { Game } from './game';
+import { Game } from './Game';
 import { questionUntilValidAnswer } from './util';
 
 clear();

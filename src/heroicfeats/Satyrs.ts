@@ -1,7 +1,7 @@
-import { CostType } from "../costType";
-import { DieFaceOption, printDieFaceOption } from "../diefaceoption";
-import { Game } from "../game";
-import { Player } from "../player";
+import { CostType } from "../CostType";
+import { DieFaceOption, printDieFaceOption } from "../DieFaceOption";
+import { Game } from "../Game";
+import { Player } from "../Player";
 import { ResolveMode } from "../ResolveMode";
 import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";

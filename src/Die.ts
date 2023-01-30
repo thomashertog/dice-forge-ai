@@ -1,4 +1,4 @@
-import { DieFaceOption, printDieFaceOption } from "./diefaceoption";
+import { DieFaceOption, printDieFaceOption } from "./DieFaceOption";
 import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer, shuffle } from "./util";
 
 export class Die {

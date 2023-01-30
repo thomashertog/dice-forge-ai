@@ -1,4 +1,4 @@
-import { DieFaceOption } from './diefaceoption';
+import { DieFaceOption } from './DieFaceOption';
 import chalk from 'chalk';
 
 export class DieFacePool{
