@@ -31,9 +31,9 @@ export class Sanctuary {
         let result = new Array();
 
         this.pools.forEach(
-            (pool, index) => { 
-                if (pool.dieFaces.length !== 0 && maxCost >= pool.cost){
-                    result.push(index+1);
+            (pool, index) => {
+                if (pool.dieFaces.length !== 0 && maxCost >= pool.cost) {
+                    result.push(index + 1);
                 }
             });
         return result;
@@ -46,11 +46,9 @@ export class Sanctuary {
                     return pool.cost;
                 }
             } else {
-                break; 
+                break;
             }
         }
         return -1;
     }
-
-
 }

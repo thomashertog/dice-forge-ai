@@ -18,13 +18,13 @@ export class Game {
     constructor(playerCount: number) {
         this.sanctuary = new Sanctuary(playerCount);
         this.players = new Array();
-        for(let i = 0; i < playerCount; i++){
-            this.players.push(new Player(3 - i, this, `player ${i+1}`));
+        for (let i = 0; i < playerCount; i++) {
+            this.players.push(new Player(3 - i, this, `player ${i + 1}`));
         }
         this.heroicFeats = new Map();
     }
 
-    async start():Promise<void> {
+    async start(): Promise<void> {
         console.log(`game started with ${this.players.length} players`)
         if (this.players.length === 3) {
             console.log("warning, this game has an extra round");
@@ -37,11 +37,11 @@ export class Game {
 
         let playersWithScores = new Map<string, number>;
 
-        for(let player of this.players){
-            for(let heroicFeat of player.heroicFeats){
+        for (let player of this.players) {
+            for (let heroicFeat of player.heroicFeats) {
                 player.addGloryPoints(heroicFeat.getGloryPointsAtEndOfGame());
             }
-            playersWithScores.set(player.name, player.gloryPoints);            
+            playersWithScores.set(player.name, player.gloryPoints);
         }
 
         console.log(playersWithScores);
@@ -59,7 +59,7 @@ export class Game {
         await player.doReinforcements();
         await player.takeTurn();
         if (player.sun >= 2) {
-            let extraTurn = await (await questionUntilValidAnswer(`${player}\nWould you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`, "Y", "N")).toUpperCase();
+            let extraTurn = (await questionUntilValidAnswer(`${player}\nWould you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`, "Y", "N")).toUpperCase();
             if (extraTurn === "Y") {
                 player.addSun(-2);
                 await player.takeTurn();
@@ -67,7 +67,7 @@ export class Game {
         }
     }
 
-    private async startTurn():Promise<void> {
+    private async startTurn(): Promise<void> {
         await this.everybodyReceivesDivineBlessing();
 
         if (this.players.length === 2) {
@@ -75,7 +75,7 @@ export class Game {
         }
     }
 
-    private async everybodyReceivesDivineBlessing():Promise<Map<Player, DieFaceOption[]>> {
+    private async everybodyReceivesDivineBlessing(): Promise<Map<Player, DieFaceOption[]>> {
         let rollsForPlayers = this.everybodyRolls();
 
         for (let player of rollsForPlayers.keys()) {
@@ -119,7 +119,7 @@ export class Game {
         return rollsForPlayers;
     }
 
-    private initializeHeroicFeats(numberOfPlayers: number):void {
+    private initializeHeroicFeats(numberOfPlayers: number): void {
         for (let portal of AllHeroicFeats) {
             let cards = new Array<HeroicFeatCard>();
             for (let card of portal.cards) {
@@ -151,7 +151,7 @@ export class Game {
             multiplier = 3;
         }
 
-        if(mode === ResolveMode.SUBTRACT){
+        if (mode === ResolveMode.SUBTRACT) {
             multiplier *= -1;
         }
 
@@ -159,15 +159,15 @@ export class Game {
             await this.resolveDieRoll(player, roll, multiplier);
         }
 
-        if(this.rollsWithChoice(rolls)){
+        if (this.rollsWithChoice(rolls)) {
             console.log(`current resources: ${player.getResourcesString()}`);
         }
     }
 
-    private async resolveDieRoll(currentPlayer: Player, roll: DieFaceOption, multiplier: number):Promise<void> {
+    private async resolveDieRoll(currentPlayer: Player, roll: DieFaceOption, multiplier: number): Promise<void> {
         switch (roll) {
-            case DieFaceOption.GOLD_1: 
-            await currentPlayer.addGold(multiplier * 1); break;
+            case DieFaceOption.GOLD_1:
+                await currentPlayer.addGold(multiplier * 1); break;
             case DieFaceOption.GOLD_2_MOON_1: await currentPlayer.addGold(multiplier * 2); currentPlayer.addMoon(multiplier * 1); break;
             case DieFaceOption.GOLD_3: await currentPlayer.addGold(multiplier * 3); break;
             case DieFaceOption.GOLD_4: await currentPlayer.addGold(multiplier * 4); break;

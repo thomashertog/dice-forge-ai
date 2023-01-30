@@ -76,7 +76,7 @@ export class Player {
         console.log(`${this}`);
         console.log(`${this.game.sanctuary}`)
         try {
-            let answer =  (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
+            let answer = (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
             if (answer === 'F') {
                 await this.forge();
             } else if (answer === 'H') {
@@ -230,14 +230,14 @@ export class Player {
 
     private async buyAndReplaceDieFace(usedPools: Array<number>): Promise<number> {
         let availablePoolNumbers = this.game.sanctuary.availablePoolNumbers(this.gold)
-                                        .filter(poolNumber => !usedPools.includes(poolNumber));
+            .filter(poolNumber => !usedPools.includes(poolNumber));
 
         let chosenPoolNumber = parseInt(
             await questionUntilValidAnswer(
                 `out of which pool are you going to buy (${availablePoolNumbers})?`,
                 ...availablePoolNumbers.map(poolNumber => poolNumber + "")));
 
-        let chosenPool = this.game.sanctuary.pools[chosenPoolNumber -1];
+        let chosenPool = this.game.sanctuary.pools[chosenPoolNumber - 1];
         const numberOfOptionsInPool = chosenPool.dieFaces.length;
 
         let buyChoice = parseInt(await questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
