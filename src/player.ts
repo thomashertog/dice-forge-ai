@@ -50,8 +50,12 @@ export class Player {
         this.heroicFeats = new Array();
     }
 
-    toString = () => {
-        return `${this.name}\t${getDieFacesAsPrettyString("left", this.leftDie.faces)}\t${getDieFacesAsPrettyString("right", this.rightDie.faces)}\nReinforcements: ${this.reinforcements}\n${this.getResourcesString()}\n${this.heroicFeats}`;
+    toString():string {
+        return `
+        ${this.name}\t${getDieFacesAsPrettyString("left", this.leftDie.faces)}\t${getDieFacesAsPrettyString("right", this.rightDie.faces)}
+        ${this.getResourcesString()}
+        Reinforcements: ${this.reinforcements}
+        ${this.heroicFeats}`;
     }
 
     async receiveDivineBlessing(): Promise<void> {
@@ -194,8 +198,15 @@ export class Player {
     async doReinforcements(): Promise<void> {
         let reinforcementsLeftForTurn = cloneDeep(this.reinforcements) as Array<ReinforcementEffect>;
         while (reinforcementsLeftForTurn.length !== 0) {
-            let restring = reinforcementsLeftForTurn.map(reinforcement => reinforcement.toString()).join(',');
-            let answer = await questionUntilValidAnswer(`${this.getResourcesString()}\nyou currently have these reinforcements available\n${restring}\nWhich one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`, ...getArrayOfNumberStringsUpTo(reinforcementsLeftForTurn.length), 'P');
+            let restring = reinforcementsLeftForTurn
+                                .map(reinforcement => reinforcement.toString())
+                                .join(',');
+            let answer = await questionUntilValidAnswer(
+                `${this.getResourcesString()}
+                you currently have these reinforcements available
+                ${restring}
+                Which one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`, 
+                ...getArrayOfNumberStringsUpTo(reinforcementsLeftForTurn.length), 'P');
 
             if (answer.toUpperCase() === 'P') {
                 return;
@@ -219,7 +230,11 @@ export class Player {
             minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
 
             if (minimumCost !== -1) {
-                let continueForging = await questionUntilValidAnswer(`You have ${chalk.yellow(this.gold)}\nDo you want to keep forging? (Y/N)`, 'Y', 'N');
+                let continueForging = await questionUntilValidAnswer(`
+                You have ${chalk.yellow(this.gold)}
+                Do you want to keep forging? (Y/N)`, 
+                'Y', 'N');
+                
                 if (continueForging.toUpperCase() === 'N') {
                     userEnd = true;
                 }
@@ -254,7 +269,14 @@ export class Player {
     }
 
     async chooseDieToReplaceDieFace(bought: DieFaceOption): Promise<Die> {
-        let leftRight = await (await questionUntilValidAnswer(`${getDieFacesAsPrettyString('left', this.leftDie.faces)}\t${getDieFacesAsPrettyString('right', this.rightDie.faces)}\non which die you want to forge ${printDieFaceOption(bought)}? Left (L) or Right (R)`, 'R', 'L')).toUpperCase();
+        let leftRight = (await questionUntilValidAnswer(
+            `${getDieFacesAsPrettyString('left', this.leftDie.faces)}
+            ${getDieFacesAsPrettyString('right', this.rightDie.faces)}
+            on which die you want to forge ${printDieFaceOption(bought)}?
+            Left (L) or Right (R)`, 
+            'R', 'L'))
+                    .toUpperCase();
+        
         if (leftRight === 'R') {
             return new Promise(resolve => resolve(this.rightDie));
         } else if (leftRight === 'L') {
@@ -269,7 +291,13 @@ export class Player {
             let goldForHammerBeforeAdding = this.goldForHammer;
             let maxGoldForHammer = this.activeHammerCount * 30 - this.goldForHammer;
 
-            let answer = parseInt(await questionUntilValidAnswer(`you have ${value} gold to distribute\nyour hammer already contains ${this.goldForHammer % 30}\nyour current treasure contains ${this.gold}/${this.MAX_GOLD}\nhow much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})\nEverything else will go to your regular gold resource`, '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
+            let answer = parseInt(await questionUntilValidAnswer(`
+            you have ${value} gold to distribute
+            your hammer already contains ${this.goldForHammer % 30}
+            your current treasure contains ${this.gold}/${this.MAX_GOLD}
+            how much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})
+            Everything else will go to your regular gold resource`, 
+            '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
             this.gold += value - answer;
             this.goldForHammer += value - (value - answer);
             if (answer > 0 && this.goldForHammer % 30 === 0) {

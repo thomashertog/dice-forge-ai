@@ -36,7 +36,9 @@ export async function questionUntilValidAnswer(message: string, ...options: stri
     options.map(option => option.toUpperCase());
     let answer = await question(message);
     while(!options.includes((answer + "").toUpperCase())){
-        console.log(`sorry, ${answer} is not valid\nit should be one of ${options.map(option => option.toUpperCase())}`);
+        console.log(`
+        sorry, ${answer} is not valid
+        it should be one of ${options.map(option => option.toUpperCase())}`);
         answer = await question(message);
     }
     return answer + "";

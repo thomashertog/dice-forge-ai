@@ -20,7 +20,10 @@ export class GuardiansOwl extends AbstractHeroicFeatCard implements Reinforcemen
     }
 
     async handleReinforcement(currentPlayer: Player): Promise<boolean> {
-        let answer = await (await questionUntilValidAnswer(`currently your resources are: ${chalk.yellow(currentPlayer.gold)}, ${chalk.blue(currentPlayer.moon)}, ${chalk.red(currentPlayer.sun)}\ndo you want ${chalk.yellow(1)} (G), ${chalk.blue(1)} (M), ${chalk.red(1)} (S) or cancel (C)`, 'G', 'M', 'S', 'C')).toUpperCase();
+        let answer = (await questionUntilValidAnswer(`
+        currently your resources are: ${chalk.yellow(currentPlayer.gold)}, ${chalk.blue(currentPlayer.moon)}, ${chalk.red(currentPlayer.sun)}
+        do you want ${chalk.yellow(1)} (G), ${chalk.blue(1)} (M), ${chalk.red(1)} (S) or cancel (C)`, 
+        'G', 'M', 'S', 'C')).toUpperCase();
 
         switch(answer){
             case 'G': await currentPlayer.addGold(1); break;

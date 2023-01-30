@@ -20,7 +20,12 @@ export class SilverHind extends AbstractHeroicFeatCard implements ReinforcementE
     }
 
     async handleReinforcement(currentPlayer: Player): Promise<boolean> {
-        let answer = await (await questionUntilValidAnswer(`you currently have these resources: ${currentPlayer.getResourcesString()}\nyour dice are as follows:\n${getDieFacesAsPrettyString('left', currentPlayer.leftDie.faces)}\t${getDieFacesAsPrettyString('right', currentPlayer.rightDie.faces)}\ndo you want to roll your left die (L) or the right die (R) or cancel (C)`, 'R', 'L', 'C')).toUpperCase();
+        let answer = (await questionUntilValidAnswer(`
+        you currently have these resources: ${currentPlayer.getResourcesString()}
+        your dice are as follows:
+        ${getDieFacesAsPrettyString('left', currentPlayer.leftDie.faces)}
+        ${getDieFacesAsPrettyString('right', currentPlayer.rightDie.faces)}
+        do you want to roll your left die (L) or the right die (R) or cancel (C)`, 'R', 'L', 'C')).toUpperCase();
 
         if(answer === 'C'){
             return new Promise((resolve) => {resolve(false)});

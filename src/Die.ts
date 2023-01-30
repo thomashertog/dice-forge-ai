@@ -13,7 +13,11 @@ export class Die {
     }
 
     async replaceFace(bought: DieFaceOption): Promise<void> {
-        let dieFaceToReplace = parseInt(await questionUntilValidAnswer(`you bought ${printDieFaceOption(bought)}\nyour die currently looks like this: ${this.toString()}\nwhich dieface you want to replace it with? (1..6)`, ...getArrayOfNumberStringsUpTo(6)));
+        let dieFaceToReplace = 
+            parseInt(await questionUntilValidAnswer(
+                `you bought ${printDieFaceOption(bought)}
+                your die currently looks like this: ${this.toString()}
+                which dieface you want to replace it with? (1..6)`, ...getArrayOfNumberStringsUpTo(6)));
         
         this.faces[dieFaceToReplace - 1] = bought;
         console.log(`new die: ${this.faces.map(face => printDieFaceOption(face))}`);

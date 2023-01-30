@@ -59,7 +59,11 @@ export class Game {
         await player.doReinforcements();
         await player.takeTurn();
         if (player.sun >= 2) {
-            let extraTurn = (await questionUntilValidAnswer(`${player}\nWould you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`, "Y", "N")).toUpperCase();
+            let extraTurn = 
+                (await questionUntilValidAnswer(`
+                    ${player}
+                    Would you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`, 
+                    "Y", "N")).toUpperCase();
             if (extraTurn === "Y") {
                 player.addSun(-2);
                 await player.takeTurn();
@@ -99,7 +103,14 @@ export class Game {
             }
 
             let options = allRolls?.filter(roll => roll !== DieFaceOption.MIRROR);
-            let replacementRoll = options[parseInt(await questionUntilValidAnswer(`you rolled ${printDieFaceOption(DieFaceOption.MIRROR)}\ncurrent resources: ${player.getResourcesString()}\noptions are: ${options.map(option => printDieFaceOption(option))}\nwhich one do you pick? (1..${options.length})`, ...getArrayOfNumberStringsUpTo(options.length)))];
+            let replacementRoll = options[
+                parseInt(
+                    await questionUntilValidAnswer(`
+                    you rolled ${printDieFaceOption(DieFaceOption.MIRROR)}
+                    current resources: ${player.getResourcesString()}
+                    options are: ${options.map(option => printDieFaceOption(option))}
+                    which one do you pick? (1..${options.length})`, 
+                    ...getArrayOfNumberStringsUpTo(options.length)))];
 
 
             return rolls.splice(rolls.indexOf(DieFaceOption.MIRROR), 1, replacementRoll);
@@ -133,7 +144,10 @@ export class Game {
 
     async resolveDieRolls(player: Player, rolls: Array<DieFaceOption>, mode: ResolveMode): Promise<void> {
         if (this.rollsWithChoice(rolls)) {
-            console.log(`you rolled ${rolls.map(roll => printDieFaceOption(roll))}\ncurrent resources:\n${player.getResourcesString()}`);
+            console.log(`
+            you rolled ${rolls.map(roll => printDieFaceOption(roll))}
+            current resources:
+            ${player.getResourcesString()}`);
             await this.handleMirrorRolls(rolls, player);
         }
 
@@ -180,7 +194,11 @@ export class Game {
             case DieFaceOption.MOON_GP_2: currentPlayer.addMoon(multiplier * 2); currentPlayer.addGloryPoints(multiplier * 2); break;
             case DieFaceOption.MOON_SUN_GOLD_GP_1: currentPlayer.addMoon(multiplier * 1); currentPlayer.addSun(multiplier * 1); await currentPlayer.addGold(multiplier * 1); currentPlayer.addGloryPoints(multiplier * 1); break;
             case DieFaceOption.PICK_GOLD_3_GP_2:
-                let pickGoldGP = await (await questionUntilValidAnswer(`current resources: ${currentPlayer.getResourcesString()} you want the gold (G) or glory points(P)?`, 'G', 'P')).toUpperCase();
+                let pickGoldGP = (await questionUntilValidAnswer(`
+                current resources: ${currentPlayer.getResourcesString()}
+                you want the gold (G) or glory points(P)?`, 
+                'G', 'P')).toUpperCase();
+                
                 if (pickGoldGP === 'G') {
                     await currentPlayer.addGold(multiplier * 3);
                 } else if (pickGoldGP === 'P') {
@@ -188,7 +206,11 @@ export class Game {
                 }
                 break;
             case DieFaceOption.PICK_GOLD_MOON_SUN_1:
-                let pick1GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
+                let pick1GoldMoonSun = (await questionUntilValidAnswer(`
+                current resources: ${currentPlayer.getResourcesString()}
+                you want the gold (G), moon shards (M) or sun shards (S)`, 
+                'G', 'M', 'S')).toUpperCase();
+                
                 if (pick1GoldMoonSun === 'G') {
                     await currentPlayer.addGold(multiplier * 1);
                 } else if (pick1GoldMoonSun === 'M') {
@@ -198,7 +220,11 @@ export class Game {
                 }
                 break;
             case DieFaceOption.PICK_GOLD_MOON_SUN_2:
-                let pick2GoldMoonSun = await (await questionUntilValidAnswer("you want the gold (G), moon shards (M) or sun shards (S)", 'G', 'M', 'S')).toUpperCase();
+                let pick2GoldMoonSun = (await questionUntilValidAnswer(`
+                current resources: ${currentPlayer.getResourcesString()}
+                you want the gold (G), moon shards (M) or sun shards (S)`,
+                'G', 'M', 'S')).toUpperCase();
+                
                 if (pick2GoldMoonSun === 'G') {
                     await currentPlayer.addGold(multiplier * 2);
                 } else if (pick2GoldMoonSun === 'M') {
