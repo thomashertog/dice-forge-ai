@@ -74,8 +74,9 @@ export class Player {
 
     async takeTurn(): Promise<void> {
         console.log(`${this}`);
+        console.log(`${this.game.sanctuary}`)
         try {
-            let answer = await (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
+            let answer =  (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
             if (answer === 'F') {
                 await this.forge();
             } else if (answer === 'H') {
@@ -234,7 +235,7 @@ export class Player {
         let chosenPoolNumber = parseInt(
             await questionUntilValidAnswer(
                 `out of which pool are you going to buy (${availablePoolNumbers})?`,
-                ...availablePoolNumbers.map(poolNumber => poolNumber + "")));7
+                ...availablePoolNumbers.map(poolNumber => poolNumber + "")));
 
         let chosenPool = this.game.sanctuary.pools[chosenPoolNumber -1];
         const numberOfOptionsInPool = chosenPool.dieFaces.length;
