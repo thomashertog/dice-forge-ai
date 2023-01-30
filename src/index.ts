@@ -9,8 +9,6 @@ import { questionUntilValidAnswer } from './util';
 clear();
 console.log(chalk.green(figlet.textSync('dice-forge', { horizontalLayout: 'full'})));
 
-const game = new Game();
-
-questionUntilValidAnswer("How many people you want to play with? (2..4)", "2", "3", "4").then(playerCount => game.start(playerCount));
+questionUntilValidAnswer("How many people you want to play with? (2..4)", "2", "3", "4").then(playerCount => new Game(parseInt(playerCount)).start());
 
 exit;

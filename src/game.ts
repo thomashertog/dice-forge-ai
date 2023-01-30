@@ -4,35 +4,33 @@ import { DieFacePool } from './diefacepool';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { Player } from './player';
 import { ResolveMode } from './ResolveMode';
+import { Sanctuary } from './Sanctuary';
 import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer, shuffle } from './util';
 
 export class Game {
 
-    sanctuary: Array<DieFacePool>;
+    sanctuary: Sanctuary;
     players: Array<Player>;
     heroicFeats: Map<String, Array<HeroicFeatCard>>;
 
     GAME_ROUNDS: number = 9;
 
-    constructor() {
-        this.sanctuary = new Array();
+    constructor(playerCount: number) {
+        this.sanctuary = new Sanctuary(playerCount);
         this.players = new Array();
+        for(let i = 0; i < playerCount; i++){
+            this.players.push(new Player(3 - i, this, `player ${i+1}`));
+        }
         this.heroicFeats = new Map();
     }
 
-    async start(playerCount: string):Promise<void> {
-        console.log(`game started with ${playerCount} players`)
-        const numberOfPlayers = parseInt(playerCount);
-        if (numberOfPlayers === 3) {
+    async start():Promise<void> {
+        console.log(`game started with ${this.players.length} players`)
+        if (this.players.length === 3) {
             console.log("warning, this game has an extra round");
             this.GAME_ROUNDS = 10;
         }
-        this.initializeSanctuary(numberOfPlayers);
-        this.initializeHeroicFeats(numberOfPlayers);
-        for (let i = 0; i < numberOfPlayers; i++) {
-            this.players.push(new Player(3 - i, this, `player ${i + 1}`));
-        }
-
+        this.initializeHeroicFeats(this.players.length);
         for (let round = 1; round <= this.GAME_ROUNDS; round++) {
             await this.playRound(round);
         }
@@ -119,17 +117,6 @@ export class Game {
         }
 
         return rollsForPlayers;
-    }
-
-    private initializeSanctuary(numberOfPlayers: number):void {
-        this.sanctuary = new Array<DieFacePool>;
-        for (let pool of AllSanctuaryDieFaces) {
-            shuffle(pool.dieFaces);
-            if (numberOfPlayers === 2) {
-                pool.dieFaces = pool.dieFaces.slice(2);
-            }
-            this.sanctuary.push(pool);
-        }
     }
 
     private initializeHeroicFeats(numberOfPlayers: number):void {

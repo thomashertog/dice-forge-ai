@@ -8,9 +8,9 @@ import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 import { ResolveMode } from './ResolveMode';
 import { getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer } from './util';
-        
+
 export class Player {
-    
+
     private MAX_GOLD = 12;
     private MAX_MOON_SUN = 6;
 
@@ -59,7 +59,7 @@ export class Player {
         await this.game.resolveDieRolls(this, rolls, ResolveMode.ADD);
     }
 
-    divineBlessing(): Array<DieFaceOption>{
+    divineBlessing(): Array<DieFaceOption> {
         let rolls = new Array<DieFaceOption>;
 
         rolls.push(this.leftDie.roll());
@@ -76,9 +76,9 @@ export class Player {
         console.log(`${this}`);
         try {
             let answer = await (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
-            if(answer === 'F'){
+            if (answer === 'F') {
                 await this.forge();
-            }else if(answer === 'H'){
+            } else if (answer === 'H') {
                 await this.heroicFeat();
             }
         } catch (err) {
@@ -86,11 +86,11 @@ export class Player {
         }
     }
 
-    private async heroicFeat(): Promise<void>{
-        for(let portal of this.game.heroicFeats.entries()){
+    private async heroicFeat(): Promise<void> {
+        for (let portal of this.game.heroicFeats.entries()) {
             let platformName = portal[0];
-            for(let player of this.game.players){
-                if(player.currentPlatform === portal[0]){
+            for (let player of this.game.players) {
+                if (player.currentPlatform === portal[0]) {
                     platformName += ` (${player.name})`;
                 }
             }
@@ -109,43 +109,43 @@ export class Player {
 
         let allCardsOfPlatform = cloneDeep(this.game.heroicFeats.get(platform)) || [];
         let firstIndex = allCardsOfPlatform?.findIndex(
-            function(card: HeroicFeatCard){
-                switch(card.getCostType()){
+            function (card: HeroicFeatCard) {
+                switch (card.getCostType()) {
                     case CostType.MOON: return currentPlayer.moon >= card.getCost();
                     case CostType.SUN: return currentPlayer.sun >= card.getCost();
-                    case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();        
+                    case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();
                 }
             }
         );
 
-        let lastIndex = allCardsOfPlatform?.length -1 - allCardsOfPlatform?.reverse().findIndex(
-            function(card: HeroicFeatCard){
-                switch(card.getCostType()){
+        let lastIndex = allCardsOfPlatform?.length - 1 - allCardsOfPlatform?.reverse().findIndex(
+            function (card: HeroicFeatCard) {
+                switch (card.getCostType()) {
                     case CostType.MOON: return currentPlayer.moon >= card.getCost();
                     case CostType.SUN: return currentPlayer.sun >= card.getCost();
-                    case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();        
+                    case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();
                 }
             }
         );
-    
-        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (${firstIndex + 1}..${lastIndex + 1})`, ...getArrayOfNumberStringsUpTo(lastIndex +1, firstIndex +1)));
-        
-        let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber -1, 1)[0];
-        if(chosenCard === undefined){
+
+        let chosenCardNumber = parseInt(await questionUntilValidAnswer(`Which card do you want to buy (${firstIndex + 1}..${lastIndex + 1})`, ...getArrayOfNumberStringsUpTo(lastIndex + 1, firstIndex + 1)));
+
+        let chosenCard = this.game.heroicFeats.get(platform)?.splice(chosenCardNumber - 1, 1)[0];
+        if (chosenCard === undefined) {
             return;
         }
         console.log(`${chosenCard}`);
         this.heroicFeats.push(chosenCard);
-        switch(chosenCard.getCostType()){
+        switch (chosenCard.getCostType()) {
             case CostType.MOON: this.moon -= chosenCard.getCost(); break;
             case CostType.SUN: this.sun -= chosenCard.getCost(); break;
             case CostType.BOTH: this.moon -= chosenCard.getCost(); this.sun -= chosenCard.getCost(); break;
         }
 
-        if(isInstantEffect(chosenCard)){
+        if (isInstantEffect(chosenCard)) {
             await chosenCard.handleEffect(this);
         }
-        if(isReinforcementEffect(chosenCard)){
+        if (isReinforcementEffect(chosenCard)) {
             chosenCard.addToListOfReinforcements(currentPlayer);
         }
     }
@@ -163,28 +163,28 @@ export class Player {
         }
     }
 
-    private availablePlatforms(): Array<string>{
+    private availablePlatforms(): Array<string> {
         //NOTE: filter platforms that aren't available because all the cheapest cards are sold out
         let platforms = new Array();
-        if(this.moon >= 1){
+        if (this.moon >= 1) {
             platforms.push("M1");
         }
-        if(this.moon >= 2){
+        if (this.moon >= 2) {
             platforms.push("M2");
         }
-        if(this.moon >= 4){
+        if (this.moon >= 4) {
             platforms.push("M3");
         }
-        if(this.sun >= 1){
+        if (this.sun >= 1) {
             platforms.push("S1");
         }
-        if(this.sun >= 2){
+        if (this.sun >= 2) {
             platforms.push("S2");
         }
-        if(this.sun >= 4){
+        if (this.sun >= 4) {
             platforms.push("S3");
         }
-        if((this.sun >= 5 && this.moon >= 5) || this.sun >= 6 || this.moon >= 6){
+        if ((this.sun >= 5 && this.moon >= 5) || this.sun >= 6 || this.moon >= 6) {
             platforms.push("E");
         }
         return platforms;
@@ -192,89 +192,64 @@ export class Player {
 
     async doReinforcements(): Promise<void> {
         let reinforcementsLeftForTurn = cloneDeep(this.reinforcements) as Array<ReinforcementEffect>;
-        while(reinforcementsLeftForTurn.length !== 0){
+        while (reinforcementsLeftForTurn.length !== 0) {
             let restring = reinforcementsLeftForTurn.map(reinforcement => reinforcement.toString()).join(',');
             let answer = await questionUntilValidAnswer(`${this.getResourcesString()}\nyou currently have these reinforcements available\n${restring}\nWhich one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`, ...getArrayOfNumberStringsUpTo(reinforcementsLeftForTurn.length), 'P');
 
-            if(answer.toUpperCase() === 'P'){
+            if (answer.toUpperCase() === 'P') {
                 return;
             }
 
             let chosenReinforcement = parseInt(answer);
-            if(await reinforcementsLeftForTurn[chosenReinforcement-1].handleReinforcement(this)){
-                reinforcementsLeftForTurn.splice(chosenReinforcement-1, 1);
+            if (await reinforcementsLeftForTurn[chosenReinforcement - 1].handleReinforcement(this)) {
+                reinforcementsLeftForTurn.splice(chosenReinforcement - 1, 1);
             }
         }
     }
 
-    private async forge(): Promise<void>{
+    private async forge(): Promise<void> {
         let userEnd = false;
-        let minimumCost = this.lowestAvailableCost();
+        let minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
         let usedPools = new Array();
 
-        while(userEnd !== true && (minimumCost !== -1 && this.gold >= minimumCost)){
-            this.printSanctuary();
+        while (userEnd !== true && minimumCost !== -1) {
+            console.log(`${this.game.sanctuary}`);
             usedPools.push(await this.buyAndReplaceDieFace(usedPools));
-            minimumCost = this.lowestAvailableCost();
+            minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
 
-            let continueForging = await questionUntilValidAnswer(`You have ${chalk.yellow(this.gold)}\nDo you want to keep forging? (Y/N)`, 'Y', 'N');
-            if (continueForging.toUpperCase() === 'N') {
-                userEnd = true;
+            if (minimumCost !== -1) {
+                let continueForging = await questionUntilValidAnswer(`You have ${chalk.yellow(this.gold)}\nDo you want to keep forging? (Y/N)`, 'Y', 'N');
+                if (continueForging.toUpperCase() === 'N') {
+                    userEnd = true;
+                }
             }
         }
 
-    }
-
-    private lowestAvailableCost(): number{
-        for(let pool of this.game.sanctuary){
-            if(pool.dieFaces.length > 0){
-                return pool.cost;
-            }
-        }
-        return -1;
-    }
-
-    private highestAffordablePool(): number{
-        let reversedSanctuary = [...this.game.sanctuary].reverse();
-        
-        for(let pool of reversedSanctuary){
-            if(pool.dieFaces.length > 0 && pool.cost <= this.gold){
-                return this.game.sanctuary.indexOf(pool) +1;
-            }
-        }
-        return 0;
-    }
-
-    private printSanctuary():void {
-        console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
-        for (let dieFacePool of this.game.sanctuary) {
-            console.log(`${chalk.yellow(dieFacePool.cost)}: ${getDieFacesAsPrettyString("", dieFacePool.dieFaces)}`);
-        }
     }
 
     private async buyAndReplaceDieFace(usedPools: Array<number>): Promise<number> {
-        let maxPoolNumber = this.highestAffordablePool();
-        
-        let pool = parseInt(
-            await questionUntilValidAnswer(`out of which pool are you going to buy (1..${maxPoolNumber})?`, 
-            ...getArrayOfNumberStringsUpTo(maxPoolNumber).filter(
-                function(poolNumber){
-                    return !usedPools.includes(parseInt(poolNumber));
-                }
-            )));
-        const numberOfOptionsInPool = this.game.sanctuary[pool-1].dieFaces.length;
+        let availablePoolNumbers = this.game.sanctuary.availablePoolNumbers(this.gold)
+                                        .filter(poolNumber => !usedPools.includes(poolNumber));
 
-        let buy = parseInt(await questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
-        
-        let bought = this.game.sanctuary[pool-1].dieFaces[buy - 1];
-        console.log(`congrats you bought ${printDieFaceOption(bought)}`);
+        let chosenPoolNumber = parseInt(
+            await questionUntilValidAnswer(
+                `out of which pool are you going to buy (${availablePoolNumbers})?`,
+                ...availablePoolNumbers.map(poolNumber => poolNumber + "")));7
 
-        let die = await this.chooseDieToReplaceDieFace(bought);
-        await die.replaceFace(bought);
+        let chosenPool = this.game.sanctuary.pools[chosenPoolNumber -1];
+        const numberOfOptionsInPool = chosenPool.dieFaces.length;
 
-        this.gold -= this.game.sanctuary[pool - 1].cost;
-        this.game.sanctuary[pool - 1].dieFaces.splice(buy - 1, 1);
-        return pool;
+        let buyChoice = parseInt(await questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
+
+        let boughtDieFace = chosenPool.dieFaces[buyChoice - 1];
+        console.log(`congrats you bought ${printDieFaceOption(boughtDieFace)}`);
+
+        let die = await this.chooseDieToReplaceDieFace(boughtDieFace);
+        await die.replaceFace(boughtDieFace);
+
+        this.gold -= chosenPool.cost;
+        chosenPool.dieFaces.splice(buyChoice - 1, 1);
+        return chosenPoolNumber;
     }
 
     async chooseDieToReplaceDieFace(bought: DieFaceOption): Promise<Die> {
@@ -289,28 +264,28 @@ export class Player {
     }
 
     async addGold(value: number): Promise<void> {
-        if(this.activeHammerCount > 0 && value > 0){
+        if (this.activeHammerCount > 0 && value > 0) {
             let goldForHammerBeforeAdding = this.goldForHammer;
             let maxGoldForHammer = this.activeHammerCount * 30 - this.goldForHammer;
 
-            let answer = parseInt(await questionUntilValidAnswer(`you have ${value} gold to distribute\nyour hammer already contains ${this.goldForHammer%30}\nyour current treasure contains ${this.gold}/${this.MAX_GOLD}\nhow much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})\nEverything else will go to your regular gold resource`, '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
+            let answer = parseInt(await questionUntilValidAnswer(`you have ${value} gold to distribute\nyour hammer already contains ${this.goldForHammer % 30}\nyour current treasure contains ${this.gold}/${this.MAX_GOLD}\nhow much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})\nEverything else will go to your regular gold resource`, '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
             this.gold += value - answer;
             this.goldForHammer += value - (value - answer);
-                if(answer > 0 && this.goldForHammer%30 === 0){
-                    this.activeHammerCount -= 1;
-                    this.goldForHammer-=30;
-                    this.addGloryPoints(15);
-                }
-                if(goldForHammerBeforeAdding < 15 && this.goldForHammer > 15){
-                    this.addGloryPoints(10);
-                }
-        }else{
+            if (answer > 0 && this.goldForHammer % 30 === 0) {
+                this.activeHammerCount -= 1;
+                this.goldForHammer -= 30;
+                this.addGloryPoints(15);
+            }
+            if (goldForHammerBeforeAdding < 15 && this.goldForHammer > 15) {
+                this.addGloryPoints(10);
+            }
+        } else {
             this.gold += value;
         }
         if (this.gold > this.MAX_GOLD) {
             this.gold = this.MAX_GOLD;
         }
-        if (this.gold < 0){
+        if (this.gold < 0) {
             this.gold = 0;
         }
     }
@@ -320,7 +295,7 @@ export class Player {
         if (this.sun > this.MAX_MOON_SUN) {
             this.sun = this.MAX_MOON_SUN;
         }
-        if (this.sun < 0){
+        if (this.sun < 0) {
             this.sun = 0
         }
     }
@@ -330,23 +305,23 @@ export class Player {
         if (this.moon > this.MAX_MOON_SUN) {
             this.moon = this.MAX_MOON_SUN;
         }
-        if(this.moon < 0){
+        if (this.moon < 0) {
             this.moon = 0;
         }
     }
 
     addGloryPoints(value: number): void {
         this.gloryPoints += value;
-        if(this.gloryPoints < 0){
+        if (this.gloryPoints < 0) {
             this.gloryPoints = 0;
         }
     }
 
-    getResourcesString():string {
+    getResourcesString(): string {
         return `${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}, ${chalk.blue(this.moon)}/${chalk.blue(this.MAX_MOON_SUN)}, ${chalk.red(this.sun)}/${chalk.red(this.MAX_MOON_SUN)}, ${chalk.green(this.gloryPoints)}`;
     }
 
-    extraChest():void{
+    extraChest(): void {
         this.MAX_GOLD += 4;
         this.MAX_MOON_SUN += 3;
     }
