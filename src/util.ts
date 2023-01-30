@@ -6,7 +6,7 @@ import { stdin as input, stdout as output } from 'process';
 
 const terminal = readline.createInterface(input, output);
 
-export function shuffle(array: Array<DieFaceOption>): void {
+export function shuffle(array: Array<DieFaceOption>): Array<DieFaceOption> {
     let currentIndex = array.length, randomIndex;
 
     // While there remain elements to shuffle.
@@ -52,6 +52,7 @@ export function getDieFacesAsPrettyString(name: string, dieFaces: Array<DieFaceO
 
 
 async function question(message: string):Promise<string> {
+    readline.clearScreenDown(input);
     return new Promise(resolve => {terminal.question(message, resolve);});
 }
 
