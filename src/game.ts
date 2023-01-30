@@ -20,7 +20,7 @@ export class Game {
         this.heroicFeats = new Map();
     }
 
-    start = async (playerCount: string) => {
+    async start(playerCount: string):Promise<void> {
         console.log(`game started with ${playerCount} players`)
         const numberOfPlayers = parseInt(playerCount);
         if (numberOfPlayers === 3) {
@@ -69,7 +69,7 @@ export class Game {
         }
     }
 
-    private startTurn = async () => {
+    private async startTurn():Promise<void> {
         await this.everybodyReceivesDivineBlessing();
 
         if (this.players.length === 2) {
@@ -77,7 +77,7 @@ export class Game {
         }
     }
 
-    private async everybodyReceivesDivineBlessing() {
+    private async everybodyReceivesDivineBlessing():Promise<Map<Player, DieFaceOption[]>> {
         let rollsForPlayers = this.everybodyRolls();
 
         for (let player of rollsForPlayers.keys()) {
@@ -121,7 +121,7 @@ export class Game {
         return rollsForPlayers;
     }
 
-    private initializeSanctuary(numberOfPlayers: number) {
+    private initializeSanctuary(numberOfPlayers: number):void {
         this.sanctuary = new Array<DieFacePool>;
         for (let pool of AllSanctuaryDieFaces) {
             shuffle(pool.dieFaces);
@@ -132,7 +132,7 @@ export class Game {
         }
     }
 
-    private initializeHeroicFeats(numberOfPlayers: number) {
+    private initializeHeroicFeats(numberOfPlayers: number):void {
         for (let portal of AllHeroicFeats) {
             let cards = new Array<HeroicFeatCard>();
             for (let card of portal.cards) {
@@ -177,7 +177,7 @@ export class Game {
         }
     }
 
-    private async resolveDieRoll(currentPlayer: Player, roll: DieFaceOption, multiplier: number) {
+    private async resolveDieRoll(currentPlayer: Player, roll: DieFaceOption, multiplier: number):Promise<void> {
         switch (roll) {
             case DieFaceOption.GOLD_1: 
             await currentPlayer.addGold(multiplier * 1); break;

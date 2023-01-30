@@ -8,8 +8,8 @@ export class Die {
         this.faces = faces;
     }
 
-    toString = () => {
-        return this.faces.map(option => printDieFaceOption(option));
+    toString():string {
+        return this.faces.map(option => printDieFaceOption(option)).join();
     }
 
     async replaceFace(bought: DieFaceOption): Promise<void> {

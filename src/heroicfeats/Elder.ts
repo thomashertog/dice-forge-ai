@@ -11,7 +11,7 @@ export class Elder extends AbstractHeroicFeatCard implements ReinforcementEffect
         super(1, CostType.SUN);
     }
 
-    toString = () => {
+    toString():string {
         return `Elder (${chalk.red(1)})`;
     }
 

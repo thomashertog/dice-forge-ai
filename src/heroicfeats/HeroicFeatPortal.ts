@@ -10,7 +10,7 @@ export class HeroicFeatPortal{
         this.cards = cards;
     }
 
-    toString = () => {
+    toString():string {
         let result = `${this.code}: `;
         for(let card of this.cards){
             result += `\t${card};`;

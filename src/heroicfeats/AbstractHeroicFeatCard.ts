@@ -21,7 +21,7 @@ export abstract class AbstractHeroicFeatCard implements HeroicFeatCard{
         return this.costType;
     }
     
-    toString = () => {
+    toString(): string{
         let result = `${this.constructor.name} (`;
         switch(this.costType){
             case CostType.MOON: result += `${chalk.blue(this.cost)})`; break;

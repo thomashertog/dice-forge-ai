@@ -11,7 +11,7 @@ export class SilverHind extends AbstractHeroicFeatCard implements ReinforcementE
         super(2, CostType.MOON);
     }
 
-    toString = () => {
+    toString():string {
         return `Silver Hind (${chalk.blue(2)})`;
     }
 

@@ -72,7 +72,7 @@ export class Player {
         await this.game.resolveDieRolls(this, new Array(die.roll()), ResolveMode.ADD);
     }
 
-    takeTurn = async () => {
+    async takeTurn(): Promise<void> {
         console.log(`${this}`);
         try {
             let answer = await (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
@@ -150,7 +150,7 @@ export class Player {
         }
     }
 
-    private async handleEventualOusting(platform: string) {
+    private async handleEventualOusting(platform: string): Promise<void> {
         for (let player of this.game.players) {
             if (player === this) {
                 continue;
@@ -245,7 +245,7 @@ export class Player {
         return 0;
     }
 
-    private printSanctuary() {
+    private printSanctuary():void {
         console.log(`so you want to forge, right, go ahead, you have ${this.gold} gold to spend`);
         for (let dieFacePool of this.game.sanctuary) {
             console.log(`${chalk.yellow(dieFacePool.cost)}: ${getDieFacesAsPrettyString("", dieFacePool.dieFaces)}`);
@@ -342,11 +342,11 @@ export class Player {
         }
     }
 
-    getResourcesString() {
+    getResourcesString():string {
         return `${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}, ${chalk.blue(this.moon)}/${chalk.blue(this.MAX_MOON_SUN)}, ${chalk.red(this.sun)}/${chalk.red(this.MAX_MOON_SUN)}, ${chalk.green(this.gloryPoints)}`;
     }
 
-    extraChest(){
+    extraChest():void{
         this.MAX_GOLD += 4;
         this.MAX_MOON_SUN += 3;
     }

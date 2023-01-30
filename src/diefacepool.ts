@@ -15,7 +15,7 @@ export class DieFacePool{
         this.dieFaces.push(face);
     }
 
-    toString = () => {
+    toString():string {
         let result = `${chalk.yellow(this.cost)}:\t`;
         for(let dieFace of this.dieFaces){
             switch(dieFace){

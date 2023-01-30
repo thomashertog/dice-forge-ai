@@ -11,7 +11,7 @@ export class GuardiansOwl extends AbstractHeroicFeatCard implements Reinforcemen
         super(2, CostType.SUN);
     }
 
-    toString = () => {
+    toString():string {
         return `Guardian's Owl (${chalk.red(2)})`;
     }
 
