@@ -2,7 +2,11 @@ import chalk from 'chalk';
 import cloneDeep from 'lodash/cloneDeep';
 import { CostType } from './CostType';
 import { Die } from './dice/Die';
-import { DieFaceOption, printDieFaceOption } from './dice/DieFaceOption';
+import { DieFace } from './dice/faces/DieFace';
+import { GloryPoints2 } from './dice/faces/GloryPoints2';
+import { Gold1 } from './dice/faces/Gold1';
+import { Moon1 } from './dice/faces/Moon1';
+import { Sun1 } from './dice/faces/Sun1';
 import { Game } from './Game';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
@@ -36,17 +40,16 @@ export class Player {
         this.game = game;
         this.activeHammerCount = 0;
         this.goldForHammer = 0;
-        // this.gold = initialGold;
-        this.gold = 12;
+        this.gold = initialGold;
         this.sun = 0;
         this.moon = 0;
         this.gloryPoints = 0;
         this.currentPlatform = "";
         this.reinforcements = new Array();
 
-        this.leftDie = new Die(DieFaceOption.SUN_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1);
-
-        this.rightDie = new Die(DieFaceOption.MOON_1, DieFaceOption.GP_2, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1, DieFaceOption.GOLD_1);
+        this.leftDie = new Die(new Sun1(), new Gold1(), new Gold1(), new Gold1(), new Gold1(), new Gold1());
+        
+        this.rightDie = new Die(new Moon1(), new GloryPoints2(), new Gold1(), new Gold1(), new Gold1(), new Gold1());
 
         this.heroicFeats = new Array();
     }
@@ -64,8 +67,8 @@ export class Player {
         await this.game.resolveDieRolls(this, rolls, ResolveMode.ADD);
     }
 
-    divineBlessing(): Array<DieFaceOption> {
-        let rolls = new Array<DieFaceOption>;
+    divineBlessing(): Array<DieFace> {
+        let rolls = new Array<DieFace>;
 
         rolls.push(this.leftDie.roll());
         rolls.push(this.rightDie.roll());
@@ -244,7 +247,7 @@ export class Player {
 
     }
 
-    private async buyAndReplaceDieFace(boughtDieFaces: Array<DieFaceOption>): Promise<DieFaceOption> {
+    private async buyAndReplaceDieFace(boughtDieFaces: Array<DieFace>): Promise<DieFace> {
         let availablePoolIndices = this.game.sanctuary.availablePoolIndices(this.gold)
             .filter(poolIndex => this.filterBoughtDieFaces(boughtDieFaces, poolIndex));
 
@@ -254,30 +257,29 @@ export class Player {
                 ...availablePoolIndices.map(index => index+1 + "")));
 
         let chosenPool = this.game.sanctuary.pools[chosenPoolNumber - 1];
-        const numberOfOptionsInPool = chosenPool.dieFaces.length;
 
-        let buyChoice = parseInt(await questionUntilValidAnswer(`which dieface do you want? (1..${numberOfOptionsInPool})`, ...getArrayOfNumberStringsUpTo(numberOfOptionsInPool)));
+        let buyChoice = (await questionUntilValidAnswer(`which dieface do you want? (${chosenPool.dieFaces.map(face => face.printWithCode())})`, ...chosenPool.dieFaces.map(face => face.code))).toUpperCase();
 
-        let boughtDieFace = chosenPool.dieFaces[buyChoice - 1];
-        console.log(`congrats you bought ${printDieFaceOption(boughtDieFace)}`);
+        let boughtDieFace = chosenPool.dieFaces.find(face => face.code === buyChoice) as DieFace;
+        console.log(`congrats you bought ${boughtDieFace}`);
 
         let die = await this.chooseDieToReplaceDieFace(boughtDieFace);
         await die.replaceFace(boughtDieFace);
 
         this.gold -= chosenPool.cost;
-        chosenPool.dieFaces.splice(buyChoice - 1, 1);
+        chosenPool.dieFaces.splice(chosenPool.dieFaces.findIndex(face => face.code === buyChoice), 1);
         return boughtDieFace;
     }
 
-    private filterBoughtDieFaces(boughtDieFaces: Array<DieFaceOption>, poolIndex: number): unknown {
-        return !this.game.sanctuary.pools[poolIndex].dieFaces.every(dieFace => boughtDieFaces.includes(dieFace));
+    private filterBoughtDieFaces(boughtDieFaces: Array<DieFace>, poolIndex: number): unknown {
+        return !this.game.sanctuary.pools[poolIndex].dieFaces.every(dieFace => boughtDieFaces.map(face => face.code).includes(dieFace.code));
     }
 
-    async chooseDieToReplaceDieFace(bought: DieFaceOption): Promise<Die> {
+    async chooseDieToReplaceDieFace(bought: DieFace): Promise<Die> {
         let leftRight = (await questionUntilValidAnswer(
             `${getDieFacesAsPrettyString('left', this.leftDie.faces)}
             ${getDieFacesAsPrettyString('right', this.rightDie.faces)}
-            on which die you want to forge ${printDieFaceOption(bought)}?
+            on which die you want to forge ${bought}?
             Left (L) or Right (R)`, 
             'R', 'L'))
                     .toUpperCase();

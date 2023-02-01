@@ -1,29 +1,29 @@
-import { DieFaceOption, printDieFaceOption } from "./DieFaceOption";
-import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer, shuffle } from "../util";
+import { questionUntilValidAnswer, shuffle } from "../util";
+import { DieFace } from "./faces/DieFace";
 
 export class Die {
-    faces: Array<DieFaceOption>;
+    faces: Array<DieFace>;
 
-    constructor(...faces: Array<DieFaceOption>) {
+    constructor(...faces: Array<DieFace>) {
         this.faces = faces;
     }
 
     toString():string {
-        return this.faces.map(option => printDieFaceOption(option)).join();
+        return this.faces.map(face => face.toString()).join();
     }
 
-    async replaceFace(bought: DieFaceOption): Promise<void> {
+    async replaceFace(bought: DieFace): Promise<void> {
         let dieFaceToReplace = 
-            parseInt(await questionUntilValidAnswer(
-                `you bought ${printDieFaceOption(bought)}
-                your die currently looks like this: ${this.toString()}
-                which dieface you want to replace it with? (1..6)`, ...getArrayOfNumberStringsUpTo(6)));
+            await questionUntilValidAnswer(
+                `you bought ${bought}
+                your die currently looks like this: ${this.faces.map(face => face.printWithCode())}
+                which dieface you want to replace it with?`, ...this.faces.map(face => face.code));
         
-        this.faces[dieFaceToReplace - 1] = bought;
-        console.log(`new die: ${this.faces.map(face => printDieFaceOption(face))}`);
+        this.faces.splice(this.faces.findIndex(face => face.code === dieFaceToReplace.toUpperCase()), 1, bought);
+        console.log(`new die: ${this.faces.map(face => face.toString())}`);
     }
 
-    roll(): DieFaceOption {
+    roll(): DieFace {
         shuffle(this.faces);
         return this.faces[0];
     }

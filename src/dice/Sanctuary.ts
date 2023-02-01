@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { shuffle } from "lodash";
 import { AllSanctuaryDieFaces } from "../data";
-import { DieFacePool } from "./DieFacePool";
 import { getDieFacesAsPrettyString } from "../util";
+import { DieFacePool } from "./DieFacePool";
 
 export class Sanctuary {
 
@@ -12,7 +12,7 @@ export class Sanctuary {
         let result = "";
         let index = 1;
         for (let pool of this.pools) {
-            result += `(${index}) -> ${chalk.yellow(pool.cost)}: ${getDieFacesAsPrettyString("", pool.dieFaces)}\n`;
+            result += `(${index}) -> ${chalk.yellow(pool.cost)}: ${pool.dieFaces.map(face => face.printWithCode())}\n`;
             index++;
         }
         return result;
@@ -21,7 +21,7 @@ export class Sanctuary {
     constructor(numberOfPlayers: number) {
         this.pools = new Array();
         for (let pool of AllSanctuaryDieFaces) {
-            shuffle(pool.dieFaces);
+            pool.dieFaces = shuffle(pool.dieFaces);
             if (numberOfPlayers === 2) {
                 pool.dieFaces = pool.dieFaces.slice(2);
             }

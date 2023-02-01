@@ -1,12 +1,12 @@
-import { DieFaceOption, printDieFaceOption } from './dice/DieFaceOption';
+import { stdin as input, stdout as output } from 'process';
+import * as readline from 'readline';
+import { DieFace } from './dice/faces/DieFace';
 import { InstantEffect } from './heroicfeats/InstantEffect';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
-import * as readline from 'readline';
-import { stdin as input, stdout as output } from 'process';
 
 const terminal = readline.createInterface(input, output);
 
-export function shuffle(array: Array<DieFaceOption>): Array<DieFaceOption> {
+export function shuffle(array: Array<DieFace>): Array<DieFace> {
     let currentIndex = array.length, randomIndex;
 
     // While there remain elements to shuffle.
@@ -44,10 +44,10 @@ export async function questionUntilValidAnswer(message: string, ...options: stri
     return answer + "";
 }
 
-export function getDieFacesAsPrettyString(name: string, dieFaces: Array<DieFaceOption>): string{
+export function getDieFacesAsPrettyString(name: string, dieFaces: Array<DieFace>): string{
     let print = `${name}: `;
     for(let face of dieFaces){
-        print += `${printDieFaceOption(face)}, `;
+        print += `${face}, `;
     }
     return print;
 }

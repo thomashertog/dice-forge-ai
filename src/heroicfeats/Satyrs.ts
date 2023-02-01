@@ -1,6 +1,5 @@
 import { CostType } from "../CostType";
-import { DieFaceOption, printDieFaceOption } from "../dice/DieFaceOption";
-import { Game } from "../Game";
+import { DieFace } from "../dice/faces/DieFace";
 import { Player } from "../Player";
 import { ResolveMode } from "../ResolveMode";
 import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer } from "../util";
@@ -14,7 +13,7 @@ export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {
-        let rolls = new Array<DieFaceOption>;
+        let rolls = new Array<DieFace>;
         
         for(let player of currentPlayer.game.players){
             if(player === currentPlayer){
@@ -26,11 +25,11 @@ export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
         }
 
         let first = await questionUntilValidAnswer(`
-        players have rolled ${rolls.map(roll => printDieFaceOption(roll))}
+        players have rolled ${rolls.map(roll => roll.toString())}
         which is the first face you want to copy? (1..${rolls.length})`, ...getArrayOfNumberStringsUpTo(rolls.length));
         let second = await questionUntilValidAnswer(`which is the second face you want to copy? (1..${rolls.length})`, ...getArrayOfNumberStringsUpTo(rolls.length).filter(value => value !== first));
 
-        let rollsToResolve = new Array<DieFaceOption>;
+        let rollsToResolve = new Array<DieFace>;
         rollsToResolve.push(rolls[parseInt(first)-1]);
         rollsToResolve.push(rolls[parseInt(second)-1]);
         await currentPlayer.game.resolveDieRolls(currentPlayer, rollsToResolve, ResolveMode.ADD); 

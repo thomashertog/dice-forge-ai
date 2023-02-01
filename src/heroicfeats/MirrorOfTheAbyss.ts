@@ -1,5 +1,5 @@
 import { CostType } from "../CostType";
-import { DieFaceOption } from "../dice/DieFaceOption";
+import { Mirror } from "../dice/faces/Mirror";
 import { Player } from "../Player";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
@@ -11,8 +11,8 @@ export class MirrorOfTheAbyss extends AbstractHeroicFeatCard implements InstantE
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {
-        let die = await currentPlayer.chooseDieToReplaceDieFace(DieFaceOption.MIRROR);
-        await die.replaceFace(DieFaceOption.MIRROR);
+        let die = await currentPlayer.chooseDieToReplaceDieFace(new Mirror());
+        await die.replaceFace(new Mirror());
     }
 
     getGloryPointsAtEndOfGame(): number {

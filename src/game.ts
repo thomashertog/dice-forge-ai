@@ -1,11 +1,12 @@
-import { AllHeroicFeats, AllSanctuaryDieFaces } from './data';
-import { DieFaceOption, printDieFaceOption } from './dice/DieFaceOption';
-import { DieFacePool } from './dice/DieFacePool';
+import { AllHeroicFeats } from './data';
+import { DieFace } from './dice/faces/DieFace';
+import { Helmet } from './dice/faces/Helmet';
+import { Mirror } from './dice/faces/Mirror';
+import { Sanctuary } from './dice/Sanctuary';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { Player } from './Player';
 import { ResolveMode } from './ResolveMode';
-import { Sanctuary } from './dice/Sanctuary';
-import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer, shuffle } from './util';
+import { questionUntilValidAnswer } from './util';
 
 export class Game {
 
@@ -59,10 +60,10 @@ export class Game {
         await player.doReinforcements();
         await player.takeTurn();
         if (player.sun >= 2) {
-            let extraTurn = 
+            let extraTurn =
                 (await questionUntilValidAnswer(`
                     ${player}
-                    Would you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`, 
+                    Would you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`,
                     "Y", "N")).toUpperCase();
             if (extraTurn === "Y") {
                 player.addSun(-2);
@@ -79,15 +80,8 @@ export class Game {
         }
     }
 
-    private async everybodyReceivesDivineBlessing(): Promise<Map<Player, DieFaceOption[]>> {
+    private async everybodyReceivesDivineBlessing(): Promise<Map<Player, DieFace[]>> {
         let rollsForPlayers = this.everybodyRolls();
-
-        for (let player of rollsForPlayers.keys()) {
-            let rolls = rollsForPlayers.get(player);
-            if (rolls !== undefined) {
-                await this.handleMirrorRolls(rolls, player);
-            }
-        }
 
         for (let rollsForPlayer of rollsForPlayers.entries()) {
             await this.resolveDieRolls(rollsForPlayer[0], rollsForPlayer[1], ResolveMode.ADD);
@@ -95,32 +89,32 @@ export class Game {
         return rollsForPlayers;
     }
 
-    async handleMirrorRolls(rolls: Array<DieFaceOption>, player: Player): Promise<DieFaceOption[]> {
-        if (rolls?.includes(DieFaceOption.MIRROR)) {
-            let allRolls = new Array<DieFaceOption>;
+    async handleMirrorRolls(rolls: Array<DieFace>, currentPlayer: Player): Promise<DieFace[]> {
+        if (rolls?.some(roll => DieFace.isMirror(roll))) {
+            let allRolls = new Array<DieFace>;
             for (let player of this.players) {
-                allRolls.push(player.leftDie.faces[0], player.rightDie.faces[0]);
+                if (player !== currentPlayer) {
+                    allRolls.push(player.leftDie.faces[0], player.rightDie.faces[0]);
+                }
             }
 
-            let options = allRolls?.filter(roll => roll !== DieFaceOption.MIRROR);
-            let replacementRoll = options[
-                parseInt(
-                    await questionUntilValidAnswer(`
-                    you rolled ${printDieFaceOption(DieFaceOption.MIRROR)}
-                    current resources: ${player.getResourcesString()}
-                    options are: ${options.map(option => printDieFaceOption(option))}
-                    which one do you pick? (1..${options.length})`, 
-                    ...getArrayOfNumberStringsUpTo(options.length)))];
+            let options = allRolls?.filter(roll => !DieFace.isMirror(roll));
+            let replacementRollChoice = await questionUntilValidAnswer(`
+                    current resources: ${currentPlayer.getResourcesString()}
+                    options are: ${options.map(option => option.printWithCode())}
+                    which one do you pick?`,
+                        ...options.map(option => option.code));
 
 
-            return rolls.splice(rolls.indexOf(DieFaceOption.MIRROR), 1, replacementRoll);
+            let replacementRoll = allRolls.find(option => option.code === replacementRollChoice.toUpperCase()) as DieFace;
+            return rolls.splice(rolls.findIndex(roll => roll.code === 'M'), 1, replacementRoll);
         }
 
         return rolls;
     }
 
-    private everybodyRolls(): Map<Player, DieFaceOption[]> {
-        let rollsForPlayers = new Map<Player, DieFaceOption[]>;
+    private everybodyRolls(): Map<Player, DieFace[]> {
+        let rollsForPlayers = new Map<Player, DieFace[]>;
 
         for (let player of this.players) {
             let rolls = player.divineBlessing();
@@ -142,10 +136,10 @@ export class Game {
         }
     }
 
-    async resolveDieRolls(player: Player, rolls: Array<DieFaceOption>, mode: ResolveMode): Promise<void> {
-        if (this.rollsWithChoice(rolls)) {
+    async resolveDieRolls(player: Player, rolls: Array<DieFace>, mode: ResolveMode): Promise<void> {
+        if (rolls.find(roll => DieFace.isMirror(roll)) !== undefined) {
             console.log(`
-            you rolled ${rolls.map(roll => printDieFaceOption(roll))}
+            you rolled ${rolls.map(roll => roll.toString())}
             current resources:
             ${player.getResourcesString()}`);
             await this.handleMirrorRolls(rolls, player);
@@ -155,13 +149,15 @@ export class Game {
         let helmetActive = false;
 
         for (let roll of rolls) {
-            if (roll === 'HELMET' && rolls.length === 2) {
+            if (DieFace.isHelmet(roll) && rolls.length === 2) {
                 helmetActive = true;
             }
         }
 
         if (helmetActive) {
-            rolls.splice(rolls.indexOf(DieFaceOption.HELMET), 1);
+            while (rolls.some(roll => DieFace.isHelmet(roll))) {
+                rolls.splice(rolls.indexOf(new Helmet()), 1);
+            }
             multiplier = 3;
         }
 
@@ -169,81 +165,11 @@ export class Game {
             multiplier *= -1;
         }
 
-        for (let roll of rolls) {
-            await this.resolveDieRoll(player, roll, multiplier);
-        }
+        console.log(`resolving rolls for ${player.name} => ${rolls.map(roll => roll.toString())}\ncurrent resources: ${player.getResourcesString()}`);
 
-        if (this.rollsWithChoice(rolls)) {
-            console.log(`current resources: ${player.getResourcesString()}`);
-        }
+        await rolls.filter(roll => !roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolveRoll(player, multiplier)), Promise.resolve());
+        await rolls.filter(roll => roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolveRoll(player, multiplier)), Promise.resolve());
+
+        console.log(`resolved rolls for ${player.name}\ncurrent resources: ${player.getResourcesString()}\n\n`);
     }
-
-    private async resolveDieRoll(currentPlayer: Player, roll: DieFaceOption, multiplier: number): Promise<void> {
-        switch (roll) {
-            case DieFaceOption.GOLD_1:
-                await currentPlayer.addGold(multiplier * 1); break;
-            case DieFaceOption.GOLD_2_MOON_1: await currentPlayer.addGold(multiplier * 2); currentPlayer.addMoon(multiplier * 1); break;
-            case DieFaceOption.GOLD_3: await currentPlayer.addGold(multiplier * 3); break;
-            case DieFaceOption.GOLD_4: await currentPlayer.addGold(multiplier * 4); break;
-            case DieFaceOption.GOLD_6: await currentPlayer.addGold(multiplier * 6); break;
-            case DieFaceOption.GP_2: currentPlayer.addGloryPoints(multiplier * 2); break;
-            case DieFaceOption.GP_3: currentPlayer.addGloryPoints(multiplier * 3); break;
-            case DieFaceOption.GP_4: currentPlayer.addGloryPoints(multiplier * 4); break;
-            case DieFaceOption.MOON_1: currentPlayer.addMoon(multiplier * 1); break;
-            case DieFaceOption.MOON_2: currentPlayer.addMoon(multiplier * 2); break;
-            case DieFaceOption.MOON_GP_2: currentPlayer.addMoon(multiplier * 2); currentPlayer.addGloryPoints(multiplier * 2); break;
-            case DieFaceOption.MOON_SUN_GOLD_GP_1: currentPlayer.addMoon(multiplier * 1); currentPlayer.addSun(multiplier * 1); await currentPlayer.addGold(multiplier * 1); currentPlayer.addGloryPoints(multiplier * 1); break;
-            case DieFaceOption.PICK_GOLD_3_GP_2:
-                let pickGoldGP = (await questionUntilValidAnswer(`
-                current resources: ${currentPlayer.getResourcesString()}
-                you want the gold (G) or glory points(P)?`, 
-                'G', 'P')).toUpperCase();
-                
-                if (pickGoldGP === 'G') {
-                    await currentPlayer.addGold(multiplier * 3);
-                } else if (pickGoldGP === 'P') {
-                    currentPlayer.addGloryPoints(multiplier * 2);
-                }
-                break;
-            case DieFaceOption.PICK_GOLD_MOON_SUN_1:
-                let pick1GoldMoonSun = (await questionUntilValidAnswer(`
-                current resources: ${currentPlayer.getResourcesString()}
-                you want the gold (G), moon shards (M) or sun shards (S)`, 
-                'G', 'M', 'S')).toUpperCase();
-                
-                if (pick1GoldMoonSun === 'G') {
-                    await currentPlayer.addGold(multiplier * 1);
-                } else if (pick1GoldMoonSun === 'M') {
-                    currentPlayer.addMoon(multiplier * 1);
-                } else if (pick1GoldMoonSun === 'S') {
-                    currentPlayer.addSun(multiplier * 1);
-                }
-                break;
-            case DieFaceOption.PICK_GOLD_MOON_SUN_2:
-                let pick2GoldMoonSun = (await questionUntilValidAnswer(`
-                current resources: ${currentPlayer.getResourcesString()}
-                you want the gold (G), moon shards (M) or sun shards (S)`,
-                'G', 'M', 'S')).toUpperCase();
-                
-                if (pick2GoldMoonSun === 'G') {
-                    await currentPlayer.addGold(multiplier * 2);
-                } else if (pick2GoldMoonSun === 'M') {
-                    currentPlayer.addMoon(multiplier * 2);
-                } else if (pick2GoldMoonSun === 'S') {
-                    currentPlayer.addSun(multiplier * 2);
-                }
-                break;
-            case DieFaceOption.SUN_1: currentPlayer.addSun(multiplier * 1); break;
-            case DieFaceOption.SUN_1_GP_1: currentPlayer.addSun(multiplier * 1); currentPlayer.addGloryPoints(multiplier * 1); break;
-            case DieFaceOption.SUN_2: currentPlayer.addSun(multiplier * 2); break;
-        }
-    }
-
-    private rollsWithChoice(rolls: Array<DieFaceOption>): boolean {
-        return rolls.includes(DieFaceOption.PICK_GOLD_3_GP_2) ||
-            rolls.includes(DieFaceOption.PICK_GOLD_MOON_SUN_1) ||
-            rolls.includes(DieFaceOption.PICK_GOLD_MOON_SUN_2) ||
-            rolls.includes(DieFaceOption.MIRROR);
-    }
-
 }
