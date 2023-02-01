@@ -16,7 +16,7 @@ export class Minotaur extends AbstractHeroicFeatCard implements InstantEffect{
                 continue;
             }
             let rolls = player.divineBlessing();
-            await player.game.resolveDieRolls(player, rolls, ResolveMode.SUBTRACT);
+            await player.resolveDieRolls(rolls, ResolveMode.SUBTRACT);
         }
     }
 
