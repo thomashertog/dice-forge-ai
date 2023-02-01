@@ -80,7 +80,7 @@ export class Player {
         await this.game.resolveDieRolls(this, new Array(die.roll()), ResolveMode.ADD);
     }
 
-    async takeTurn(): Promise<void> {
+    async takeTurn(): Promise<boolean> {
         console.log(`${this}`);
         console.log(`${this.game.sanctuary}`)
         try {
@@ -89,10 +89,13 @@ export class Player {
                 await this.forge();
             } else if (answer === 'H') {
                 await this.heroicFeat();
+            } else if (answer === 'P'){
+                return new Promise(resolve => resolve(false));
             }
         } catch (err) {
             console.log(`WTF, something is wrong here\nerr: ${err}`);
         }
+        return new Promise(resolve => resolve(true));
     }
 
     private async heroicFeat(): Promise<void> {

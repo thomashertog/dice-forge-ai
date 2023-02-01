@@ -1,7 +1,6 @@
 import { AllHeroicFeats } from './data';
 import { DieFace } from './dice/faces/DieFace';
 import { Helmet } from './dice/faces/Helmet';
-import { Mirror } from './dice/faces/Mirror';
 import { Sanctuary } from './dice/Sanctuary';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { Player } from './Player';
@@ -58,8 +57,8 @@ export class Game {
         await this.startTurn();
         console.log(`starting turn for player in round ${round}`);
         await player.doReinforcements();
-        await player.takeTurn();
-        if (player.sun >= 2) {
+        let executed = await player.takeTurn();
+        if (player.sun >= 2 && executed === true) {
             let extraTurn =
                 (await questionUntilValidAnswer(`
                     ${player}
