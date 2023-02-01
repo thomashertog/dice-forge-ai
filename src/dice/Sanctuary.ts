@@ -3,19 +3,14 @@ import { shuffle } from "lodash";
 import { AllSanctuaryDieFaces } from "../data";
 import { getDieFacesAsPrettyString } from "../util";
 import { DieFacePool } from "./DieFacePool";
+import { DieFace } from "./faces/DieFace";
 
 export class Sanctuary {
 
     pools: Array<DieFacePool>;
 
     toString(): string {
-        let result = "";
-        let index = 1;
-        for (let pool of this.pools) {
-            result += `(${index}) -> ${chalk.yellow(pool.cost)}: ${pool.dieFaces}\n`;
-            index++;
-        }
-        return result;
+        return this.pools.map(pool => `${chalk.yellow(pool.cost)}: ${pool.dieFaces}`).join('\n');
     }
 
     constructor(numberOfPlayers: number) {
@@ -29,16 +24,14 @@ export class Sanctuary {
         }
     }
 
-    availablePoolIndices(maxCost: number): Array<number> {
-        let result = new Array();
+    availablePools(maxCost: number, boughtDieFaces: Array<DieFace>): Array<DieFacePool> {
+        return this.pools
+            .filter(pool => pool.dieFaces.length !== 0 && maxCost >= pool.cost)
+            .filter(pool => !allFacesInPoolAreAlreadyBought(pool));
 
-        this.pools.forEach(
-            (pool, index) => {
-                if (pool.dieFaces.length !== 0 && maxCost >= pool.cost) {
-                    result.push(index);
-                }
-            });
-        return result;
+        function allFacesInPoolAreAlreadyBought(pool: DieFacePool): boolean {
+            return pool.dieFaces.every(dieFace => boughtDieFaces.map(face => face.code).includes(dieFace.code));
+        }
     }
 
     lowestAvailablePoolCost(maxCost: number): number {

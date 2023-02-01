@@ -74,5 +74,5 @@ export async function chooseDieFace(options: Array<DieFace>): Promise<DieFace>{
         `,
         ...options.map(option => option.code));
 
-        return options.find(option => option.is(answer)) as DieFace;
+        return options.find(option => option.is(answer.toUpperCase())) as DieFace;
 }

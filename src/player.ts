@@ -57,10 +57,11 @@ export class Player {
 
     toString():string {
         return `
-        ${this.name}\t${getDieFacesAsPrettyString("left", this.leftDie.faces)}\t${getDieFacesAsPrettyString("right", this.rightDie.faces)}
+        ${this.name}
+        -----------------------
+        ${getDieFacesAsPrettyString("left", this.leftDie.faces)}    ${getDieFacesAsPrettyString("right", this.rightDie.faces)}
         ${this.getResourcesString()}
-        Reinforcements: ${this.reinforcements}
-        ${this.heroicFeats}`;
+        Reinforcements: ${this.reinforcements}`;
     }
 
     async receiveDivineBlessing(): Promise<void> {
@@ -233,10 +234,11 @@ export class Player {
         let boughtDieFaces = new Array();
 
         while (userEnd !== true && minimumCost !== -1) {
-            console.log(`${this.game.sanctuary}`);
             let bought = await this.buyDieFace(boughtDieFaces);
             boughtDieFaces.push(bought);
+            
             await this.replaceDieFace(bought);
+            
             minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
 
             if (minimumCost !== -1) {
@@ -254,12 +256,16 @@ export class Player {
     }
 
     private async buyDieFace(boughtDieFaces: Array<DieFace>): Promise<DieFace>{
-        let availablePoolIndices = this.game.sanctuary.availablePoolIndices(this.gold)
-            .filter(poolIndex => this.filterBoughtDieFaces(boughtDieFaces, poolIndex));
+        let availablePools = this.game.sanctuary.availablePools(this.gold, boughtDieFaces);
 
-        let poolNumber = parseInt(await questionUntilValidAnswer(`out of which pool are you going to buy (${availablePoolIndices.map(index => index+1)})?`, ...availablePoolIndices.map(index => index+1+"")));
+        availablePools.map((pool, index) => console.log(`(${index+1}) -> ${pool}`));
 
-        let pool = this.game.sanctuary.pools[poolNumber -1];
+        //TODO: find a way to do this without poolNumber as a separate variable
+        let poolNumber = parseInt(await questionUntilValidAnswer(`
+        you have ${chalk.yellow(this.gold)} to spend
+        out of which pool are you going to buy (${availablePools.map((_pool, index) => index+1)})?`, 
+        ...availablePools.map((_pool, index) => index+1+"")));
+        let pool = availablePools[poolNumber -1];
 
         let buy = await chooseDieFace(pool.dieFaces);
         this.gold -= pool.cost;
@@ -272,10 +278,6 @@ export class Player {
     private async replaceDieFace(replacement: DieFace): Promise<void> {
         let die = await this.chooseDieToReplaceDieFace(replacement);
         await die.replaceFace(replacement);
-    }
-
-    private filterBoughtDieFaces(boughtDieFaces: Array<DieFace>, poolIndex: number): unknown {
-        return !this.game.sanctuary.pools[poolIndex].dieFaces.every(dieFace => boughtDieFaces.map(face => face.code).includes(dieFace.code));
     }
 
     async chooseDieToReplaceDieFace(bought: DieFace): Promise<Die> {
@@ -292,7 +294,7 @@ export class Player {
         } else if (leftRight === 'L') {
             return new Promise(resolve => resolve(this.leftDie));
         } else {
-            return new Promise((resolve, reject) => reject);
+            return new Promise((_resolve, reject) => reject);
         }
     }
 
@@ -366,28 +368,13 @@ export class Player {
     }
 
     async resolveDieRolls(rolls: Array<DieFace>, mode: ResolveMode): Promise<void> {
-        if (rolls.find(roll => DieFace.isMirror(roll)) !== undefined) {
-            console.log(`
-            you rolled ${rolls.map(roll => roll.toString())}
-            current resources:
-            ${this.getResourcesString()}`);
-            await this.handleMirrorRolls(rolls);
-        }
+        await this.handleMirrorRollsEventually(rolls);
 
         let multiplier = 1;
-        let helmetActive = false;
 
-        for (let roll of rolls) {
-            if (DieFace.isHelmet(roll) && rolls.length === 2) {
-                helmetActive = true;
-            }
-        }
-
-        if (helmetActive) {
-            while (rolls.some(roll => DieFace.isHelmet(roll))) {
-                rolls.splice(rolls.indexOf(new Helmet()), 1);
-            }
-            multiplier = 3;
+        while(rolls.some(roll => DieFace.isHelmet(roll))){
+            rolls.splice(rolls.findIndex(roll => DieFace.isHelmet(roll)), 1);
+            multiplier *= 3;
         }
 
         if (mode === ResolveMode.SUBTRACT) {
@@ -402,8 +389,8 @@ export class Player {
         console.log(`resolved rolls for ${this.name}\ncurrent resources: ${this.getResourcesString()}\n\n`);
     }
 
-    async handleMirrorRolls(rolls: Array<DieFace>): Promise<DieFace[]> {
-        if (rolls?.some(roll => DieFace.isMirror(roll))) {
+    async handleMirrorRollsEventually(rolls: Array<DieFace>): Promise<DieFace[]> {
+        if (rolls.some(roll => DieFace.isMirror(roll))) {
             let allRolls = new Array<DieFace>;
             this.game.players.filter(player => player !== this)
                     .map(player => allRolls.push(player.leftDie.faces[0], player.rightDie.faces[0]));

@@ -16,8 +16,6 @@ export class DieFacePool{
     }
 
     toString():string {
-        let result = `${chalk.yellow(this.cost)}:\t`;
-        result += this.dieFaces.map(face => `${face.toString()}; `)
-        return result;
+        return `${chalk.yellow(this.cost)}: ${this.dieFaces}`;
     }
 }
