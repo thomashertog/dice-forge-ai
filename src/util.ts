@@ -65,3 +65,14 @@ export function getArrayOfNumberStringsUpTo(maxNumber: number, offset:number=1):
     }
     return options;
 }
+
+export async function chooseDieFace(options: Array<DieFace>): Promise<DieFace>{
+    const answer = await questionUntilValidAnswer(
+        `
+        options are: ${options.map(option => option.printWithCode())}
+        which one do you pick?
+        `,
+        ...options.map(option => option.code));
+
+        return options.find(option => option.is(answer)) as DieFace;
+}

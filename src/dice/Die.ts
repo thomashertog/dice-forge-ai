@@ -1,4 +1,4 @@
-import { questionUntilValidAnswer, shuffle } from "../util";
+import { chooseDieFace, questionUntilValidAnswer, shuffle } from "../util";
 import { DieFace } from "./faces/DieFace";
 
 export class Die {
@@ -13,13 +13,9 @@ export class Die {
     }
 
     async replaceFace(bought: DieFace): Promise<void> {
-        let dieFaceToReplace = 
-            await questionUntilValidAnswer(
-                `you bought ${bought}
-                your die currently looks like this: ${this.faces.map(face => face.printWithCode())}
-                which dieface you want to replace it with?`, ...this.faces.map(face => face.code));
+        let dieFaceToReplace = await chooseDieFace(this.faces);
         
-        this.faces.splice(this.faces.findIndex(face => face.code === dieFaceToReplace.toUpperCase()), 1, bought);
+        this.faces.splice(this.faces.findIndex(face => face.is(dieFaceToReplace.code)), 1, bought);
         console.log(`new die: ${this.faces.map(face => face.toString())}`);
     }
 

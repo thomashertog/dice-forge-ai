@@ -12,7 +12,7 @@ import { Game } from './Game';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 import { ResolveMode } from './ResolveMode';
-import { getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer } from './util';
+import { chooseDieFace, getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer } from './util';
 
 export class Player {
 
@@ -261,15 +261,9 @@ export class Player {
 
         let pool = this.game.sanctuary.pools[poolNumber -1];
 
-        let buy = pool.dieFaces.find(
-            async face => 
-            face.code === 
-                (await questionUntilValidAnswer(
-                    `which dieface do you want? (${pool.dieFaces.map(face => face.printWithCode())})`, 
-                    ...pool.dieFaces.map(face => face.code)))
-                    .toUpperCase()) as DieFace;
-
+        let buy = await chooseDieFace(pool.dieFaces);
         this.gold -= pool.cost;
+
         pool.dieFaces.splice(pool.dieFaces.findIndex(face => face.is(buy.code)), 1);
         
         return buy;
@@ -415,18 +409,17 @@ export class Player {
                     .map(player => allRolls.push(player.leftDie.faces[0], player.rightDie.faces[0]));
 
             let options = allRolls?.filter(roll => !DieFace.isMirror(roll));
-            let replacementRollChoice = await questionUntilValidAnswer(`
-                    current resources: ${this.getResourcesString()}
-                    options are: ${options.map(option => option.printWithCode())}
-                    which one do you pick?`,
-                        ...options.map(option => option.code));
 
+            console.log(`your current resources are ${this.getResourcesString()}`);
 
-            let replacementRoll = allRolls.find(option => option.code === replacementRollChoice.toUpperCase()) as DieFace;
+            let replacementRoll = 
+                allRolls
+                    .find(async option => 
+                        option.is((await chooseDieFace(options)).code)) as DieFace;
+            
             return rolls.splice(rolls.findIndex(roll => roll.code === 'M'), 1, replacementRoll);
         }
 
         return rolls;
     }
-
 }
