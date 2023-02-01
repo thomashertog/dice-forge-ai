@@ -5,7 +5,6 @@ import { Die } from './dice/Die';
 import { DieFace } from './dice/faces/DieFace';
 import { GloryPoints2 } from './dice/faces/GloryPoints2';
 import { Gold1 } from './dice/faces/Gold1';
-import { Helmet } from './dice/faces/Helmet';
 import { Moon1 } from './dice/faces/Moon1';
 import { Sun1 } from './dice/faces/Sun1';
 import { Game } from './Game';
