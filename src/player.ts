@@ -377,7 +377,7 @@ export class Player {
             you rolled ${rolls.map(roll => roll.toString())}
             current resources:
             ${this.getResourcesString()}`);
-            await this.game.handleMirrorRolls(rolls, this);
+            await this.handleMirrorRolls(rolls);
         }
 
         let multiplier = 1;
@@ -407,4 +407,26 @@ export class Player {
 
         console.log(`resolved rolls for ${this.name}\ncurrent resources: ${this.getResourcesString()}\n\n`);
     }
+
+    async handleMirrorRolls(rolls: Array<DieFace>): Promise<DieFace[]> {
+        if (rolls?.some(roll => DieFace.isMirror(roll))) {
+            let allRolls = new Array<DieFace>;
+            this.game.players.filter(player => player !== this)
+                    .map(player => allRolls.push(player.leftDie.faces[0], player.rightDie.faces[0]));
+
+            let options = allRolls?.filter(roll => !DieFace.isMirror(roll));
+            let replacementRollChoice = await questionUntilValidAnswer(`
+                    current resources: ${this.getResourcesString()}
+                    options are: ${options.map(option => option.printWithCode())}
+                    which one do you pick?`,
+                        ...options.map(option => option.code));
+
+
+            let replacementRoll = allRolls.find(option => option.code === replacementRollChoice.toUpperCase()) as DieFace;
+            return rolls.splice(rolls.findIndex(roll => roll.code === 'M'), 1, replacementRoll);
+        }
+
+        return rolls;
+    }
+
 }

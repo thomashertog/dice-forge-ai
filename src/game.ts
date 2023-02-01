@@ -87,30 +87,6 @@ export class Game {
         return rollsForPlayers;
     }
 
-    async handleMirrorRolls(rolls: Array<DieFace>, currentPlayer: Player): Promise<DieFace[]> {
-        if (rolls?.some(roll => DieFace.isMirror(roll))) {
-            let allRolls = new Array<DieFace>;
-            for (let player of this.players) {
-                if (player !== currentPlayer) {
-                    allRolls.push(player.leftDie.faces[0], player.rightDie.faces[0]);
-                }
-            }
-
-            let options = allRolls?.filter(roll => !DieFace.isMirror(roll));
-            let replacementRollChoice = await questionUntilValidAnswer(`
-                    current resources: ${currentPlayer.getResourcesString()}
-                    options are: ${options.map(option => option.printWithCode())}
-                    which one do you pick?`,
-                        ...options.map(option => option.code));
-
-
-            let replacementRoll = allRolls.find(option => option.code === replacementRollChoice.toUpperCase()) as DieFace;
-            return rolls.splice(rolls.findIndex(roll => roll.code === 'M'), 1, replacementRoll);
-        }
-
-        return rolls;
-    }
-
     private everybodyRolls(): Map<Player, DieFace[]> {
         let rollsForPlayers = new Map<Player, DieFace[]>;
 
