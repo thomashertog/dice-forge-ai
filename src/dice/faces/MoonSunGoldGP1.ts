@@ -12,7 +12,7 @@ export class MoonSunGoldGP1 extends DieFace{
         return `${chalk.yellow(1)}+${chalk.blue(1)}+${chalk.red(1)}+${chalk.green(1)}`;
     }
 
-    async resolveRoll(currentPlayer: Player, multiplier: number): Promise<void> {
+    async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         currentPlayer.addMoon(multiplier * 1);
         currentPlayer.addSun(multiplier * 1);
         currentPlayer.addGloryPoints(multiplier * 1);

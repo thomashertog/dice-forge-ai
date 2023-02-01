@@ -13,7 +13,7 @@ export class PickGoldMoonSun2 extends DieFace{
         return `${chalk.yellow(2)}/${chalk.blue(2)}/${chalk.red(2)}`;
     }
 
-    async resolveRoll(currentPlayer: Player, multiplier: number): Promise<void> {
+    async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         let pick1GoldMoonSun = 
         (await questionUntilValidAnswer(`
                 current resources: ${currentPlayer.getResourcesString()}

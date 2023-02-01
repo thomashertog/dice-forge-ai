@@ -15,7 +15,7 @@ export abstract class DieFace{
         return `${this.toString()} (${this.code})`;
     }
 
-    abstract resolveRoll(currentPlayer: Player, multiplier
+    abstract resolve(currentPlayer: Player, multiplier
         : number): void;
 
     static isMirror(face: DieFace): face is Mirror {

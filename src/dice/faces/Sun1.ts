@@ -12,7 +12,7 @@ export class Sun1 extends DieFace{
         return `${chalk.red(1)}`;
     }
 
-    resolveRoll(currentPlayer: Player, multiplier: number): void {
+    resolve(currentPlayer: Player, multiplier: number): void {
         currentPlayer.addSun(multiplier * 1);
     }
     

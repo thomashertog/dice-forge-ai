@@ -12,7 +12,7 @@ export class Moon1 extends DieFace{
         return `${chalk.blue(1)}`;
     }
 
-    resolveRoll(currentPlayer: Player, multiplier: number): void {
+    resolve(currentPlayer: Player, multiplier: number): void {
         currentPlayer.addMoon(multiplier * 1);
     }
     

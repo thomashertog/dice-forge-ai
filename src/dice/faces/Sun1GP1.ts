@@ -12,7 +12,7 @@ export class Sun1GP1 extends DieFace{
         return `${chalk.green(1)}+${chalk.red(1)}`;
     }
 
-    resolveRoll(currentPlayer: Player, multiplier: number): void {
+    resolve(currentPlayer: Player, multiplier: number): void {
         currentPlayer.addGloryPoints(multiplier * 1);
         currentPlayer.addSun(multiplier * 1);
     }

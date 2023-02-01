@@ -12,7 +12,7 @@ export class Helmet extends DieFace{
         return `${chalk.bgBlackBright.black('x3')}`;
     }
 
-    resolveRoll(currentPlayer: Player, multiplier: number): void {
+    resolve(currentPlayer: Player, multiplier: number): void {
         //TODO
     }
     

@@ -13,7 +13,7 @@ export class PickGold3GP2 extends DieFace {
         return `${chalk.yellow(3)}/${chalk.green(2)}`;
     }
 
-    async resolveRoll(currentPlayer: Player, multiplier: number): Promise<void> {
+    async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         let pickGoldGP = (await questionUntilValidAnswer(`
                 current resources: ${currentPlayer.getResourcesString()}
                 you want the gold (G) or glory points(P)?`,

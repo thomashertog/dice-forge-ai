@@ -166,8 +166,8 @@ export class Game {
 
         console.log(`resolving rolls for ${player.name} => ${rolls.map(roll => roll.toString())}\ncurrent resources: ${player.getResourcesString()}`);
 
-        await rolls.filter(roll => !roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolveRoll(player, multiplier)), Promise.resolve());
-        await rolls.filter(roll => roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolveRoll(player, multiplier)), Promise.resolve());
+        await rolls.filter(roll => !roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(player, multiplier)), Promise.resolve());
+        await rolls.filter(roll => roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(player, multiplier)), Promise.resolve());
 
         console.log(`resolved rolls for ${player.name}\ncurrent resources: ${player.getResourcesString()}\n\n`);
     }

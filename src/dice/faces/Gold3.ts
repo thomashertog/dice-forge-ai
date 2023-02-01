@@ -12,7 +12,7 @@ export class Gold3 extends DieFace{
         return `${chalk.yellow(3)}`;
     }
 
-    async resolveRoll(currentPlayer: Player, multiplier: number): Promise<void> {
+    async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         await currentPlayer.addGold(multiplier * 3);
     }
     

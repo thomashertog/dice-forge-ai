@@ -12,7 +12,7 @@ export class GloryPoints2 extends DieFace{
         return `${chalk.green(2)}`;
     }
 
-    resolveRoll(currentPlayer: Player, multiplier: number): void {
+    resolve(currentPlayer: Player, multiplier: number): void {
         currentPlayer.addGloryPoints(multiplier * 2);
     }
     
