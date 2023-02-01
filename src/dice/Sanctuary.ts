@@ -12,7 +12,7 @@ export class Sanctuary {
         let result = "";
         let index = 1;
         for (let pool of this.pools) {
-            result += `(${index}) -> ${chalk.yellow(pool.cost)}: ${pool.dieFaces.map(face => face.printWithCode())}\n`;
+            result += `(${index}) -> ${chalk.yellow(pool.cost)}: ${pool.dieFaces}\n`;
             index++;
         }
         return result;
