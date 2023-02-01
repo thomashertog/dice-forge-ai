@@ -1,5 +1,5 @@
 import { CostType } from "../CostType";
-import { DieFaceOption, printDieFaceOption } from "../DieFaceOption";
+import { DieFaceOption, printDieFaceOption } from "../dice/DieFaceOption";
 import { Game } from "../Game";
 import { Player } from "../Player";
 import { ResolveMode } from "../ResolveMode";

@@ -1,8 +1,8 @@
 import chalk from 'chalk';
 import cloneDeep from 'lodash/cloneDeep';
 import { CostType } from './CostType';
-import { Die } from './Die';
-import { DieFaceOption, printDieFaceOption } from './DieFaceOption';
+import { Die } from './dice/Die';
+import { DieFaceOption, printDieFaceOption } from './dice/DieFaceOption';
 import { Game } from './Game';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
@@ -36,7 +36,8 @@ export class Player {
         this.game = game;
         this.activeHammerCount = 0;
         this.goldForHammer = 0;
-        this.gold = initialGold;
+        // this.gold = initialGold;
+        this.gold = 12;
         this.sun = 0;
         this.moon = 0;
         this.gloryPoints = 0;
@@ -222,11 +223,11 @@ export class Player {
     private async forge(): Promise<void> {
         let userEnd = false;
         let minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
-        let usedPools = new Array();
+        let boughtDieFaces = new Array();
 
         while (userEnd !== true && minimumCost !== -1) {
             console.log(`${this.game.sanctuary}`);
-            usedPools.push(await this.buyAndReplaceDieFace(usedPools));
+            boughtDieFaces.push(await this.buyAndReplaceDieFace(boughtDieFaces));
             minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
 
             if (minimumCost !== -1) {
@@ -243,14 +244,14 @@ export class Player {
 
     }
 
-    private async buyAndReplaceDieFace(usedPools: Array<number>): Promise<number> {
-        let availablePoolNumbers = this.game.sanctuary.availablePoolNumbers(this.gold)
-            .filter(poolNumber => !usedPools.includes(poolNumber));
+    private async buyAndReplaceDieFace(boughtDieFaces: Array<DieFaceOption>): Promise<DieFaceOption> {
+        let availablePoolIndices = this.game.sanctuary.availablePoolIndices(this.gold)
+            .filter(poolIndex => this.filterBoughtDieFaces(boughtDieFaces, poolIndex));
 
         let chosenPoolNumber = parseInt(
             await questionUntilValidAnswer(
-                `out of which pool are you going to buy (${availablePoolNumbers})?`,
-                ...availablePoolNumbers.map(poolNumber => poolNumber + "")));
+                `out of which pool are you going to buy (${availablePoolIndices.map(index => index+1)})?`,
+                ...availablePoolIndices.map(index => index+1 + "")));
 
         let chosenPool = this.game.sanctuary.pools[chosenPoolNumber - 1];
         const numberOfOptionsInPool = chosenPool.dieFaces.length;
@@ -265,7 +266,11 @@ export class Player {
 
         this.gold -= chosenPool.cost;
         chosenPool.dieFaces.splice(buyChoice - 1, 1);
-        return chosenPoolNumber;
+        return boughtDieFace;
+    }
+
+    private filterBoughtDieFaces(boughtDieFaces: Array<DieFaceOption>, poolIndex: number): unknown {
+        return !this.game.sanctuary.pools[poolIndex].dieFaces.every(dieFace => boughtDieFaces.includes(dieFace));
     }
 
     async chooseDieToReplaceDieFace(bought: DieFaceOption): Promise<Die> {

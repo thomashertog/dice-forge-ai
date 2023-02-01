@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { shuffle } from "lodash";
-import { AllSanctuaryDieFaces } from "./data";
+import { AllSanctuaryDieFaces } from "../data";
 import { DieFacePool } from "./DieFacePool";
-import { getDieFacesAsPrettyString } from "./util";
+import { getDieFacesAsPrettyString } from "../util";
 
 export class Sanctuary {
 
@@ -10,8 +10,10 @@ export class Sanctuary {
 
     toString(): string {
         let result = "";
+        let index = 1;
         for (let pool of this.pools) {
-            result += `${chalk.yellow(pool.cost)}: ${getDieFacesAsPrettyString("", pool.dieFaces)}\n`;
+            result += `(${index}) -> ${chalk.yellow(pool.cost)}: ${getDieFacesAsPrettyString("", pool.dieFaces)}\n`;
+            index++;
         }
         return result;
     }
@@ -27,13 +29,13 @@ export class Sanctuary {
         }
     }
 
-    availablePoolNumbers(maxCost: number): Array<number> {
+    availablePoolIndices(maxCost: number): Array<number> {
         let result = new Array();
 
         this.pools.forEach(
             (pool, index) => {
                 if (pool.dieFaces.length !== 0 && maxCost >= pool.cost) {
-                    result.push(index + 1);
+                    result.push(index);
                 }
             });
         return result;
@@ -41,7 +43,7 @@ export class Sanctuary {
 
     lowestAvailablePoolCost(maxCost: number): number {
         for (let pool of this.pools) {
-            if (maxCost > pool.cost) {
+            if (maxCost >= pool.cost) {
                 if (pool.dieFaces.length > 0) {
                     return pool.cost;
                 }

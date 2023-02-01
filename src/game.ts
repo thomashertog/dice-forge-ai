@@ -1,10 +1,10 @@
 import { AllHeroicFeats, AllSanctuaryDieFaces } from './data';
-import { DieFaceOption, printDieFaceOption } from './DieFaceOption';
-import { DieFacePool } from './DieFacePool';
+import { DieFaceOption, printDieFaceOption } from './dice/DieFaceOption';
+import { DieFacePool } from './dice/DieFacePool';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { Player } from './Player';
 import { ResolveMode } from './ResolveMode';
-import { Sanctuary } from './Sanctuary';
+import { Sanctuary } from './dice/Sanctuary';
 import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer, shuffle } from './util';
 
 export class Game {
