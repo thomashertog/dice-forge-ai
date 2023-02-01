@@ -5,6 +5,7 @@ import { Die } from './dice/Die';
 import { DieFace } from './dice/faces/DieFace';
 import { GloryPoints2 } from './dice/faces/GloryPoints2';
 import { Gold1 } from './dice/faces/Gold1';
+import { Helmet } from './dice/faces/Helmet';
 import { Moon1 } from './dice/faces/Moon1';
 import { Sun1 } from './dice/faces/Sun1';
 import { Game } from './Game';
@@ -64,7 +65,7 @@ export class Player {
 
     async receiveDivineBlessing(): Promise<void> {
         let rolls = this.divineBlessing();
-        await this.game.resolveDieRolls(this, rolls, ResolveMode.ADD);
+        await this.resolveDieRolls(rolls, ResolveMode.ADD);
     }
 
     divineBlessing(): Array<DieFace> {
@@ -77,7 +78,7 @@ export class Player {
     }
 
     async minorBlessing(die: Die): Promise<void> {
-        await this.game.resolveDieRolls(this, new Array(die.roll()), ResolveMode.ADD);
+        await this.resolveDieRolls(new Array(die.roll()), ResolveMode.ADD);
     }
 
     async takeTurn(): Promise<boolean> {
@@ -233,7 +234,9 @@ export class Player {
 
         while (userEnd !== true && minimumCost !== -1) {
             console.log(`${this.game.sanctuary}`);
-            boughtDieFaces.push(await this.buyAndReplaceDieFace(boughtDieFaces));
+            let bought = await this.buyDieFace(boughtDieFaces);
+            boughtDieFaces.push(bought);
+            await this.replaceDieFace(bought);
             minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
 
             if (minimumCost !== -1) {
@@ -250,28 +253,31 @@ export class Player {
 
     }
 
-    private async buyAndReplaceDieFace(boughtDieFaces: Array<DieFace>): Promise<DieFace> {
+    private async buyDieFace(boughtDieFaces: Array<DieFace>): Promise<DieFace>{
         let availablePoolIndices = this.game.sanctuary.availablePoolIndices(this.gold)
             .filter(poolIndex => this.filterBoughtDieFaces(boughtDieFaces, poolIndex));
 
-        let chosenPoolNumber = parseInt(
-            await questionUntilValidAnswer(
-                `out of which pool are you going to buy (${availablePoolIndices.map(index => index+1)})?`,
-                ...availablePoolIndices.map(index => index+1 + "")));
+        let poolNumber = parseInt(await questionUntilValidAnswer(`out of which pool are you going to buy (${availablePoolIndices.map(index => index+1)})?`, ...availablePoolIndices.map(index => index+1+"")));
 
-        let chosenPool = this.game.sanctuary.pools[chosenPoolNumber - 1];
+        let pool = this.game.sanctuary.pools[poolNumber -1];
 
-        let buyChoice = (await questionUntilValidAnswer(`which dieface do you want? (${chosenPool.dieFaces.map(face => face.printWithCode())})`, ...chosenPool.dieFaces.map(face => face.code))).toUpperCase();
+        let buy = pool.dieFaces.find(
+            async face => 
+            face.code === 
+                (await questionUntilValidAnswer(
+                    `which dieface do you want? (${pool.dieFaces.map(face => face.printWithCode())})`, 
+                    ...pool.dieFaces.map(face => face.code)))
+                    .toUpperCase()) as DieFace;
 
-        let boughtDieFace = chosenPool.dieFaces.find(face => face.code === buyChoice) as DieFace;
-        console.log(`congrats you bought ${boughtDieFace}`);
+        this.gold -= pool.cost;
+        pool.dieFaces.splice(pool.dieFaces.findIndex(face => face.is(buy.code)), 1);
+        
+        return buy;
+    }
 
-        let die = await this.chooseDieToReplaceDieFace(boughtDieFace);
-        await die.replaceFace(boughtDieFace);
-
-        this.gold -= chosenPool.cost;
-        chosenPool.dieFaces.splice(chosenPool.dieFaces.findIndex(face => face.code === buyChoice), 1);
-        return boughtDieFace;
+    private async replaceDieFace(replacement: DieFace): Promise<void> {
+        let die = await this.chooseDieToReplaceDieFace(replacement);
+        await die.replaceFace(replacement);
     }
 
     private filterBoughtDieFaces(boughtDieFaces: Array<DieFace>, poolIndex: number): unknown {
@@ -363,5 +369,42 @@ export class Player {
     extraChest(): void {
         this.MAX_GOLD += 4;
         this.MAX_MOON_SUN += 3;
+    }
+
+    async resolveDieRolls(rolls: Array<DieFace>, mode: ResolveMode): Promise<void> {
+        if (rolls.find(roll => DieFace.isMirror(roll)) !== undefined) {
+            console.log(`
+            you rolled ${rolls.map(roll => roll.toString())}
+            current resources:
+            ${this.getResourcesString()}`);
+            await this.game.handleMirrorRolls(rolls, this);
+        }
+
+        let multiplier = 1;
+        let helmetActive = false;
+
+        for (let roll of rolls) {
+            if (DieFace.isHelmet(roll) && rolls.length === 2) {
+                helmetActive = true;
+            }
+        }
+
+        if (helmetActive) {
+            while (rolls.some(roll => DieFace.isHelmet(roll))) {
+                rolls.splice(rolls.indexOf(new Helmet()), 1);
+            }
+            multiplier = 3;
+        }
+
+        if (mode === ResolveMode.SUBTRACT) {
+            multiplier *= -1;
+        }
+
+        console.log(`resolving rolls for ${this.name} => ${rolls.map(roll => roll.toString())}\ncurrent resources: ${this.getResourcesString()}`);
+
+        await rolls.filter(roll => !roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(this, multiplier)), Promise.resolve());
+        await rolls.filter(roll => roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(this, multiplier)), Promise.resolve());
+
+        console.log(`resolved rolls for ${this.name}\ncurrent resources: ${this.getResourcesString()}\n\n`);
     }
 }

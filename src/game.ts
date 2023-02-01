@@ -1,6 +1,5 @@
 import { AllHeroicFeats } from './data';
 import { DieFace } from './dice/faces/DieFace';
-import { Helmet } from './dice/faces/Helmet';
 import { Sanctuary } from './dice/Sanctuary';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { Player } from './Player';
@@ -83,7 +82,7 @@ export class Game {
         let rollsForPlayers = this.everybodyRolls();
 
         for (let rollsForPlayer of rollsForPlayers.entries()) {
-            await this.resolveDieRolls(rollsForPlayer[0], rollsForPlayer[1], ResolveMode.ADD);
+            await rollsForPlayer[0].resolveDieRolls(rollsForPlayer[1], ResolveMode.ADD);
         }
         return rollsForPlayers;
     }
@@ -133,42 +132,5 @@ export class Game {
             }
             this.heroicFeats.set(portal.code, cards);
         }
-    }
-
-    async resolveDieRolls(player: Player, rolls: Array<DieFace>, mode: ResolveMode): Promise<void> {
-        if (rolls.find(roll => DieFace.isMirror(roll)) !== undefined) {
-            console.log(`
-            you rolled ${rolls.map(roll => roll.toString())}
-            current resources:
-            ${player.getResourcesString()}`);
-            await this.handleMirrorRolls(rolls, player);
-        }
-
-        let multiplier = 1;
-        let helmetActive = false;
-
-        for (let roll of rolls) {
-            if (DieFace.isHelmet(roll) && rolls.length === 2) {
-                helmetActive = true;
-            }
-        }
-
-        if (helmetActive) {
-            while (rolls.some(roll => DieFace.isHelmet(roll))) {
-                rolls.splice(rolls.indexOf(new Helmet()), 1);
-            }
-            multiplier = 3;
-        }
-
-        if (mode === ResolveMode.SUBTRACT) {
-            multiplier *= -1;
-        }
-
-        console.log(`resolving rolls for ${player.name} => ${rolls.map(roll => roll.toString())}\ncurrent resources: ${player.getResourcesString()}`);
-
-        await rolls.filter(roll => !roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(player, multiplier)), Promise.resolve());
-        await rolls.filter(roll => roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(player, multiplier)), Promise.resolve());
-
-        console.log(`resolved rolls for ${player.name}\ncurrent resources: ${player.getResourcesString()}\n\n`);
     }
 }
