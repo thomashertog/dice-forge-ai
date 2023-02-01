@@ -81,8 +81,8 @@ export class Game {
     private async everybodyReceivesDivineBlessing(): Promise<Map<Player, DieFace[]>> {
         let rollsForPlayers = this.everybodyRolls();
 
-        for (let rollsForPlayer of rollsForPlayers.entries()) {
-            await rollsForPlayer[0].resolveDieRolls(rollsForPlayer[1], ResolveMode.ADD);
+        for (let player of this.players) {
+            await player.resolveDieRolls(rollsForPlayers.get(player) as Array<DieFace>, ResolveMode.ADD);
         }
         return rollsForPlayers;
     }
