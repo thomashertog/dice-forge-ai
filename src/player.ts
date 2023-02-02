@@ -236,7 +236,7 @@ export class Player {
             let bought = await this.buyDieFace(boughtDieFaces);
             boughtDieFaces.push(bought);
             
-            await this.replaceDieFace(bought);
+            await this.placeDieFaceOntoDie(bought);
             
             minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
 
@@ -251,7 +251,6 @@ export class Player {
                 }
             }
         }
-
     }
 
     private async buyDieFace(boughtDieFaces: Array<DieFace>): Promise<DieFace>{
@@ -274,12 +273,12 @@ export class Player {
         return buy;
     }
 
-    private async replaceDieFace(replacement: DieFace): Promise<void> {
+    async placeDieFaceOntoDie(replacement: DieFace): Promise<void> {
         let die = await this.chooseDieToReplaceDieFace(replacement);
         await die.replaceFace(replacement);
     }
 
-    async chooseDieToReplaceDieFace(bought: DieFace): Promise<Die> {
+    private async chooseDieToReplaceDieFace(bought: DieFace): Promise<Die> {
         let leftRight = (await questionUntilValidAnswer(
             `${getDieFacesAsPrettyString('left', this.leftDie.faces)}
             ${getDieFacesAsPrettyString('right', this.rightDie.faces)}
@@ -369,16 +368,8 @@ export class Player {
     async resolveDieRolls(rolls: Array<DieFace>, mode: ResolveMode): Promise<void> {
         await this.handleMirrorRollsEventually(rolls);
 
-        let multiplier = 1;
-
-        while(rolls.some(roll => DieFace.isHelmet(roll))){
-            rolls.splice(rolls.findIndex(roll => DieFace.isHelmet(roll)), 1);
-            multiplier *= 3;
-        }
-
-        if (mode === ResolveMode.SUBTRACT) {
-            multiplier *= -1;
-        }
+        let multiplier = this.handleHelmetEventually(rolls);
+        multiplier = this.handleMinotaurEventually(mode, multiplier);
 
         console.log(`resolving rolls for ${this.name} => ${rolls.map(roll => roll.toString())}\ncurrent resources: ${this.getResourcesString()}`);
 
@@ -386,6 +377,23 @@ export class Player {
         await rolls.filter(roll => roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(this, multiplier)), Promise.resolve());
 
         console.log(`resolved rolls for ${this.name}\ncurrent resources: ${this.getResourcesString()}\n\n`);
+    }
+
+    private handleMinotaurEventually(mode: ResolveMode, multiplier: number) {
+        if (mode === ResolveMode.SUBTRACT) {
+            multiplier *= -1;
+        }
+        return multiplier;
+    }
+
+    private handleHelmetEventually(rolls: DieFace[]) {
+        let multiplier = 1;
+
+        while (rolls.some(roll => DieFace.isHelmet(roll))) {
+            rolls.splice(rolls.findIndex(roll => DieFace.isHelmet(roll)), 1);
+            multiplier *= 3;
+        }
+        return multiplier;
     }
 
     async handleMirrorRollsEventually(rolls: Array<DieFace>): Promise<DieFace[]> {
@@ -398,10 +406,9 @@ export class Player {
 
             console.log(`your current resources are ${this.getResourcesString()}`);
 
-            let replacementRoll = 
-                allRolls
-                    .find(async option => 
-                        option.is((await chooseDieFace(options)).code)) as DieFace;
+            const replacementChoice = await chooseDieFace(options)
+
+            let replacementRoll = allRolls.find(option => option.is(replacementChoice.code)) as DieFace;
             
             return rolls.splice(rolls.findIndex(roll => roll.code === 'M'), 1, replacementRoll);
         }

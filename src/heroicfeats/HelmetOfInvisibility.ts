@@ -11,8 +11,7 @@ export class HelmetOfInvisibility extends AbstractHeroicFeatCard implements Inst
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {
-        let die = await currentPlayer.chooseDieToReplaceDieFace(new Helmet());
-        await die.replaceFace(new Helmet());
+        await currentPlayer.placeDieFaceOntoDie(new Helmet());
     }
 
     getGloryPointsAtEndOfGame(): number {
