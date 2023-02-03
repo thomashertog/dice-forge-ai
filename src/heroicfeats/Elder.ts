@@ -8,11 +8,7 @@ import { ReinforcementEffect } from "./ReinforcementEffect";
 export class Elder extends AbstractHeroicFeatCard implements ReinforcementEffect{
 
     constructor(){
-        super(1, CostType.SUN);
-    }
-
-    toString():string {
-        return `Elder (${chalk.red(1)})`;
+        super('E', 1, CostType.SUN);
     }
 
     addToListOfReinforcements(currentPlayer: Player): void {

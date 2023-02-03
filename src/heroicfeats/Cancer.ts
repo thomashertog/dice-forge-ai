@@ -6,7 +6,7 @@ import { InstantEffect } from "./InstantEffect";
 export class Cancer extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
-        super(6, CostType.MOON);
+        super('C', 6, CostType.MOON);
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {

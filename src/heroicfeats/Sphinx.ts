@@ -7,7 +7,7 @@ import { InstantEffect } from "./InstantEffect";
 export class Sphinx extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
-        super(6, CostType.SUN);
+        super('S', 6, CostType.SUN);
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {

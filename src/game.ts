@@ -1,7 +1,6 @@
-import { AllHeroicFeats } from './data';
 import { DieFace } from './dice/faces/DieFace';
 import { Sanctuary } from './dice/Sanctuary';
-import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
+import { HeroicFeatIsland } from './heroicfeats/HeroicFeatIsland';
 import { Player } from './Player';
 import { ResolveMode } from './ResolveMode';
 import { questionUntilValidAnswer } from './util';
@@ -9,18 +8,19 @@ import { questionUntilValidAnswer } from './util';
 export class Game {
 
     sanctuary: Sanctuary;
+    heroicFeats: HeroicFeatIsland;
     players: Array<Player>;
-    heroicFeats: Map<String, Array<HeroicFeatCard>>;
 
     GAME_ROUNDS: number = 9;
 
     constructor(playerCount: number) {
         this.sanctuary = new Sanctuary(playerCount);
+        this.heroicFeats = new HeroicFeatIsland(playerCount);
+        
         this.players = new Array();
         for (let i = 0; i < playerCount; i++) {
             this.players.push(new Player(3 - i, this, `player ${i + 1}`));
         }
-        this.heroicFeats = new Map();
     }
 
     async start(): Promise<void> {
@@ -29,7 +29,6 @@ export class Game {
             console.log("warning, this game has an extra round");
             this.GAME_ROUNDS = 10;
         }
-        this.initializeHeroicFeats(this.players.length);
         for (let round = 1; round <= this.GAME_ROUNDS; round++) {
             await this.playRound(round);
         }
@@ -96,17 +95,5 @@ export class Game {
         }
 
         return rollsForPlayers;
-    }
-
-    private initializeHeroicFeats(numberOfPlayers: number): void {
-        for (let portal of AllHeroicFeats) {
-            let cards = new Array<HeroicFeatCard>();
-            for (let card of portal.cards) {
-                for (let i = 1; i <= numberOfPlayers; i++) {
-                    cards.push(card);
-                }
-            }
-            this.heroicFeats.set(portal.code, cards);
-        }
     }
 }

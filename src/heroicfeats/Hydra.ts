@@ -4,7 +4,7 @@ import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 export class Hydra extends AbstractHeroicFeatCard{
 
     constructor(){
-        super(5, CostType.BOTH);
+        super('H', 5, CostType.BOTH);
     }
 
     getGloryPointsAtEndOfGame(): number {

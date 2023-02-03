@@ -1,6 +1,7 @@
+import { Player } from "../Player";
 import { HeroicFeatCard } from "./HeroicFeatCard";
 
-export class HeroicFeatPortal{
+export class HeroicFeatPlatform{
 
     code: string;
     cards: Array<HeroicFeatCard>;

@@ -7,7 +7,7 @@ import { InstantEffect } from "./InstantEffect";
 export class MirrorOfTheAbyss extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
-        super(5, CostType.SUN);
+        super('M', 5, CostType.SUN);
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {

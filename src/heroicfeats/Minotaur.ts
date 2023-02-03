@@ -7,7 +7,7 @@ import { InstantEffect } from "./InstantEffect";
 export class Minotaur extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
-        super(3, CostType.SUN);
+        super('M', 3, CostType.SUN);
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {

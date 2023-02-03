@@ -8,11 +8,7 @@ import { ReinforcementEffect } from "./ReinforcementEffect";
 export class SilverHind extends AbstractHeroicFeatCard implements ReinforcementEffect{
     
     constructor(){
-        super(2, CostType.MOON);
-    }
-
-    toString():string {
-        return `Silver Hind (${chalk.blue(2)})`;
+        super('H', 2, CostType.MOON);
     }
 
     addToListOfReinforcements(player: Player): void {

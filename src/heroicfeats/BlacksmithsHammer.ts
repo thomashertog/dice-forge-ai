@@ -8,7 +8,7 @@ export class BlacksmithsHammer extends AbstractHeroicFeatCard implements Instant
     gold: number;
 
     constructor(){
-        super(1, CostType.MOON);
+        super('H', 1, CostType.MOON);
         this.gold = 0;
     }
 

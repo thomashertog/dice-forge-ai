@@ -4,7 +4,7 @@ import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 export class Gorgon extends AbstractHeroicFeatCard {
 
     constructor(){
-        super(4, CostType.SUN);
+        super('G', 4, CostType.SUN);
     }
 
     getGloryPointsAtEndOfGame(): number {

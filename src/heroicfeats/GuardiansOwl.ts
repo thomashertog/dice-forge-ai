@@ -8,11 +8,7 @@ import { ReinforcementEffect } from "./ReinforcementEffect";
 export class GuardiansOwl extends AbstractHeroicFeatCard implements ReinforcementEffect{
 
     constructor(){
-        super(2, CostType.SUN);
-    }
-
-    toString():string {
-        return `Guardian's Owl (${chalk.red(2)})`;
+        super('O', 2, CostType.SUN);
     }
 
     addToListOfReinforcements(currentPlayer: Player): void {

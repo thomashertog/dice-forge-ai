@@ -23,7 +23,7 @@ import { FerryMan } from "./heroicfeats/Ferryman";
 import { Gorgon } from "./heroicfeats/Gorgon";
 import { GuardiansOwl } from "./heroicfeats/GuardiansOwl";
 import { HelmetOfInvisibility } from "./heroicfeats/HelmetOfInvisibility";
-import { HeroicFeatPortal } from "./heroicfeats/HeroicFeatPortal";
+import { HeroicFeatPlatform } from "./heroicfeats/HeroicFeatPlatform";
 import { Hydra } from "./heroicfeats/Hydra";
 import { Minotaur } from "./heroicfeats/Minotaur";
 import { MirrorOfTheAbyss } from "./heroicfeats/MirrorOfTheAbyss";
@@ -45,27 +45,27 @@ export const AllSanctuaryDieFaces: Array<DieFacePool> = new Array<DieFacePool>(
     new DieFacePool(12, [new PickGoldMoonSun2(), new GloryPoints4(), new MoonSunGoldGP1(), new MoonGP2()])
 );
 
-export const AllHeroicFeats: Array<HeroicFeatPortal> = new Array<HeroicFeatPortal>(
-    new HeroicFeatPortal("M1",
+export const AllHeroicFeats: Array<HeroicFeatPlatform> = new Array<HeroicFeatPlatform>(
+    new HeroicFeatPlatform("M1",
         new BlacksmithsHammer(), 
         new BlackmithsChest()),
-    new HeroicFeatPortal("M2",
+    new HeroicFeatPlatform("M2",
         new SilverHind(),
         new Satyrs()),
-    new HeroicFeatPortal("M3",
+    new HeroicFeatPlatform("M3",
         new FerryMan(),
         new HelmetOfInvisibility()),
-    new HeroicFeatPortal("E",
+    new HeroicFeatPlatform("E",
         new Cancer(),
         new Hydra(),
         new Sphinx()),
-    new HeroicFeatPortal("S1",
+    new HeroicFeatPlatform("S1",
         new Elder(),
         new WildSpirits()),
-    new HeroicFeatPortal("S2",
+    new HeroicFeatPlatform("S2",
         new GuardiansOwl(),
         new Minotaur),
-    new HeroicFeatPortal("S3",
+    new HeroicFeatPlatform("S3",
         new Gorgon(),
         new MirrorOfTheAbyss())
 );

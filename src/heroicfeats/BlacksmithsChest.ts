@@ -6,7 +6,7 @@ import { InstantEffect } from "./InstantEffect";
 export class BlackmithsChest extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
-        super(1, CostType.MOON);
+        super('C', 1, CostType.MOON);
     }
 
     handleEffect(currentPlayer: Player): void {

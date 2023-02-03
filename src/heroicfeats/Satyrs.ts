@@ -9,7 +9,7 @@ import { InstantEffect } from "./InstantEffect";
 export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
-        super(3, CostType.MOON);
+        super('S', 3, CostType.MOON);
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {
