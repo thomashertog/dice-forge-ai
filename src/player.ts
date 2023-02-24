@@ -103,15 +103,8 @@ export class Player {
 
     async jumpTo(targetPlatform: HeroicFeatPlatform): Promise<void> {
         await targetPlatform.handleEventualOusting();
-        this.clearPlayerFromItsCurrentPlatform();
+        this.game.heroicFeats.clearPlayerFromItsCurrentPlatform(this);
         targetPlatform.player = this;
-    }
-
-    private clearPlayerFromItsCurrentPlatform() {
-        let currentPlatform = this.game.heroicFeats.platforms.find(platform => platform.player === this);
-        if (currentPlatform !== undefined) {
-            currentPlatform.player = null;
-        }
     }
 
     buyCard(card: HeroicFeatCard, platform: HeroicFeatPlatform): void {

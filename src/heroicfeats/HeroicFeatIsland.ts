@@ -26,4 +26,10 @@ export class HeroicFeatIsland{
         return this.platforms.filter(platform => platform.cards.filter(card => card.canBeBoughtBy(player)).length > 0).map(platform => platform.code);
     }
 
+    clearPlayerFromItsCurrentPlatform(player: Player): void {
+        let currentPlatform = this.platforms.find(platform => platform.player === player);
+        if (currentPlatform !== undefined) {
+            currentPlatform.player = null;
+        }
+    }
 }
