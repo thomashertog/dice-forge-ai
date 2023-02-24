@@ -1,6 +1,7 @@
+import { platform } from "os";
 import { AllHeroicFeats } from "../data";
-import { HeroicFeatCard } from "./HeroicFeatCard";
-import { HeroicFeatPlatform as HeroicFeatPlatform } from "./HeroicFeatPlatform";
+import { Player } from "../Player";
+import { HeroicFeatPlatform } from "./HeroicFeatPlatform";
 
 export class HeroicFeatIsland{
 
@@ -9,13 +10,20 @@ export class HeroicFeatIsland{
     constructor(numberOfPlayers: number) {
         this.platforms = new Array();
         for (let portal of AllHeroicFeats) {
-            let cards = new Array<HeroicFeatCard>();
-            for (let card of portal.cards) {
-                for (let i = 1; i <= numberOfPlayers; i++) {
-                    cards.push(card);
-                }
+            let cards = [];
+            for(let i = 0; i<numberOfPlayers; i++){
+                cards.push(...portal.cards)
             }
             this.platforms.push(new HeroicFeatPlatform(portal.code, ...cards));
         }
     }
+
+    toString(): string{
+        return this.platforms.map(platform => platform.toString()).join('\n');
+    }
+
+    availablePlatformsFor(player: Player): Array<string> {
+        return this.platforms.filter(platform => platform.cards.filter(card => card.canBeBoughtBy(player)).length > 0).map(platform => platform.code);
+    }
+
 }

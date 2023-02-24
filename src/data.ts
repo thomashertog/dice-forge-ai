@@ -64,7 +64,7 @@ export const AllHeroicFeats: Array<HeroicFeatPlatform> = new Array<HeroicFeatPla
         new WildSpirits()),
     new HeroicFeatPlatform("S2",
         new GuardiansOwl(),
-        new Minotaur),
+        new Minotaur()),
     new HeroicFeatPlatform("S3",
         new Gorgon(),
         new MirrorOfTheAbyss())

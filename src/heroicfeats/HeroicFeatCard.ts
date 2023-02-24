@@ -1,4 +1,5 @@
 import { CostType } from "../CostType";
+import { Player } from "../Player";
 
 export interface HeroicFeatCard{
 
@@ -7,4 +8,5 @@ export interface HeroicFeatCard{
     getCost(): number;
     getCostType(): CostType;
 
+    canBeBoughtBy(player: Player): boolean;
 }

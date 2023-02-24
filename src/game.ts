@@ -52,8 +52,9 @@ export class Game {
     }
 
     private async playTurn(player: Player, round: number): Promise<void> {
+        console.clear();
         await this.startTurn();
-        console.log(`starting turn for player in round ${round}`);
+        console.log(`starting turn for ${player.name} in round ${round}`);
         await player.doReinforcements();
         let executed = await player.takeTurn();
         if (player.sun >= 2 && executed === true) {

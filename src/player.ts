@@ -1,4 +1,6 @@
+import assert from 'assert';
 import chalk from 'chalk';
+import { result } from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
 import { CostType } from './CostType';
 import { Die } from './dice/Die';
@@ -12,7 +14,7 @@ import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { HeroicFeatPlatform } from './heroicfeats/HeroicFeatPlatform';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 import { ResolveMode } from './ResolveMode';
-import { chooseDieFace, getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer } from './util';
+import { chooseDieFace, countCardsByType, getArrayOfNumberStringsUpTo, getDieFacesAsPrettyString, isInstantEffect, isReinforcementEffect, questionUntilValidAnswer } from './util';
 
 export class Player {
 
@@ -22,7 +24,6 @@ export class Player {
     leftDie: Die;
     rightDie: Die;
     heroicFeats: Array<HeroicFeatCard>;
-    currentPlatform: HeroicFeatPlatform;
 
     reinforcements: Array<ReinforcementEffect>;
 
@@ -45,17 +46,16 @@ export class Player {
         this.sun = 0;
         this.moon = 0;
         this.gloryPoints = 0;
-        this.currentPlatform = new HeroicFeatPlatform("");
         this.reinforcements = new Array();
 
         this.leftDie = new Die(new Sun1(), new Gold1(), new Gold1(), new Gold1(), new Gold1(), new Gold1());
-        
+
         this.rightDie = new Die(new Moon1(), new GloryPoints2(), new Gold1(), new Gold1(), new Gold1(), new Gold1());
 
         this.heroicFeats = new Array();
     }
 
-    toString():string {
+    toString(): string {
         return `
         ${this.name}
         -----------------------
@@ -85,13 +85,14 @@ export class Player {
     async takeTurn(): Promise<boolean> {
         console.log(`${this}`);
         console.log(`${this.game.sanctuary}`)
+        console.log(`${this.game.heroicFeats}`)
         try {
             let answer = (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
             if (answer === 'F') {
                 await this.forge();
             } else if (answer === 'H') {
                 await this.heroicFeat();
-            } else if (answer === 'P'){
+            } else if (answer === 'P') {
                 return new Promise(resolve => resolve(false));
             }
         } catch (err) {
@@ -100,109 +101,80 @@ export class Player {
         return new Promise(resolve => resolve(true));
     }
 
+    async jumpTo(targetPlatform: HeroicFeatPlatform): Promise<void> {
+        await targetPlatform.handleEventualOusting();
+        this.clearPlayerFromItsCurrentPlatform();
+        targetPlatform.player = this;
+    }
+
+    private clearPlayerFromItsCurrentPlatform() {
+        let currentPlatform = this.game.heroicFeats.platforms.find(platform => platform.player === this);
+        if (currentPlatform !== undefined) {
+            currentPlatform.player = null;
+        }
+    }
+
+    buyCard(card: HeroicFeatCard, platform: HeroicFeatPlatform): void {
+        this.heroicFeats.push(card);
+        platform.cards.splice(platform.cards.findIndex(c => c.getCode() === card.getCode()), 1);
+
+        switch (card.getCostType()) {
+            case CostType.MOON: this.moon -= card.getCost(); break;
+            case CostType.SUN: this.sun -= card.getCost(); break;
+            case CostType.BOTH: this.moon -= card.getCost(); this.sun -= card.getCost(); break;
+        }
+    }
+
     private async heroicFeat(): Promise<void> {
-        for (let platform of this.game.heroicFeats.platforms) {
-            let platformName = platform.code;
-            for (let player of this.game.players) {
-                if (player.currentPlatform === platform) {
-                    platformName += ` (${player.name})`;
-                }
-            }
-            console.log(`${platformName}: ${platform.cards}`);
-        }
+        let chosenPlatform = await this.pickPlatform();
+        await this.jumpTo(chosenPlatform);
 
-        console.log(`available platforms: ${this.availablePlatforms()}`);
-        let platformChoice = await (await questionUntilValidAnswer("To which platform do you want to jump?", ...this.availablePlatforms())).toUpperCase();
+        let card = await this.pickCardToBuy(chosenPlatform);
+        this.buyCard(card, chosenPlatform);
 
-        this.currentPlatform = this.game.heroicFeats.platforms.find(platform => platform.code === platformChoice) as HeroicFeatPlatform;
-        
-        await this.handleEventualOusting(this.currentPlatform);
-
-        //NOTE: needed for use in filter function
-        let currentPlayer = this;
-
-        let allCardsOfPlatform = cloneDeep(this.currentPlatform.cards);
-
-        let availableCards = allCardsOfPlatform.filter(() => function(card: HeroicFeatCard){
-            switch(card.getCostType()){
-                    case CostType.MOON: return currentPlayer.moon >= card.getCost();
-                    case CostType.SUN: return currentPlayer.sun >= card.getCost();
-                    case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();
-            }
-        });
-
-        let chosenCardCode = await questionUntilValidAnswer(`Which card do you want to buy (${availableCards}`, ...availableCards.map(card => card.getCode()));
-
-        let chosenCard = this.currentPlatform.cards.find(card => card.getCode() === chosenCardCode.toUpperCase()) as HeroicFeatCard;
-
-        this.currentPlatform.cards.splice(this.currentPlatform.cards.findIndex(card => card.getCode() === chosenCardCode.toUpperCase()), 1);
-        console.log(`${chosenCard}`);
-        this.heroicFeats.push(chosenCard);
-        switch (chosenCard.getCostType()) {
-            case CostType.MOON: this.moon -= chosenCard.getCost(); break;
-            case CostType.SUN: this.sun -= chosenCard.getCost(); break;
-            case CostType.BOTH: this.moon -= chosenCard.getCost(); this.sun -= chosenCard.getCost(); break;
-        }
-
-        if (isInstantEffect(chosenCard)) {
-            await chosenCard.handleEffect(this);
-        }
-        if (isReinforcementEffect(chosenCard)) {
-            chosenCard.addToListOfReinforcements(currentPlayer);
+        if (isInstantEffect(card)) {
+            await card.handleEffect(this);
+        }else if(isReinforcementEffect(card)) {
+            card.addToListOfReinforcements(this);
         }
     }
 
-    async handleEventualOusting(platform: HeroicFeatPlatform): Promise<void> {
-        for (let player of this.game.players) {
-            if (player === this) {
-                continue;
-            }
-            if (player.currentPlatform === platform) {
-                console.log(`ousting ${player.name}`);
-                player.currentPlatform = new HeroicFeatPlatform("");
-                await player.receiveDivineBlessing();
-            }
-        }
+    private async pickPlatform(): Promise<HeroicFeatPlatform> {
+        console.log(this.game.heroicFeats.toString());
+        let platformChoice = await (await questionUntilValidAnswer("To which platform do you want to jump?", ...this.game.heroicFeats.availablePlatformsFor(this))).toUpperCase();
+
+        let platform = this.game.heroicFeats.platforms.find(platform => platform!.code === platformChoice);
+        assert(platform);
+
+        return platform;
     }
 
-    private availablePlatforms(): Array<string> {
-        //NOTE: filter platforms that aren't available because all the cheapest cards are sold out
-        let platforms = new Array();
-        if (this.moon >= 1) {
-            platforms.push("M1");
-        }
-        if (this.moon >= 2) {
-            platforms.push("M2");
-        }
-        if (this.moon >= 4) {
-            platforms.push("M3");
-        }
-        if (this.sun >= 1) {
-            platforms.push("S1");
-        }
-        if (this.sun >= 2) {
-            platforms.push("S2");
-        }
-        if (this.sun >= 4) {
-            platforms.push("S3");
-        }
-        if ((this.sun >= 5 && this.moon >= 5) || this.sun >= 6 || this.moon >= 6) {
-            platforms.push("E");
-        }
-        return platforms;
+    private async pickCardToBuy(platform: HeroicFeatPlatform): Promise<HeroicFeatCard> {
+        let availableCards = countCardsByType(platform.cards.filter(card => isBuyable(this, card)));
+
+        let chosenCardCode = await questionUntilValidAnswer(
+            `Which card do you want to buy
+            ${Array.from(availableCards.entries())
+                    .reduce((cardsString, [card, amount]) => cardsString += `${card} (${amount})`, "")}`, 
+            ...Array.from(availableCards.keys()).map(card => card.getCode()));
+
+        let chosenCard = platform.cards.find(card => card.getCode() === chosenCardCode.toUpperCase());
+
+        assert(chosenCard);
+        return chosenCard;
     }
 
     async doReinforcements(): Promise<void> {
         let reinforcementsLeftForTurn = cloneDeep(this.reinforcements) as Array<ReinforcementEffect>;
         while (reinforcementsLeftForTurn.length !== 0) {
             let restring = reinforcementsLeftForTurn
-                                .map(reinforcement => reinforcement.toString())
-                                .join(',');
+                .map(reinforcement => reinforcement.toString())
+                .join(',');
             let answer = await questionUntilValidAnswer(
                 `${this.getResourcesString()}
                 you currently have these reinforcements available
                 ${restring}
-                Which one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`, 
+                Which one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`,
                 ...getArrayOfNumberStringsUpTo(reinforcementsLeftForTurn.length), 'P');
 
             if (answer.toUpperCase() === 'P') {
@@ -224,17 +196,17 @@ export class Player {
         while (userEnd !== true && minimumCost !== -1) {
             let bought = await this.buyDieFace(boughtDieFaces);
             boughtDieFaces.push(bought);
-            
+
             await this.placeDieFaceOntoDie(bought);
-            
+
             minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
 
             if (minimumCost !== -1) {
                 let continueForging = await questionUntilValidAnswer(`
                 You have ${chalk.yellow(this.gold)}
-                Do you want to keep forging? (Y/N)`, 
-                'Y', 'N');
-                
+                Do you want to keep forging? (Y/N)`,
+                    'Y', 'N');
+
                 if (continueForging.toUpperCase() === 'N') {
                     userEnd = true;
                 }
@@ -242,23 +214,23 @@ export class Player {
         }
     }
 
-    private async buyDieFace(boughtDieFaces: Array<DieFace>): Promise<DieFace>{
+    private async buyDieFace(boughtDieFaces: Array<DieFace>): Promise<DieFace> {
         let availablePools = this.game.sanctuary.availablePools(this.gold, boughtDieFaces);
 
-        availablePools.map((pool, index) => console.log(`(${index+1}) -> ${pool}`));
+        availablePools.map((pool, index) => console.log(`(${index + 1}) -> ${pool}`));
 
         //TODO: find a way to do this without poolNumber as a separate variable
         let poolNumber = parseInt(await questionUntilValidAnswer(`
         you have ${chalk.yellow(this.gold)} to spend
-        out of which pool are you going to buy (${availablePools.map((_pool, index) => index+1)})?`, 
-        ...availablePools.map((_pool, index) => index+1+"")));
-        let pool = availablePools[poolNumber -1];
+        out of which pool are you going to buy (${availablePools.map((_pool, index) => index + 1)})?`,
+            ...availablePools.map((_pool, index) => index + 1 + "")));
+        let pool = availablePools[poolNumber - 1];
 
         let buy = await chooseDieFace(pool.dieFaces);
         this.gold -= pool.cost;
 
         pool.dieFaces.splice(pool.dieFaces.findIndex(face => face.is(buy.code)), 1);
-        
+
         return buy;
     }
 
@@ -272,10 +244,10 @@ export class Player {
             `${getDieFacesAsPrettyString('left', this.leftDie.faces)}
             ${getDieFacesAsPrettyString('right', this.rightDie.faces)}
             on which die you want to forge ${bought}?
-            Left (L) or Right (R)`, 
+            Left (L) or Right (R)`,
             'R', 'L'))
-                    .toUpperCase();
-        
+            .toUpperCase();
+
         if (leftRight === 'R') {
             return new Promise(resolve => resolve(this.rightDie));
         } else if (leftRight === 'L') {
@@ -295,8 +267,8 @@ export class Player {
             your hammer already contains ${this.goldForHammer % 30}
             your current treasure contains ${this.gold}/${this.MAX_GOLD}
             how much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})
-            Everything else will go to your regular gold resource`, 
-            '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
+            Everything else will go to your regular gold resource`,
+                '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
             this.gold += value - answer;
             this.goldForHammer += value - (value - answer);
             if (answer > 0 && this.goldForHammer % 30 === 0) {
@@ -360,12 +332,8 @@ export class Player {
         let multiplier = this.handleHelmetEventually(rolls);
         multiplier = this.handleMinotaurEventually(mode, multiplier);
 
-        console.log(`resolving rolls for ${this.name} => ${rolls.map(roll => roll.toString())}\ncurrent resources: ${this.getResourcesString()}`);
-
         await rolls.filter(roll => !roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(this, multiplier)), Promise.resolve());
         await rolls.filter(roll => roll.hasChoice()).reduce((chain, roll) => chain.then(() => roll.resolve(this, multiplier)), Promise.resolve());
-
-        console.log(`resolved rolls for ${this.name}\ncurrent resources: ${this.getResourcesString()}\n\n`);
     }
 
     private handleMinotaurEventually(mode: ResolveMode, multiplier: number) {
@@ -389,7 +357,7 @@ export class Player {
         if (rolls.some(roll => DieFace.isMirror(roll))) {
             let allRolls = new Array<DieFace>;
             this.game.players.filter(player => player !== this)
-                    .map(player => allRolls.push(player.leftDie.faces[0], player.rightDie.faces[0]));
+                .map(player => allRolls.push(player.leftDie.faces[0], player.rightDie.faces[0]));
 
             let options = allRolls?.filter(roll => !DieFace.isMirror(roll));
 
@@ -398,10 +366,18 @@ export class Player {
             const replacementChoice = await chooseDieFace(options)
 
             let replacementRoll = allRolls.find(option => option.is(replacementChoice.code)) as DieFace;
-            
+
             return rolls.splice(rolls.findIndex(roll => roll.code === 'M'), 1, replacementRoll);
         }
 
         return rolls;
+    }
+}
+
+function isBuyable(currentPlayer: Player, card: HeroicFeatCard): boolean {
+    switch (card.getCostType()) {
+        case CostType.MOON: return currentPlayer.moon >= card.getCost();
+        case CostType.SUN: return currentPlayer.sun >= card.getCost();
+        case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();
     }
 }

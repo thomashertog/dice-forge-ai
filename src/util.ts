@@ -1,6 +1,7 @@
 import { stdin as input, stdout as output } from 'process';
 import * as readline from 'readline';
 import { DieFace } from './dice/faces/DieFace';
+import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { InstantEffect } from './heroicfeats/InstantEffect';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 
@@ -75,4 +76,16 @@ export async function chooseDieFace(options: Array<DieFace>): Promise<DieFace>{
         ...options.map(option => option.code));
 
         return options.find(option => option.is(answer.toUpperCase())) as DieFace;
+}
+
+export function countCardsByType(cards: Array<HeroicFeatCard>): Map<HeroicFeatCard, number> {
+    return cards.reduce((accumulator, currentCard) => pushCard(accumulator, currentCard), new Map<HeroicFeatCard, number>());
+
+    function pushCard(accumulator: Map<HeroicFeatCard, number>, currentCard: HeroicFeatCard): Map<HeroicFeatCard, number> {
+        let currentAmount = accumulator.get(currentCard) || 0;
+        accumulator.set(currentCard, currentAmount+1);
+
+        return accumulator;
+    }
+
 }
