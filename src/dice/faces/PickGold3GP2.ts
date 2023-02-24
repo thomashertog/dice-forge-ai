@@ -1,9 +1,9 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
 import { questionUntilValidAnswer } from "../../util";
-import { DieFace } from "./DieFace";
+import { BuyableDieFace } from "./BuyableDieFace";
 
-export class PickGold3GP2 extends DieFace {
+export class PickGold3GP2 extends BuyableDieFace {
 
     constructor() {
         super('P3');
@@ -15,8 +15,8 @@ export class PickGold3GP2 extends DieFace {
 
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         let pickGoldGP = (await questionUntilValidAnswer(`
-                current resources: ${currentPlayer.getResourcesString()}
-                you want the gold (G) or glory points(P)?`,
+current resources: ${currentPlayer.getResourcesString()}
+you want the gold (G) or glory points(P)?`,
             'G', 'P')).toUpperCase();
 
         if (pickGoldGP === 'G') {
@@ -28,5 +28,9 @@ export class PickGold3GP2 extends DieFace {
 
     hasChoice(): boolean {
         return true;
+    }
+
+    getCost(): number {
+        return 5;
     }
 }

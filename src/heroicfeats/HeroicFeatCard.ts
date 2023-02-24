@@ -1,12 +1,11 @@
+import { Buyable } from "../Buyable";
 import { CostType } from "../CostType";
-import { Player } from "../Player";
 
-export interface HeroicFeatCard{
+export interface HeroicFeatCard extends Buyable{
 
     getCode(): string;
     getGloryPointsAtEndOfGame(): number;
     getCost(): number;
     getCostType(): CostType;
 
-    canBeBoughtBy(player: Player): boolean;
 }

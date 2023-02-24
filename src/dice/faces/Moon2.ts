@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
-import { DieFace } from "./DieFace";
+import { BuyableDieFace } from "./BuyableDieFace";
 
-export class Moon2 extends DieFace{
+export class Moon2 extends BuyableDieFace{
     
     constructor(){
         super('M2');
@@ -16,4 +16,7 @@ export class Moon2 extends DieFace{
         currentPlayer.addMoon(multiplier * 2);
     }
     
+    getCost(): number {
+        return 6;
+    }
 }

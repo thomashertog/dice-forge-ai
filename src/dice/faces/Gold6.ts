@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
-import { DieFace } from "./DieFace";
+import { BuyableDieFace } from "./BuyableDieFace";
 
-export class Gold6 extends DieFace{
+export class Gold6 extends BuyableDieFace{
     
     constructor(){
         super('G6');
@@ -15,5 +15,8 @@ export class Gold6 extends DieFace{
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         await currentPlayer.addGold(multiplier * 6);
     }
-    
+
+    getCost(): number {
+        return 4;
+    }
 }

@@ -58,10 +58,13 @@ export class Game {
         await player.doReinforcements();
         let executed = await player.takeTurn();
         if (player.sun >= 2 && executed === true) {
+            console.clear();
             let extraTurn =
                 (await questionUntilValidAnswer(`
-                    ${player}
-                    Would you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`,
+${player}\n
+${this.sanctuary}\n
+${this.heroicFeats}\n
+Would you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`,
                     "Y", "N")).toUpperCase();
             if (extraTurn === "Y") {
                 player.addSun(-2);

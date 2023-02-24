@@ -68,14 +68,12 @@ export function getArrayOfNumberStringsUpTo(maxNumber: number, offset:number=1):
 }
 
 export async function chooseDieFace(options: Array<DieFace>): Promise<DieFace>{
-    const answer = await questionUntilValidAnswer(
-        `
-        options are: ${options.map(option => option.printWithCode())}
-        which one do you pick?
-        `,
-        ...options.map(option => option.code));
+    const answer = await (await questionUntilValidAnswer(`
+options are: ${Array.from(new Set(options)).map(option => option.printWithCode())}
+which one do you pick?\n`,
+        ...options.map(option => option.code))).toUpperCase();
 
-        return options.find(option => option.is(answer.toUpperCase())) as DieFace;
+        return options.find(option => option.is(answer)) as DieFace;
 }
 
 export function countCardsByType(cards: Array<HeroicFeatCard>): Map<HeroicFeatCard, number> {

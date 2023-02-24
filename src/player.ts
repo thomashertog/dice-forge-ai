@@ -1,9 +1,10 @@
 import assert from 'assert';
 import chalk from 'chalk';
-import { result } from 'lodash';
 import cloneDeep from 'lodash/cloneDeep';
+import { Buyable } from './Buyable';
 import { CostType } from './CostType';
 import { Die } from './dice/Die';
+import { BuyableDieFace, isBuyableDieFace } from './dice/faces/BuyableDieFace';
 import { DieFace } from './dice/faces/DieFace';
 import { GloryPoints2 } from './dice/faces/GloryPoints2';
 import { Gold1 } from './dice/faces/Gold1';
@@ -57,11 +58,11 @@ export class Player {
 
     toString(): string {
         return `
-        ${this.name}
-        -----------------------
-        ${getDieFacesAsPrettyString("left", this.leftDie.faces)}    ${getDieFacesAsPrettyString("right", this.rightDie.faces)}
-        ${this.getResourcesString()}
-        Reinforcements: ${this.reinforcements}`;
+${this.name}
+-----------------------
+${getDieFacesAsPrettyString("left", this.leftDie.faces)}    ${getDieFacesAsPrettyString("right", this.rightDie.faces)}
+${this.getResourcesString()}
+Reinforcements: ${this.reinforcements}`;
     }
 
     async receiveDivineBlessing(): Promise<void> {
@@ -83,9 +84,8 @@ export class Player {
     }
 
     async takeTurn(): Promise<boolean> {
-        console.log(`${this}`);
-        console.log(`${this.game.sanctuary}`)
-        console.log(`${this.game.heroicFeats}`)
+        console.clear();
+        console.log(`${this}\n\n${this.game.sanctuary}\n\n${this.game.heroicFeats}\n`)
         try {
             let answer = (await questionUntilValidAnswer("What do you want to do now? (F) Forge / (H) Heroic feat / (P) Pass", 'F', 'H', 'P')).toUpperCase();
             if (answer === 'F') {
@@ -127,13 +127,17 @@ export class Player {
 
         if (isInstantEffect(card)) {
             await card.handleEffect(this);
-        }else if(isReinforcementEffect(card)) {
+        } else if (isReinforcementEffect(card)) {
             card.addToListOfReinforcements(this);
         }
     }
 
     private async pickPlatform(): Promise<HeroicFeatPlatform> {
-        console.log(this.game.heroicFeats.toString());
+        console.clear();
+        console.log(`
+${this}\n
+${this.game.heroicFeats}`);
+
         let platformChoice = await (await questionUntilValidAnswer("To which platform do you want to jump?", ...this.game.heroicFeats.availablePlatformsFor(this))).toUpperCase();
 
         let platform = this.game.heroicFeats.platforms.find(platform => platform!.code === platformChoice);
@@ -143,12 +147,16 @@ export class Player {
     }
 
     private async pickCardToBuy(platform: HeroicFeatPlatform): Promise<HeroicFeatCard> {
-        let availableCards = countCardsByType(platform.cards.filter(card => isBuyable(this, card)));
+        let availableCards = countCardsByType(platform.cards.filter(card => card.isAffordableFor(this)));
+
+        const cardsWithAmountsAvailable =
+            Array.from(availableCards.entries())
+                .map(([card, amount]) => `${card} (${amount})`).join(' | ');
 
         let chosenCardCode = await questionUntilValidAnswer(
-            `Which card do you want to buy
-            ${Array.from(availableCards.entries())
-                    .reduce((cardsString, [card, amount]) => cardsString += `${card} (${amount})`, "")}`, 
+            `
+Which card do you want to buy
+${cardsWithAmountsAvailable}`,
             ...Array.from(availableCards.keys()).map(card => card.getCode()));
 
         let chosenCard = platform.cards.find(card => card.getCode() === chosenCardCode.toUpperCase());
@@ -160,23 +168,24 @@ export class Player {
     async doReinforcements(): Promise<void> {
         let reinforcementsLeftForTurn = cloneDeep(this.reinforcements) as Array<ReinforcementEffect>;
         while (reinforcementsLeftForTurn.length !== 0) {
-            let restring = reinforcementsLeftForTurn
+            let reinforcements = reinforcementsLeftForTurn
                 .map(reinforcement => reinforcement.toString())
                 .join(',');
-            let answer = await questionUntilValidAnswer(
+            let answer = await (await questionUntilValidAnswer(
                 `${this.getResourcesString()}
                 you currently have these reinforcements available
-                ${restring}
-                Which one do you want to use (1...${reinforcementsLeftForTurn.length}) or pass (P)`,
-                ...getArrayOfNumberStringsUpTo(reinforcementsLeftForTurn.length), 'P');
+                ${reinforcements}
+                Which one do you want to use or pass (P)`,
+                ...reinforcementsLeftForTurn.map(reinforcement => reinforcement.getCode()), 'P')).toUpperCase();
 
-            if (answer.toUpperCase() === 'P') {
+            if (answer === 'P') {
                 return;
-            }
-
-            let chosenReinforcement = parseInt(answer);
-            if (await reinforcementsLeftForTurn[chosenReinforcement - 1].handleReinforcement(this)) {
-                reinforcementsLeftForTurn.splice(chosenReinforcement - 1, 1);
+            } else {
+                let currentReinforcement = reinforcementsLeftForTurn.find(reinforcement => reinforcement.getCode() === answer);
+                if (currentReinforcement !== undefined) {
+                    await currentReinforcement.handleReinforcement(this);
+                    reinforcementsLeftForTurn.splice(reinforcementsLeftForTurn.findIndex(reinforcement => reinforcement === currentReinforcement), 1);
+                }
             }
         }
     }
@@ -184,20 +193,28 @@ export class Player {
     private async forge(): Promise<void> {
         let userEnd = false;
         let minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
-        let boughtDieFaces = new Array();
+        let boughtDieFaces = new Set<BuyableDieFace>();
 
         while (userEnd !== true && minimumCost !== -1) {
-            let bought = await this.buyDieFace(boughtDieFaces);
-            boughtDieFaces.push(bought);
+            console.clear();
+            let bought = await this.pickDieFace(boughtDieFaces);
 
-            await this.placeDieFaceOntoDie(bought);
+            if (isBuyableDieFace(bought)) {
+                this.buyDieFace(bought);
+                boughtDieFaces.add(bought);
+                await this.placeDieFaceOntoDie(bought);
+            }
 
             minimumCost = this.game.sanctuary.lowestAvailablePoolCost(this.gold);
 
             if (minimumCost !== -1) {
+                console.clear();
                 let continueForging = await questionUntilValidAnswer(`
-                You have ${chalk.yellow(this.gold)}
-                Do you want to keep forging? (Y/N)`,
+You have ${chalk.yellow(this.gold)}
+You already bought: ${getDieFacesAsPrettyString("", Array.from(boughtDieFaces))}\n
+${getDieFacesAsPrettyString("left", this.leftDie.faces)} ${getDieFacesAsPrettyString("right", this.rightDie.faces)}\n
+${this.game.sanctuary}\n
+Do you want to keep forging? (Y/N)`,
                     'Y', 'N');
 
                 if (continueForging.toUpperCase() === 'N') {
@@ -207,24 +224,24 @@ export class Player {
         }
     }
 
-    private async buyDieFace(boughtDieFaces: Array<DieFace>): Promise<DieFace> {
-        let availablePools = this.game.sanctuary.availablePools(this.gold, boughtDieFaces);
+    private async pickDieFace(boughtDieFaces: Set<BuyableDieFace>): Promise<BuyableDieFace> {
+        let buyableFaces = this.game.sanctuary.buyableDieFacesFor(this.gold, boughtDieFaces);
 
-        availablePools.map((pool, index) => console.log(`(${index + 1}) -> ${pool}`));
+        let buy = await (await questionUntilValidAnswer(`
+${this}\n
+you have ${chalk.yellow(this.gold)} to spend
+which die face are you going to buy?
+${this.game.sanctuary}\n`,
+            ...buyableFaces.map(dieface => dieface.code))).toUpperCase();
 
-        //TODO: find a way to do this without poolNumber as a separate variable
-        let poolNumber = parseInt(await questionUntilValidAnswer(`
-        you have ${chalk.yellow(this.gold)} to spend
-        out of which pool are you going to buy (${availablePools.map((_pool, index) => index + 1)})?`,
-            ...availablePools.map((_pool, index) => index + 1 + "")));
-        let pool = availablePools[poolNumber - 1];
+        let dieFace = buyableFaces.find(face => face.is(buy));
+        assert(dieFace);
+        return dieFace;
+    }
 
-        let buy = await chooseDieFace(pool.dieFaces);
-        this.gold -= pool.cost;
-
-        pool.dieFaces.splice(pool.dieFaces.findIndex(face => face.is(buy.code)), 1);
-
-        return buy;
+    buyDieFace(face: BuyableDieFace): void {
+        this.gold -= face.getCost();
+        this.game.sanctuary.removeDieFace(face);
     }
 
     async placeDieFaceOntoDie(replacement: DieFace): Promise<void> {
@@ -233,11 +250,11 @@ export class Player {
     }
 
     private async chooseDieToReplaceDieFace(bought: DieFace): Promise<Die> {
-        let leftRight = (await questionUntilValidAnswer(
-            `${getDieFacesAsPrettyString('left', this.leftDie.faces)}
-            ${getDieFacesAsPrettyString('right', this.rightDie.faces)}
-            on which die you want to forge ${bought}?
-            Left (L) or Right (R)`,
+        let leftRight = (await questionUntilValidAnswer(`
+${getDieFacesAsPrettyString('left', this.leftDie.faces)}
+${getDieFacesAsPrettyString('right', this.rightDie.faces)}
+on which die you want to forge ${bought}?
+Left (L) or Right (R)`,
             'R', 'L'))
             .toUpperCase();
 
@@ -256,9 +273,9 @@ export class Player {
             let maxGoldForHammer = this.activeHammerCount * 30 - this.goldForHammer;
 
             let answer = parseInt(await questionUntilValidAnswer(`
-            you have ${value} gold to distribute
-            your hammer already contains ${this.goldForHammer % 30}
-            your current treasure contains ${this.gold}/${this.MAX_GOLD}
+            you have ${chalk.yellow(value)} to distribute
+            your hammer already contains ${chalk.yellow(this.goldForHammer % 30)}
+            your current treasure contains ${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}
             how much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})
             Everything else will go to your regular gold resource`,
                 '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
@@ -367,10 +384,6 @@ export class Player {
     }
 }
 
-function isBuyable(currentPlayer: Player, card: HeroicFeatCard): boolean {
-    switch (card.getCostType()) {
-        case CostType.MOON: return currentPlayer.moon >= card.getCost();
-        case CostType.SUN: return currentPlayer.sun >= card.getCost();
-        case CostType.BOTH: return currentPlayer.moon >= card.getCost() && currentPlayer.sun >= card.getCost();
-    }
-}
+function isBuyable(face: unknown): face is Buyable {
+    return (face as Buyable).getCost !== undefined
+} 

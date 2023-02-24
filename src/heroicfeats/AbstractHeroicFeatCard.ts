@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { Buyable } from "../Buyable";
 import { CostType } from "../CostType";
 import { Player } from "../Player";
 import { HeroicFeatCard } from "./HeroicFeatCard";
@@ -38,11 +39,11 @@ export abstract class AbstractHeroicFeatCard implements HeroicFeatCard{
         return result;
     }
 
-    canBeBoughtBy(player: Player):boolean{
+    isAffordableFor(player: Player):boolean{
         switch(this.getCostType()){
-            case CostType.MOON: return this.getCost() <= player.moon;
-            case CostType.SUN: return this.getCost() <= player.sun;
-            case CostType.BOTH: return this.getCost() <= player.moon && this.getCost() <= player.sun;
+            case CostType.MOON: return player.moon >= this.getCost() ;
+            case CostType.SUN: return player.sun >= this.getCost();
+            case CostType.BOTH: return player.moon >= this.getCost() && player.sun >= this.getCost();
         }
     }
 }

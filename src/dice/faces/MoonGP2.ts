@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
-import { DieFace } from "./DieFace";
+import { BuyableDieFace } from "./BuyableDieFace";
 
-export class MoonGP2 extends DieFace{
+export class MoonGP2 extends BuyableDieFace{
     
     constructor(){
         super('MGP2');
@@ -17,4 +17,7 @@ export class MoonGP2 extends DieFace{
         currentPlayer.addGloryPoints(multiplier * 2);
     }
     
+    getCost(): number {
+        return 12;
+    }
 }

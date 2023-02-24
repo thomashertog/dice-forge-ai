@@ -1,9 +1,9 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
 import { questionUntilValidAnswer } from "../../util";
-import { DieFace } from "./DieFace";
+import { BuyableDieFace } from "./BuyableDieFace";
 
-export class PickGoldMoonSun2 extends DieFace{
+export class PickGoldMoonSun2 extends BuyableDieFace{
     
     constructor(){
         super('P2');
@@ -16,8 +16,8 @@ export class PickGoldMoonSun2 extends DieFace{
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         let pick1GoldMoonSun = 
         (await questionUntilValidAnswer(`
-                current resources: ${currentPlayer.getResourcesString()}
-                you want the gold (G), moon shards (M) or sun shards (S)`, 
+current resources: ${currentPlayer.getResourcesString()}
+you want the gold (G), moon shards (M) or sun shards (S)`, 
                 'G', 'M', 'S')).toUpperCase();
                 
         if (pick1GoldMoonSun === 'G') {
@@ -31,5 +31,9 @@ export class PickGoldMoonSun2 extends DieFace{
  
     hasChoice(): boolean {
         return true;
+    }
+
+    getCost(): number {
+        return 12;
     }
 }

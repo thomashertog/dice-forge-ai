@@ -1,16 +1,21 @@
 import chalk from "chalk";
 import { shuffle } from "lodash";
 import { AllSanctuaryDieFaces } from "../data";
-import { getDieFacesAsPrettyString } from "../util";
 import { DieFacePool } from "./DieFacePool";
-import { DieFace } from "./faces/DieFace";
+import { BuyableDieFace } from "./faces/BuyableDieFace";
 
 export class Sanctuary {
+    
+    removeDieFace(face: BuyableDieFace) {
+        this.pools.find(pool => pool.dieFaces.includes(face))?.removeDieFace(face);
+    }
 
     pools: Array<DieFacePool>;
 
     toString(): string {
-        return this.pools.map(pool => `${chalk.yellow(pool.cost)}: ${pool.dieFaces}`).join('\n');
+        return this.pools.map(pool => 
+            `${chalk.yellow(pool.cost)}: ${pool.dieFaces.map(face => `${face.toString()} (${face.code})`).join(', ')}`)
+            .join('\n');
     }
 
     constructor(numberOfPlayers: number) {
@@ -24,14 +29,11 @@ export class Sanctuary {
         }
     }
 
-    availablePools(maxCost: number, boughtDieFaces: Array<DieFace>): Array<DieFacePool> {
+    buyableDieFacesFor(maxCost: number, boughtDieFaces: Set<BuyableDieFace>): Array<BuyableDieFace> {
         return this.pools
             .filter(pool => pool.dieFaces.length !== 0 && maxCost >= pool.cost)
-            .filter(pool => !allFacesInPoolAreAlreadyBought(pool));
-
-        function allFacesInPoolAreAlreadyBought(pool: DieFacePool): boolean {
-            return pool.dieFaces.every(dieFace => boughtDieFaces.map(face => face.code).includes(dieFace.code));
-        }
+            .flatMap(pool => pool.dieFaces)
+            .filter(dieFace => !Array.from(boughtDieFaces).map(face => face.code).includes(dieFace.code));
     }
 
     lowestAvailablePoolCost(maxCost: number): number {

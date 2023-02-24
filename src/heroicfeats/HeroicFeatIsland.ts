@@ -1,4 +1,3 @@
-import { platform } from "os";
 import { AllHeroicFeats } from "../data";
 import { Player } from "../Player";
 import { HeroicFeatPlatform } from "./HeroicFeatPlatform";
@@ -23,7 +22,7 @@ export class HeroicFeatIsland{
     }
 
     availablePlatformsFor(player: Player): Array<string> {
-        return this.platforms.filter(platform => platform.cards.filter(card => card.canBeBoughtBy(player)).length > 0).map(platform => platform.code);
+        return this.platforms.filter(platform => platform.cards.filter(card => card.isAffordableFor(player)).length > 0).map(platform => platform.code);
     }
 
     clearPlayerFromItsCurrentPlatform(player: Player): void {
