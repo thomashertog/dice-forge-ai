@@ -23,8 +23,10 @@ export class HeroicFeatPlatform {
             .reduce((accumulator, [card, amount]) => accumulator += `${card} (${amount})\t`, result)
     }
 
-    async handleEventualOusting(): Promise<void> {
-        await this.player?.receiveDivineBlessing();
+    async handleEventualOusting(currentPlayer: Player): Promise<void> {
+        if(this.player !== currentPlayer){
+            await this.player?.receiveDivineBlessing();
+        }
     }
 
 }

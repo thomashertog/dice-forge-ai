@@ -15,7 +15,7 @@ export class PickGold3GP2 extends BuyableDieFace {
 
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         let pickGoldGP = (await questionUntilValidAnswer(`
-current resources: ${currentPlayer.getResourcesString()}
+${currentPlayer}
 you want the gold (G) or glory points(P)?`,
             'G', 'P')).toUpperCase();
 

@@ -102,7 +102,7 @@ Reinforcements: ${this.reinforcements}`;
     }
 
     async jumpTo(targetPlatform: HeroicFeatPlatform): Promise<void> {
-        await targetPlatform.handleEventualOusting();
+        await targetPlatform.handleEventualOusting(this);
         this.game.heroicFeats.clearPlayerFromItsCurrentPlatform(this);
         targetPlatform.player = this;
     }
@@ -171,11 +171,11 @@ ${cardsWithAmountsAvailable}`,
             let reinforcements = reinforcementsLeftForTurn
                 .map(reinforcement => reinforcement.toString())
                 .join(',');
-            let answer = await (await questionUntilValidAnswer(
-                `${this.getResourcesString()}
-                you currently have these reinforcements available
-                ${reinforcements}
-                Which one do you want to use or pass (P)`,
+            let answer = await (await questionUntilValidAnswer(`
+${this.getResourcesString()}
+you currently have these reinforcements available
+${reinforcements}
+Which one do you want to use or pass (P)`,
                 ...reinforcementsLeftForTurn.map(reinforcement => reinforcement.getCode()), 'P')).toUpperCase();
 
             if (answer === 'P') {
