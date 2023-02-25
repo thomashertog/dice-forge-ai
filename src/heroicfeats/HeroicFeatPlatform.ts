@@ -24,7 +24,7 @@ export class HeroicFeatPlatform {
     }
 
     async handleEventualOusting(currentPlayer: Player): Promise<void> {
-        if(this.player !== currentPlayer){
+        if(this.player !== null && this.player !== currentPlayer){
             await this.player?.receiveDivineBlessing();
         }
     }
