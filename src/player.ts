@@ -11,6 +11,7 @@ import { Gold1 } from './dice/faces/Gold1';
 import { Moon1 } from './dice/faces/Moon1';
 import { Sun1 } from './dice/faces/Sun1';
 import { Game } from './Game';
+import { GameRound } from './GameRound';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { HeroicFeatPlatform } from './heroicfeats/HeroicFeatPlatform';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
@@ -328,7 +329,16 @@ Left (L) or Right (R)`,
     }
 
     getResourcesString(): string {
-        return `${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}, ${chalk.blue(this.moon)}/${chalk.blue(this.MAX_MOON_SUN)}, ${chalk.red(this.sun)}/${chalk.red(this.MAX_MOON_SUN)}, ${chalk.green(this.gloryPoints)}`;
+        let resources = [`${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}`, 
+        `${chalk.blue(this.moon)}/${chalk.blueBright(this.MAX_MOON_SUN)}`, 
+        `${chalk.red(this.sun)}/${chalk.red(this.MAX_MOON_SUN)}`, 
+        `${chalk.green(this.gloryPoints)}`];
+
+        if(this.activeHammerCount > 0){
+            resources.push(`Hammer: ${chalk.yellow(this.goldForHammer)}/${chalk.yellow(30)}`);
+        }
+        
+        return resources.join('\t');
     }
 
     extraChest(): void {
@@ -381,6 +391,56 @@ Left (L) or Right (R)`,
         }
 
         return rolls;
+    }
+
+    async playTurn(player: Player, roundNumber: number): Promise<void> {
+        console.clear();
+        await this.startTurn();
+        console.log(`starting turn for ${player.name} in round ${roundNumber}`);
+        await player.doReinforcements();
+        let executed = await player.takeTurn();
+        if (player.sun >= 2 && executed === true) {
+            console.clear();
+            let extraTurn =
+                (await questionUntilValidAnswer(`
+${player}\n
+${this.game.sanctuary}\n
+${this.game.heroicFeats}\n
+Would you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`,
+                    "Y", "N")).toUpperCase();
+            if (extraTurn === "Y") {
+                player.addSun(-2);
+                await player.takeTurn();
+            }
+        }
+    }
+
+    private async startTurn(): Promise<void> {
+        await this.everybodyReceivesDivineBlessing();
+
+        if (this.game.players.length === 2) {
+            await this.everybodyReceivesDivineBlessing();
+        }
+    }
+
+    private async everybodyReceivesDivineBlessing(): Promise<Map<Player, DieFace[]>> {
+        let rollsForPlayers = this.everybodyRolls();
+
+        for (let player of this.game.players) {
+            await player.resolveDieRolls(rollsForPlayers.get(player) as Array<DieFace>, ResolveMode.ADD);
+        }
+        return rollsForPlayers;
+    }
+
+    private everybodyRolls(): Map<Player, DieFace[]> {
+        let rollsForPlayers = new Map<Player, DieFace[]>;
+
+        for (let player of this.game.players) {
+            let rolls = player.divineBlessing();
+            rollsForPlayers.set(player, rolls);
+        }
+
+        return rollsForPlayers;
     }
 }
 
