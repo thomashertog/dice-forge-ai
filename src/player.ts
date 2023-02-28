@@ -11,7 +11,6 @@ import { Gold1 } from './dice/faces/Gold1';
 import { Moon1 } from './dice/faces/Moon1';
 import { Sun1 } from './dice/faces/Sun1';
 import { Game } from './Game';
-import { GameRound } from './GameRound';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { HeroicFeatPlatform } from './heroicfeats/HeroicFeatPlatform';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
@@ -274,11 +273,12 @@ Left (L) or Right (R)`,
             let maxGoldForHammer = this.activeHammerCount * 30 - this.goldForHammer;
 
             let answer = parseInt(await questionUntilValidAnswer(`
-            you have ${chalk.yellow(value)} to distribute
-            your hammer already contains ${chalk.yellow(this.goldForHammer % 30)}
-            your current treasure contains ${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}
-            how much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})
-            Everything else will go to your regular gold resource`,
+${this}
+you have ${chalk.yellow(value)} to distribute
+your hammer already contains ${chalk.yellow(this.goldForHammer % 30)}
+your current treasure contains ${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}
+how much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})
+Everything else will go to your regular gold resource`,
                 '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
             this.gold += value - answer;
             this.goldForHammer += value - (value - answer);

@@ -1,5 +1,6 @@
 import { DieFace } from './dice/faces/DieFace';
 import { Sanctuary } from './dice/Sanctuary';
+import { GameRound } from './GameRound';
 import { HeroicFeatIsland } from './heroicfeats/HeroicFeatIsland';
 import { Player } from './Player';
 import { ResolveMode } from './ResolveMode';
@@ -16,21 +17,21 @@ export class Game {
     constructor(playerCount: number) {
         this.sanctuary = new Sanctuary(playerCount);
         this.heroicFeats = new HeroicFeatIsland(playerCount);
-        
+
         this.players = new Array();
         for (let i = 0; i < playerCount; i++) {
             this.players.push(new Player(3 - i, this, `player ${i + 1}`));
+        }
+
+        if(playerCount === 3){
+            this.GAME_ROUNDS = 10;
         }
     }
 
     async start(): Promise<void> {
         console.log(`game started with ${this.players.length} players`)
-        if (this.players.length === 3) {
-            console.log("warning, this game has an extra round");
-            this.GAME_ROUNDS = 10;
-        }
-        for (let round = 1; round <= this.GAME_ROUNDS; round++) {
-            await this.playRound(round);
+        for (let i = 1; i <= this.GAME_ROUNDS; i++) {
+            await new GameRound(i).start(this.players);
         }
 
         let playersWithScores = new Map<string, number>;
@@ -45,13 +46,7 @@ export class Game {
         console.log(playersWithScores);
     }
 
-    private async playRound(round: number): Promise<void> {
-        for await (let player of this.players) {
-            await this.playTurn(player, round);
-        }
-    }
-
-    private async playTurn(player: Player, round: number): Promise<void> {
+    private async playTurn(player: Player, round: GameRound): Promise<void> {
         console.clear();
         await this.startTurn();
         console.log(`starting turn for ${player.name} in round ${round}`);
