@@ -275,8 +275,6 @@ Left (L) or Right (R)`,
             let answer = parseInt(await questionUntilValidAnswer(`
 ${this}
 you have ${chalk.yellow(value)} to distribute
-your hammer already contains ${chalk.yellow(this.goldForHammer % 30)}
-your current treasure contains ${chalk.yellow(this.gold)}/${chalk.yellow(this.MAX_GOLD)}
 how much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})
 Everything else will go to your regular gold resource`,
                 '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
