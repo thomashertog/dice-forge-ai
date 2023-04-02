@@ -12,6 +12,10 @@ export class Sun1 extends BuyableDieFace{
         return `${chalk.red(1)}`;
     }
 
+    unstyledString(): string {
+        return '1';
+    }
+
     resolve(currentPlayer: Player, multiplier: number): void {
         currentPlayer.addSun(multiplier * 1);
     }

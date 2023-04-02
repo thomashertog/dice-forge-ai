@@ -6,7 +6,7 @@ import { InstantEffect } from "./InstantEffect";
 export class WildSpirits extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
-        super('S', 1, CostType.SUN);
+        super('WS', 1, CostType.SUN);
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {

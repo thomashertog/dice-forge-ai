@@ -15,20 +15,17 @@ export class PlayerTurn{
     }
 
     async play(): Promise<void> {
-        console.clear();
+        this.round.game.currentPlayerTurn = this;
         await this.start();
-        console.log(`starting turn for ${this.player.name} in round ${this.round.count}`);
         await this.player.doReinforcements();
+
+        console.log(`${this.player.game}`);
+
         let executed = await this.player.takeTurn();
         if (this.player.sun >= 2 && executed === true) {
             console.clear();
             let extraTurn =
-                (await questionUntilValidAnswer(`
-${this.player}\n
-${this.round.game.sanctuary}\n
-${this.round.game.heroicFeats}\n
-Would you like to perform an extra action for 2 sun shards? Yes (Y) / No (N)`,
-                    "Y", "N")).toUpperCase();
+                (await questionUntilValidAnswer(this.round.game, `Would you like to perform an extra action for 2 sun shards? Yes / No`, "Y", "N")).toUpperCase();
             if (extraTurn === "Y") {
                 this.player.addSun(-2);
                 await this.player.takeTurn();

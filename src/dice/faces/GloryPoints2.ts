@@ -12,6 +12,10 @@ export class GloryPoints2 extends DieFace{
         return `${chalk.green(2)}`;
     }
 
+    unstyledString(): string {
+        return '2';
+    }
+
     resolve(currentPlayer: Player, multiplier: number): void {
         currentPlayer.addGloryPoints(multiplier * 2);
     }

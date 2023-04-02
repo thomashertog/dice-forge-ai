@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { RIGHT_PADDING_LENGTH, toPaddedString } from '../util';
 import { BuyableDieFace } from './faces/BuyableDieFace';
 
 export class DieFacePool {
@@ -16,7 +17,7 @@ export class DieFacePool {
     }
 
     toString(): string {
-        return `${chalk.yellow(this.cost)}: ${this.dieFaces}`;
+        return `${chalk.yellow(this.cost)}: ${toPaddedString(this.dieFaces, RIGHT_PADDING_LENGTH - `${this.cost}: `.length)}`;
     }
 
     removeDieFace(face: BuyableDieFace): void {

@@ -8,4 +8,5 @@ export interface HeroicFeatCard extends Buyable{
     getCost(): number;
     getCostType(): CostType;
 
+    unstyledString(): string;
 }

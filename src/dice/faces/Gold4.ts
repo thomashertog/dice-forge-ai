@@ -13,6 +13,10 @@ export class Gold4 extends BuyableDieFace{
         return `${chalk.yellow(4)}`;
     }
 
+    unstyledString(): string {
+        return '4';
+    }
+
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         await currentPlayer.addGold(multiplier * 4);
     }

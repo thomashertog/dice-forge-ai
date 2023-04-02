@@ -5,11 +5,15 @@ import { BuyableDieFace } from "./BuyableDieFace";
 export class Sun1GP1 extends BuyableDieFace{
     
     constructor(){
-        super('SGP1');
+        super('GP1S1');
     }
 
     toString(): string {
         return `${chalk.green(1)}+${chalk.red(1)}`;
+    }
+
+    unstyledString(): string {
+        return '1+1';
     }
 
     resolve(currentPlayer: Player, multiplier: number): void {

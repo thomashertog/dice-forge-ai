@@ -30,13 +30,18 @@ export abstract class AbstractHeroicFeatCard implements HeroicFeatCard{
     }
     
     toString(): string{
-        let result = `${this.constructor.name} (${this.code}) -> `;
+        let result = '';
         switch(this.costType){
-            case CostType.MOON: result += `${chalk.blue(this.cost)}`; break;
+            case CostType.MOON: result += `${chalk.blueBright(this.cost)}`; break;
             case CostType.SUN: result += `${chalk.red(this.cost)}`; break;
-            case CostType.BOTH: result += `${chalk.blue(this.cost)} + ${chalk.red(this.cost)}`; break;
+            case CostType.BOTH: result += `${chalk.blueBright(this.cost)} + ${chalk.red(this.cost)}`; break;
             }
+        result += ` -> ${this.constructor.name}`
         return result;
+    }
+
+    unstyledString(): string {
+        return `${this.cost} -> ${this.constructor.name}`
     }
 
     isAffordableFor(player: Player):boolean{

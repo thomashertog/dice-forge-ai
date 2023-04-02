@@ -12,6 +12,10 @@ export class Helmet extends DieFace{
         return `${chalk.bgBlackBright.black('x3')}`;
     }
 
+    unstyledString(): string {
+        return 'x3';
+    }
+
     resolve(currentPlayer: Player, multiplier: number): void {
         //TODO
     }

@@ -9,7 +9,11 @@ export class Gold2Moon1 extends BuyableDieFace {
     }
 
     toString(): string {
-        return `${chalk.yellow(2)}+${chalk.blue(1)}`;
+        return `${chalk.yellow(2)}+${chalk.blueBright(1)}`;
+    }
+
+    unstyledString(): string {
+        return '2+1';
     }
 
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {

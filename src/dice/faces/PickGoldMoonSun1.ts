@@ -10,15 +10,16 @@ export class PickGoldMoonSun1 extends BuyableDieFace{
     }
 
     toString(): string {
-        return `${chalk.yellow(1)}/${chalk.blue(1)}/${chalk.red(1)}`;
+        return `${chalk.yellow(1)}/${chalk.blueBright(1)}/${chalk.red(1)}`;
+    }
+
+    unstyledString(): string {
+        return '1/1/1';
     }
 
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         let pick1GoldMoonSun = 
-        (await questionUntilValidAnswer(`
-${currentPlayer}
-you want the gold (G), moon shards (M) or sun shards (S)`, 
-                'G', 'M', 'S')).toUpperCase();
+        (await questionUntilValidAnswer(currentPlayer.game, `you want the Gold, Moon shards or Sun shards?`, 'G', 'M', 'S')).toUpperCase();
                 
         if (pick1GoldMoonSun === 'G') {
             await currentPlayer.addGold(multiplier * 1);

@@ -11,6 +11,8 @@ export abstract class DieFace{
 
     abstract toString(): string;
 
+    abstract unstyledString(): string;
+
     printWithCode(): string{
         return `${this.toString()} (${this.code})`;
     }

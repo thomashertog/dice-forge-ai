@@ -1,9 +1,11 @@
 import { stdin as input, stdout as output } from 'process';
 import * as readline from 'readline';
+import { BuyableDieFace } from './dice/faces/BuyableDieFace';
 import { DieFace } from './dice/faces/DieFace';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { InstantEffect } from './heroicfeats/InstantEffect';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
+import { Game } from './game';
 
 const terminal = readline.createInterface(input, output);
 
@@ -33,29 +35,43 @@ export function isReinforcementEffect(arg: any): arg is ReinforcementEffect{
     return (arg as ReinforcementEffect).addToListOfReinforcements !== undefined;
 }
 
-export async function questionUntilValidAnswer(message: string, ...options: string[]): Promise<string>{
+export async function questionUntilValidAnswer(game: Game | null, message: string, ...options: string[]): Promise<string>{
     options.map(option => option.toUpperCase());
-    let answer = await question(message);
+    let answer = await question(game, message);
     while(!options.includes((answer + "").toUpperCase())){
         console.log(`
         sorry, ${answer} is not valid
         it should be one of ${options.map(option => option.toUpperCase())}`);
-        answer = await question(message);
+        answer = await question(game, message);
     }
     return answer + "";
 }
 
-export function getDieFacesAsPrettyString(name: string, dieFaces: Array<DieFace>): string{
-    let print = `${name}: `;
-    for(let face of dieFaces){
-        print += `${face}, `;
+export function getDieFacesAsPrettyString(name: string, dieFaces: Array<DieFace>, usePadding: boolean): string{
+    if(dieFaces === undefined){
+        return '';
     }
+    let print = `${name}: `;
+    print += toPaddedString(dieFaces, RIGHT_PADDING_LENGTH - print.length);
+
     return print;
 }
 
+export function toPaddedString(dieFaces: Array<DieFace | BuyableDieFace>, paddingLength?: number): string{
+    let result = dieFaces.join(', ');
+    //styling through chalk messes with length, padding needs to be done manually
+    const resultLength = dieFaces.map(face => {return face.unstyledString()}).join(', ').length;
+    for(let i = resultLength; i < (paddingLength || RIGHT_PADDING_LENGTH); i++){
+        result += ' ';
+    }
+    return result;
+}
 
-async function question(message: string):Promise<string> {
-    readline.clearScreenDown(input);
+async function question(game: Game | null, message: string):Promise<string> {
+    console.clear();
+    if(!!game){
+        console.log(`${game}`);
+    }
     return new Promise(resolve => {terminal.question(message, resolve);});
 }
 
@@ -67,10 +83,8 @@ export function getArrayOfNumberStringsUpTo(maxNumber: number, offset:number=1):
     return options;
 }
 
-export async function chooseDieFace(options: Array<DieFace>): Promise<DieFace>{
-    const answer = await (await questionUntilValidAnswer(`
-options are: ${Array.from(new Set(options)).map(option => option.printWithCode())}
-which one do you pick?\n`,
+export async function chooseDieFace(options: Array<DieFace>, game: Game): Promise<DieFace>{
+    const answer = await (await questionUntilValidAnswer(game, `which dieface do you want to replace?`,
         ...options.map(option => option.code))).toUpperCase();
 
         return options.find(option => option.is(answer)) as DieFace;
@@ -87,3 +101,5 @@ export function countCardsByType(cards: Array<HeroicFeatCard>): Map<HeroicFeatCa
     }
 
 }
+
+export const RIGHT_PADDING_LENGTH = 40;

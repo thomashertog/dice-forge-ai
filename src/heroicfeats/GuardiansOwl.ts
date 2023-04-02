@@ -8,7 +8,7 @@ import { ReinforcementEffect } from "./ReinforcementEffect";
 export class GuardiansOwl extends AbstractHeroicFeatCard implements ReinforcementEffect{
 
     constructor(){
-        super('O', 2, CostType.SUN);
+        super('GO', 2, CostType.SUN);
     }
 
     addToListOfReinforcements(currentPlayer: Player): void {
@@ -16,10 +16,7 @@ export class GuardiansOwl extends AbstractHeroicFeatCard implements Reinforcemen
     }
 
     async handleReinforcement(currentPlayer: Player): Promise<boolean> {
-        let answer = (await questionUntilValidAnswer(`
-        currently your resources are: ${chalk.yellow(currentPlayer.gold)}, ${chalk.blue(currentPlayer.moon)}, ${chalk.red(currentPlayer.sun)}
-        do you want ${chalk.yellow(1)} (G), ${chalk.blue(1)} (M), ${chalk.red(1)} (S) or cancel (C)`, 
-        'G', 'M', 'S', 'C')).toUpperCase();
+        let answer = (await questionUntilValidAnswer(currentPlayer.game, `do you want ${chalk.yellow(1)}, ${chalk.blueBright(1)}, ${chalk.red(1)} or Cancel?`, 'G', 'M', 'S', 'C')).toUpperCase();
 
         switch(answer){
             case 'G': await currentPlayer.addGold(1); break;

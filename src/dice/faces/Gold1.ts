@@ -12,6 +12,10 @@ export class Gold1 extends DieFace{
         return `${chalk.yellow(1)}`;
     }
 
+    unstyledString(): string {
+        return '1';
+    }
+
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         await currentPlayer.addGold(multiplier * 1);
     }

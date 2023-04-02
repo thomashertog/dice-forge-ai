@@ -12,6 +12,10 @@ export class GloryPoints3 extends BuyableDieFace{
         return `${chalk.green(3)}`;
     }
 
+    unstyledString(): string {
+        return '3';
+    }
+
     resolve(currentPlayer: Player, multiplier: number): void {
         currentPlayer.addGloryPoints(multiplier * 3);
     }

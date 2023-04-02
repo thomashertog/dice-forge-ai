@@ -9,7 +9,11 @@ export class MoonSunGoldGP1 extends BuyableDieFace{
     }
 
     toString(): string {
-        return `${chalk.yellow(1)}+${chalk.blue(1)}+${chalk.red(1)}+${chalk.green(1)}`;
+        return `${chalk.yellow(1)}+${chalk.blueBright(1)}+${chalk.red(1)}+${chalk.green(1)}`;
+    }
+
+    unstyledString(): string {
+        return '1+1+1+1';
     }
 
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {

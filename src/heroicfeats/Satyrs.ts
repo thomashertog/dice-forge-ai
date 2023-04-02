@@ -24,10 +24,11 @@ export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
             rolls.push(player.rightDie.roll());
         }
 
-        let first = await questionUntilValidAnswer(`
+        //TODO
+        let first = await questionUntilValidAnswer(currentPlayer.game, `
         players have rolled ${rolls.map(roll => roll.toString())}
         which is the first face you want to copy? (1..${rolls.length})`, ...getArrayOfNumberStringsUpTo(rolls.length));
-        let second = await questionUntilValidAnswer(`which is the second face you want to copy? (1..${rolls.length})`, ...getArrayOfNumberStringsUpTo(rolls.length).filter(value => value !== first));
+        let second = await questionUntilValidAnswer(currentPlayer.game, `which is the second face you want to copy? (1..${rolls.length})`, ...getArrayOfNumberStringsUpTo(rolls.length).filter(value => value !== first));
 
         let rollsToResolve = new Array<DieFace>;
         rollsToResolve.push(rolls[parseInt(first)-1]);

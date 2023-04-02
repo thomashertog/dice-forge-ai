@@ -12,6 +12,10 @@ export class GloryPoints4 extends BuyableDieFace{
         return `${chalk.green(4)}`;
     }
 
+    unstyledString(): string {
+        return '4';
+    }
+
     resolve(currentPlayer: Player, multiplier: number): void {
         currentPlayer.addMoon(multiplier * 4);
     }

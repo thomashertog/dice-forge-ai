@@ -7,7 +7,7 @@ import { InstantEffect } from "./InstantEffect";
 export class HelmetOfInvisibility extends AbstractHeroicFeatCard implements InstantEffect{
 
     constructor(){
-        super('H', 5, CostType.MOON);
+        super('HOI', 5, CostType.MOON);
     }
 
     async handleEffect(currentPlayer: Player): Promise<void> {

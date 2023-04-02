@@ -5,11 +5,15 @@ import { BuyableDieFace } from "./BuyableDieFace";
 export class MoonGP2 extends BuyableDieFace{
     
     constructor(){
-        super('MGP2');
+        super('GP2M2');
     }
 
     toString(): string {
-        return `${chalk.green(2)}+${chalk.blue(2)}`;
+        return `${chalk.green(2)}+${chalk.blueBright(2)}`;
+    }
+
+    unstyledString(): string {
+        return '2+2';
     }
 
     resolve(currentPlayer: Player, multiplier: number): void {

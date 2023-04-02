@@ -15,18 +15,25 @@ export class HeroicFeatPlatform {
     }
 
     toString(): string {
-        let result = `${this.code} (${this.player?.name || ""}):`;
+        let result = `${this.code.padStart(2)} (${this.player?.name || ""}): `;
 
         let cardsWithAmountsAvailable = countCardsByType(this.cards);
 
         return Array.from(cardsWithAmountsAvailable.entries())
-            .reduce((accumulator, [card, amount]) => accumulator += `${card} (${amount})\t`, result)
+            .reduce((accumulator, [card, amount]) => { 
+                accumulator += `${card} (${amount})`;
+                for(let i = card.unstyledString().length; i < 25; i++){
+                    accumulator += ' ';
+                }
+                return accumulator;
+             }, result)
     }
 
     async handleEventualOusting(currentPlayer: Player): Promise<void> {
         if(this.player !== null && this.player !== currentPlayer){
             await this.player?.receiveDivineBlessing();
         }
+        this.player = currentPlayer;
     }
 
 }

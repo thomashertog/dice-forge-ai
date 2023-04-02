@@ -12,6 +12,10 @@ export class Mirror extends DieFace{
         return `${chalk.bgCyan(' ')}`;
     }
 
+    unstyledString(): string {
+        return ' ';
+    }
+
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         //TODO
     }

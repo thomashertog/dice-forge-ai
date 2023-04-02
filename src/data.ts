@@ -19,7 +19,7 @@ import { BlackmithsChest } from "./heroicfeats/BlacksmithsChest";
 import { BlacksmithsHammer } from "./heroicfeats/blacksmithsHammer";
 import { Cancer } from "./heroicfeats/Cancer";
 import { Elder } from "./heroicfeats/Elder";
-import { FerryMan } from "./heroicfeats/Ferryman";
+import { Ferryman } from "./heroicfeats/Ferryman";
 import { Gorgon } from "./heroicfeats/Gorgon";
 import { GuardiansOwl } from "./heroicfeats/GuardiansOwl";
 import { HelmetOfInvisibility } from "./heroicfeats/HelmetOfInvisibility";
@@ -53,7 +53,7 @@ export const AllHeroicFeats: Array<HeroicFeatPlatform> = new Array<HeroicFeatPla
         new SilverHind(),
         new Satyrs()),
     new HeroicFeatPlatform("M3",
-        new FerryMan(),
+        new Ferryman(),
         new HelmetOfInvisibility()),
     new HeroicFeatPlatform("E",
         new Cancer(),

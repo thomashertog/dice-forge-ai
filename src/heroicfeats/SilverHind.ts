@@ -8,7 +8,7 @@ import { ReinforcementEffect } from "./ReinforcementEffect";
 export class SilverHind extends AbstractHeroicFeatCard implements ReinforcementEffect{
     
     constructor(){
-        super('H', 2, CostType.MOON);
+        super('SH', 2, CostType.MOON);
     }
 
     addToListOfReinforcements(player: Player): void {
@@ -16,12 +16,7 @@ export class SilverHind extends AbstractHeroicFeatCard implements ReinforcementE
     }
 
     async handleReinforcement(currentPlayer: Player): Promise<boolean> {
-        let answer = (await questionUntilValidAnswer(`
-        you currently have these resources: ${currentPlayer.getResourcesString()}
-        your dice are as follows:
-        ${getDieFacesAsPrettyString('left', currentPlayer.leftDie.faces)}
-        ${getDieFacesAsPrettyString('right', currentPlayer.rightDie.faces)}
-        do you want to roll your left die (L) or the right die (R) or cancel (C)`, 'R', 'L', 'C')).toUpperCase();
+        let answer = (await questionUntilValidAnswer(currentPlayer.game, `Do you want to roll your Left die or the Right die or Cancel?`, 'R', 'L', 'C')).toUpperCase();
 
         if(answer === 'C'){
             return new Promise((resolve) => {resolve(false)});

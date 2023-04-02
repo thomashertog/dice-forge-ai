@@ -9,7 +9,11 @@ export class Moon1 extends BuyableDieFace{
     }
 
     toString(): string {
-        return `${chalk.blue(1)}`;
+        return `${chalk.blueBright(1)}`;
+    }
+
+    unstyledString(): string {
+        return '1';
     }
 
     resolve(currentPlayer: Player, multiplier: number): void {

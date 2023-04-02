@@ -14,6 +14,7 @@ export class GameRound{
 
     async start(players: Array<Player>): Promise<void> {
         for await (let player of players) {
+            this.game.currentRoundNumber = this.count;
             let turn = new PlayerTurn(player, this);
             await turn.play();
         }
