@@ -83,8 +83,11 @@ export function getArrayOfNumberStringsUpTo(maxNumber: number, offset:number=1):
     return options;
 }
 
-export async function chooseDieFace(options: Array<DieFace>, game: Game): Promise<DieFace>{
-    const answer = await (await questionUntilValidAnswer(game, `which dieface do you want to replace?`,
+export async function chooseDieFace(options: Array<DieFace>, game: Game, showOptions?: boolean): Promise<DieFace>{
+    showOptions = showOptions || false;
+    const answer = await (await questionUntilValidAnswer(game, 
+`${showOptions ? getDieFacesAsPrettyString('', options, false) : ''}
+which dieface do you pick?`,
         ...options.map(option => option.code))).toUpperCase();
 
         return options.find(option => option.is(answer)) as DieFace;

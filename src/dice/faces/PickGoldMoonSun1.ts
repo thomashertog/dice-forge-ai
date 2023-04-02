@@ -19,7 +19,7 @@ export class PickGoldMoonSun1 extends BuyableDieFace{
 
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
         let pick1GoldMoonSun = 
-        (await questionUntilValidAnswer(currentPlayer.game, `you want the Gold, Moon shards or Sun shards?`, 'G', 'M', 'S')).toUpperCase();
+        (await questionUntilValidAnswer(currentPlayer.game, `you (${currentPlayer.name}) want the Gold, Moon shards or Sun shards?`, 'G', 'M', 'S')).toUpperCase();
                 
         if (pick1GoldMoonSun === 'G') {
             await currentPlayer.addGold(multiplier * 1);

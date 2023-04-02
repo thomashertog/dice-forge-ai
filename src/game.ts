@@ -83,6 +83,8 @@ ${this.getAllPlayersInformation()}`;
         result = this.players.reduce((accumulator, player) => accumulator += `${player.getResourcesString(true)}|`, result + '\n');
         result = this.emptyLineInPlayerInformation(result);
         result = this.players.reduce((accumulator) => accumulator += `${'Reinforcements:'.padEnd(RIGHT_PADDING_LENGTH)}|`, result + '\n');
+     
+        //TODO: count reinforcements by type
         result = this.players.reduce((accumulator, player) => accumulator += player.reinforcements.map(reinforcement => reinforcement.constructor.name).join(', ').padEnd(RIGHT_PADDING_LENGTH) + '|', result +'\n');
 
         return result + '\n';

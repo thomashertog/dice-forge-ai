@@ -151,7 +151,7 @@ Reinforcements: ${this.reinforcements}
 
     buyCard(card: HeroicFeatCard, platform: HeroicFeatPlatform): void {
         this.heroicFeats.push(card);
-        platform.cards.reverse().splice(platform.cards.findIndex(c => c.getCode() === card.getCode()), 1);
+        platform.cards.splice(platform.cards.map(c => c.getCode()).lastIndexOf(card.getCode()), 1);
 
         switch (card.getCostType()) {
             case CostType.MOON: this.moon -= card.getCost(); break;
@@ -167,9 +167,12 @@ Reinforcements: ${this.reinforcements}
             console.log(`${this}\n\n${this.game.sanctuary}\n\n${this.game.heroicFeats}`);
 
             let reinforcements = reinforcementsLeftForTurn
-                .map(reinforcement => reinforcement.toString())
+                .map(reinforcement => reinforcement.constructor.name)
                 .join(',');
-            let answer = await (await questionUntilValidAnswer(this.game, `Which reinforcement do you want to use or pass`,
+            let answer = await (await questionUntilValidAnswer(this.game, 
+`
+${reinforcements}
+Which reinforcement do you want to use or pass`,
                 ...reinforcementsLeftForTurn.map(reinforcement => reinforcement.getCode()), 'P')).toUpperCase();
 
             if (answer === 'P') {
@@ -378,7 +381,7 @@ Everything else will go to your regular gold resource`,
 
             let options = allRolls?.filter(roll => !DieFace.isMirror(roll));
 
-            const replacementChoice = await chooseDieFace(options, this.game)
+            const replacementChoice = await chooseDieFace(options, this.game, true)
 
             let replacementRoll = allRolls.find(option => option.is(replacementChoice.code)) as DieFace;
 

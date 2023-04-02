@@ -33,7 +33,6 @@ export class HeroicFeatPlatform {
         if(this.player !== null && this.player !== currentPlayer){
             await this.player?.receiveDivineBlessing();
         }
-        this.player = currentPlayer;
     }
 
 }
