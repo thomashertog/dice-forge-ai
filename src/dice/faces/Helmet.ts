@@ -17,7 +17,7 @@ export class Helmet extends DieFace{
     }
 
     resolve(currentPlayer: Player, multiplier: number): void {
-        //TODO
+        //nothing to do here, helmet can't be resolved on its own
     }
     
 }

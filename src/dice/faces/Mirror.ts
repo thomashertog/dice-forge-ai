@@ -17,7 +17,7 @@ export class Mirror extends DieFace{
     }
 
     async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
-        //TODO
+        //nothing to do here, mirror can't be resolved on its own
     }
 
     hasChoice(): boolean {
