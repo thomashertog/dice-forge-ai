@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
 import { DieFace } from "./DieFace";
+import { Game } from "../../game";
 
 export class GloryPoints2 extends DieFace{
     
@@ -16,7 +17,7 @@ export class GloryPoints2 extends DieFace{
         return '2';
     }
 
-    resolve(currentPlayer: Player, multiplier: number): void {
+    resolve(game: Game, currentPlayer: Player, multiplier: number): void {
         currentPlayer.addGloryPoints(multiplier * 2);
     }
     

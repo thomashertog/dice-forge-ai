@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
 import { DieFace } from "./DieFace";
+import { Game } from "../../game";
 
 export class Mirror extends DieFace{
     
@@ -16,7 +17,7 @@ export class Mirror extends DieFace{
         return ' ';
     }
 
-    async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
+    async resolve(game: Game, currentPlayer: Player, multiplier: number): Promise<void> {
         //nothing to do here, mirror can't be resolved on its own
     }
 

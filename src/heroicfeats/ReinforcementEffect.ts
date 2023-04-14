@@ -1,4 +1,5 @@
 import { Player } from "../Player";
+import { Game } from "../game";
 
 export interface ReinforcementEffect{
 
@@ -7,5 +8,5 @@ export interface ReinforcementEffect{
 
     addToListOfReinforcements(currentPlayer: Player): void;
 
-    handleReinforcement(currentPlayer: Player): Promise<boolean>;
+    handleReinforcement(game: Game, currentPlayer: Player): Promise<boolean>;
 }

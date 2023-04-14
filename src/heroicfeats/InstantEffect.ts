@@ -1,6 +1,7 @@
 import { Player } from "../Player";
+import { Game } from "../game";
 
 export interface InstantEffect{
 
-    handleEffect(currentPlayer: Player): void;
+    handleEffect(game: Game, currentPlayer: Player): void;
 }

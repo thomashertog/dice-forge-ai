@@ -1,11 +1,12 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
-import { BuyableDieFace } from "./BuyableDieFace";
+import { Game } from "../../game";
+import { DieFace } from "./DieFace";
 
-export class Sun2 extends BuyableDieFace{
+export class Sun2 extends DieFace{
     
     constructor(){
-        super('S2');
+        super('S2', 8);
     }
 
     toString(): string {
@@ -16,11 +17,7 @@ export class Sun2 extends BuyableDieFace{
         return '2';
     }
     
-    resolve(currentPlayer: Player, multiplier: number): void {
+    resolve(game: Game, currentPlayer: Player, multiplier: number): void {
         currentPlayer.addSun(multiplier * 2);
-    }
- 
-    getCost(): number {
-        return 8;
     }
 }

@@ -1,12 +1,13 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
-import { questionUntilValidAnswer } from "../../util";
-import { BuyableDieFace } from "./BuyableDieFace";
+import { CommandLineInterface } from "../../cli";
+import { Game } from "../../game";
+import { GoldenDieFace } from "./GoldenDieFace";
 
-export class PickGoldMoonSun2 extends BuyableDieFace{
+export class PickGoldMoonSun2 extends GoldenDieFace{
     
     constructor(){
-        super('P2');
+        super('P2', 12);
     }
 
     toString(): string {
@@ -17,24 +18,22 @@ export class PickGoldMoonSun2 extends BuyableDieFace{
         return '2/2/2';
     }
 
-    async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
-        let pick1GoldMoonSun = 
-        (await questionUntilValidAnswer(currentPlayer.game, `you (${currentPlayer.name}) want the Gold, Moon shards or Sun shards?`, 'G', 'M', 'S')).toUpperCase();
+    async resolve(game: Game, currentPlayer: Player, multiplier: number): Promise<void> {
+        const value = multiplier * 2;
+        
+        const resource = 
+        (await CommandLineInterface.chooseResource(game, currentPlayer.name, value, 'G', 'M', 'S')).toUpperCase();
                 
-        if (pick1GoldMoonSun === 'G') {
-            await currentPlayer.addGold(multiplier * 2);
-        } else if (pick1GoldMoonSun === 'M') {
+        if (resource === 'G') {
+            await this.resolveGold(game, currentPlayer, multiplier * 2);
+        } else if (resource === 'M') {
             currentPlayer.addMoon(multiplier * 2);
-        } else if (pick1GoldMoonSun === 'S') {
+        } else if (resource === 'S') {
             currentPlayer.addSun(multiplier * 2);
         }
     }
  
     hasChoice(): boolean {
         return true;
-    }
-
-    getCost(): number {
-        return 12;
     }
 }

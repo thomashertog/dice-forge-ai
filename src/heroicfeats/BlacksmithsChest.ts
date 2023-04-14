@@ -1,5 +1,6 @@
 import { CostType } from "../CostType";
 import { Player } from "../Player";
+import { Game } from "../game";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
@@ -9,7 +10,7 @@ export class BlackmithsChest extends AbstractHeroicFeatCard implements InstantEf
         super('BC', 1, CostType.MOON);
     }
 
-    handleEffect(currentPlayer: Player): void {
+    handleEffect(game: Game, currentPlayer: Player): void {
         currentPlayer.extraChest();
     }
 

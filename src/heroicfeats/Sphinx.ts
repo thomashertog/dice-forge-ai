@@ -1,6 +1,8 @@
 import { CostType } from "../CostType";
 import { Player } from "../Player";
-import { getDieFacesAsPrettyString, questionUntilValidAnswer } from "../util";
+import { CommandLineInterface } from "../cli";
+import { Game } from "../game";
+import { minorBlessing } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
@@ -10,19 +12,19 @@ export class Sphinx extends AbstractHeroicFeatCard implements InstantEffect{
         super('S', 6, CostType.SUN);
     }
 
-    async handleEffect(currentPlayer: Player): Promise<void> {
-        let leftRight = await (await questionUntilValidAnswer(currentPlayer.game, `do you want to roll your Left die or your Right die?`, 'L', 'R')).toUpperCase();
+    async handleEffect(game: Game, currentPlayer: Player): Promise<void> {
+        const answer = await CommandLineInterface.whichDieToRoll(game);
 
-        if(leftRight === 'L'){
-            await currentPlayer.minorBlessing(currentPlayer.leftDie);
-            await currentPlayer.minorBlessing(currentPlayer.leftDie);
-            await currentPlayer.minorBlessing(currentPlayer.leftDie);
-            await currentPlayer.minorBlessing(currentPlayer.leftDie);
-        }else if(leftRight === 'R'){
-            await currentPlayer.minorBlessing(currentPlayer.rightDie);
-            await currentPlayer.minorBlessing(currentPlayer.rightDie);
-            await currentPlayer.minorBlessing(currentPlayer.rightDie);
-            await currentPlayer.minorBlessing(currentPlayer.rightDie);
+        if(answer === 'L'){
+            await minorBlessing(game, currentPlayer, currentPlayer.leftDie);
+            await minorBlessing(game, currentPlayer, currentPlayer.leftDie);
+            await minorBlessing(game, currentPlayer,currentPlayer.leftDie);
+            await minorBlessing(game, currentPlayer,currentPlayer.leftDie);
+        }else if(answer === 'R'){
+            await minorBlessing(game, currentPlayer,currentPlayer.rightDie);
+            await minorBlessing(game, currentPlayer,currentPlayer.rightDie);
+            await minorBlessing(game, currentPlayer,currentPlayer.rightDie);
+            await minorBlessing(game, currentPlayer,currentPlayer.rightDie);
         }
     }
 

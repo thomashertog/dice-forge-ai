@@ -1,11 +1,12 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
-import { BuyableDieFace } from "./BuyableDieFace";
+import { Game } from "../../game";
+import { GoldenDieFace } from "./GoldenDieFace";
 
-export class Gold2Moon1 extends BuyableDieFace {
+export class Gold2Moon1 extends GoldenDieFace {
     
     constructor(){
-        super('G2M1');
+        super('G2M1', 4);
     }
 
     toString(): string {
@@ -16,12 +17,8 @@ export class Gold2Moon1 extends BuyableDieFace {
         return '2+1';
     }
 
-    async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
+    async resolve(game: Game, currentPlayer: Player, multiplier: number): Promise<void> {
         currentPlayer.addMoon(multiplier * 1);
-        await currentPlayer.addGold(multiplier * 2);
-    }
-    
-    getCost(): number {
-        return 4;
+        await this.resolveGold(game, currentPlayer, multiplier * 2);
     }
 }

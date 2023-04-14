@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
 import { DieFace } from "./DieFace";
+import { Game } from "../../game";
 
 export class Helmet extends DieFace{
     
@@ -16,7 +17,7 @@ export class Helmet extends DieFace{
         return 'x3';
     }
 
-    resolve(currentPlayer: Player, multiplier: number): void {
+    resolve(game: Game, currentPlayer: Player, multiplier: number): void {
         //nothing to do here, helmet can't be resolved on its own
     }
     

@@ -1,6 +1,6 @@
-import { Game } from "./Game";
 import { Player } from "./Player";
 import { PlayerTurn } from "./PlayerTurn";
+import { Game } from "./game";
 
 export class GameRound{
 

@@ -1,8 +1,11 @@
+import assert from "assert";
 import { CostType } from "../CostType";
-import { DieFace } from "../dice/faces/DieFace";
 import { Player } from "../Player";
 import { ResolveMode } from "../ResolveMode";
-import { getArrayOfNumberStringsUpTo, questionUntilValidAnswer } from "../util";
+import { CommandLineInterface } from "../cli";
+import { DieFace } from "../dice/faces/DieFace";
+import { Game } from "../game";
+import { resolveDieRolls } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
@@ -12,10 +15,10 @@ export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
         super('S', 3, CostType.MOON);
     }
 
-    async handleEffect(currentPlayer: Player): Promise<void> {
+    async handleEffect(game: Game, currentPlayer: Player): Promise<void> {
         let rolls = new Array<DieFace>;
         
-        for(let player of currentPlayer.game.players){
+        for(let player of game.players){
             if(player === currentPlayer){
                 continue;
             }
@@ -24,16 +27,20 @@ export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
             rolls.push(player.rightDie.roll());
         }
 
-        let first = await questionUntilValidAnswer(currentPlayer.game, `
-        players have rolled ${rolls.map(roll => roll.toString())}
-        which is the first face you want to copy?`, ...rolls.map(roll => roll.code));
-        let chosen = rolls.splice(rolls.findIndex(roll => roll.code === first));
-        let second = await questionUntilValidAnswer(currentPlayer.game, `you chose ${chosen}\n${rolls.map(roll => roll.toString())} are available\nwhich is the second face you want to copy? `, ...rolls.map(roll => roll.code));
+        const chosenDieFaces: DieFace[] = [];
+
+        const first = await CommandLineInterface.chooseDieFace(rolls, game, true);
+        let dieface = rolls.splice(rolls.findIndex(roll => roll.code === first.code), 1).at(0);
+        assert(dieface);
+        chosenDieFaces.push(dieface);
+
+        const second = await CommandLineInterface.chooseDieFace(rolls, game, true);
+        chosenDieFaces.push(second);
 
         let rollsToResolve = new Array<DieFace>;
-        rollsToResolve.push(rolls.find(roll => roll.code === first) as DieFace);
-        rollsToResolve.push(rolls.find(roll => roll.code === second) as DieFace);
-        await currentPlayer.resolveDieRolls(rollsToResolve, ResolveMode.ADD); 
+        rollsToResolve.push(...chosenDieFaces);
+        
+        await resolveDieRolls(game, currentPlayer, rollsToResolve, ResolveMode.ADD); 
     }
 
     getGloryPointsAtEndOfGame(): number {

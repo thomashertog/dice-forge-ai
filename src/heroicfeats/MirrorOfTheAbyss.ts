@@ -1,5 +1,7 @@
+import { CommandLineInterface } from "../cli";
 import { CostType } from "../CostType";
 import { Mirror } from "../dice/faces/Mirror";
+import { Game } from "../game";
 import { Player } from "../Player";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
@@ -10,8 +12,11 @@ export class MirrorOfTheAbyss extends AbstractHeroicFeatCard implements InstantE
         super('MOTA', 5, CostType.SUN);
     }
 
-    async handleEffect(currentPlayer: Player): Promise<void> {
-        await currentPlayer.placeDieFaceOntoDie(new Mirror());
+    async handleEffect(game: Game, currentPlayer: Player): Promise<void> {
+        const die = await CommandLineInterface.chooseDieToReplaceDieFace(game, currentPlayer, new Mirror());
+        let dieFaceToReplace = await CommandLineInterface.chooseDieFace(die.faces, game);
+        
+        die.replaceFace(dieFaceToReplace, new Mirror(), game);
     }
 
     getGloryPointsAtEndOfGame(): number {

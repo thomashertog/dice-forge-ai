@@ -1,12 +1,13 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
-import { questionUntilValidAnswer } from "../../util";
-import { BuyableDieFace } from "./BuyableDieFace";
+import { CommandLineInterface } from "../../cli";
+import { Game } from "../../game";
+import { GoldenDieFace } from "./GoldenDieFace";
 
-export class PickGold3GP2 extends BuyableDieFace {
+export class PickGold3GP2 extends GoldenDieFace {
 
     constructor() {
-        super('P3');
+        super('P3', 5);
     }
 
     toString(): string {
@@ -17,21 +18,18 @@ export class PickGold3GP2 extends BuyableDieFace {
         return '3/2';
     }
 
-    async resolve(currentPlayer: Player, multiplier: number): Promise<void> {
-        let pickGoldGP = (await questionUntilValidAnswer(currentPlayer.game, `you (${currentPlayer.name}) want the Gold (G) or glory Points?`, 'G', 'P')).toUpperCase();
+    async resolve(game: Game, currentPlayer: Player, multiplier: number): Promise<void> {
+        
+        const resource = (await CommandLineInterface.chooseResource(game, currentPlayer.name, null, 'G', 'P')).toUpperCase();
 
-        if (pickGoldGP === 'G') {
-            await currentPlayer.addGold(multiplier * 3);
-        } else if (pickGoldGP === 'P') {
+        if (resource === 'G') {
+            await this.resolveGold(game, currentPlayer, multiplier * 3)
+        } else if (resource === 'P') {
             currentPlayer.addGloryPoints(multiplier * 2);
         }
     }
 
     hasChoice(): boolean {
         return true;
-    }
-
-    getCost(): number {
-        return 5;
     }
 }

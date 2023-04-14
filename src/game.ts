@@ -1,9 +1,10 @@
+import { DieFace } from './dice/faces/DieFace';
 import { Sanctuary } from './dice/Sanctuary';
 import { GameRound } from './GameRound';
 import { HeroicFeatIsland } from './heroicfeats/HeroicFeatIsland';
 import { Player } from './Player';
 import { PlayerTurn } from './PlayerTurn';
-import { getDieFacesAsPrettyString, RIGHT_PADDING_LENGTH, toPaddedString } from './util';
+import { getDieFacesAsPrettyString, RIGHT_PADDING_LENGTH } from './util';
 
 export class Game {
 
@@ -11,7 +12,7 @@ export class Game {
     heroicFeats: HeroicFeatIsland;
     players: Array<Player>;
 
-    currentRoundNumber:number = 0;
+    currentRoundNumber: number = 0;
     currentPlayerTurn: PlayerTurn | null = null;
 
     GAME_ROUNDS: number = 9;
@@ -22,7 +23,7 @@ export class Game {
 
         this.players = new Array();
         for (let i = 0; i < playerCount; i++) {
-            this.players.push(new Player(3 - i, this, `player ${i + 1}`));
+            this.players.push(new Player(3 - i, `player ${i + 1}`));
         }
 
         if (playerCount === 3) {
@@ -70,22 +71,22 @@ ${this.getAllPlayersInformation()}`;
     private getAllPlayersInformation() {
         let result = this.players.reduce((accumulator, player) => {
             let playerName = player.name;
-            if(player === this.currentPlayerTurn?.player){
+            if (player === this.currentPlayerTurn?.player) {
                 playerName += " *";
             }
             accumulator += `${playerName.padEnd(RIGHT_PADDING_LENGTH)}|`
             return accumulator;
         }, '');
         result = this.emptyLineInPlayerInformation(result);
-        result = this.players.reduce((accumulator, player) => accumulator += `${getDieFacesAsPrettyString('L', player.leftDie.faces, true)}|`, result + '\n');
-        result = this.players.reduce((accumulator, player) => accumulator += `${getDieFacesAsPrettyString('R', player.rightDie.faces, true)}|`, result + '\n');
+        result = this.players.reduce((accumulator, player) => accumulator += `${getDieFacesAsPrettyString('L', player.leftDie.faces)}|`, result + '\n');
+        result = this.players.reduce((accumulator, player) => accumulator += `${getDieFacesAsPrettyString('R', player.rightDie.faces)}|`, result + '\n');
         result = this.emptyLineInPlayerInformation(result);
         result = this.players.reduce((accumulator, player) => accumulator += `${player.getResourcesString(true)}|`, result + '\n');
         result = this.emptyLineInPlayerInformation(result);
         result = this.players.reduce((accumulator) => accumulator += `${'Reinforcements:'.padEnd(RIGHT_PADDING_LENGTH)}|`, result + '\n');
-     
+
         //TODO: count reinforcements by type
-        result = this.players.reduce((accumulator, player) => accumulator += player.reinforcements.map(reinforcement => reinforcement.constructor.name).join(', ').padEnd(RIGHT_PADDING_LENGTH) + '|', result +'\n');
+        result = this.players.reduce((accumulator, player) => accumulator += player.reinforcements.map(reinforcement => reinforcement.constructor.name).join(', ').padEnd(RIGHT_PADDING_LENGTH) + '|', result + '\n');
 
         return result + '\n';
     }
@@ -98,5 +99,11 @@ ${this.getAllPlayersInformation()}`;
             return accumulator + '|';
         }, start + '\n');
 
+    }
+
+    getRollsOfOtherPlayers(currentPlayer: Player): DieFace[] {
+        return this.players
+        .filter(player => player !== currentPlayer)
+        .flatMap(player => [player.leftDie.faces[0], player.rightDie.faces[0]]);
     }
 }

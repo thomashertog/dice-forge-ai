@@ -2,11 +2,11 @@ import chalk from "chalk";
 import { shuffle } from "lodash";
 import { AllSanctuaryDieFaces } from "../data";
 import { DieFacePool } from "./DieFacePool";
-import { BuyableDieFace } from "./faces/BuyableDieFace";
+import { DieFace } from "./faces/DieFace";
 
 export class Sanctuary {
     
-    removeDieFace(face: BuyableDieFace) {
+    removeDieFace(face: DieFace) {
         this.pools.find(pool => pool.dieFaces.includes(face))?.removeDieFace(face);
     }
 
@@ -29,7 +29,7 @@ export class Sanctuary {
         }
     }
 
-    buyableDieFacesFor(maxCost: number, boughtDieFaces: Set<BuyableDieFace>): Array<BuyableDieFace> {
+    buyableDieFacesFor(maxCost: number, boughtDieFaces: Set<DieFace>): Array<DieFace> {
         return this.pools
             .filter(pool => pool.dieFaces.length !== 0 && maxCost >= pool.cost)
             .flatMap(pool => pool.dieFaces)

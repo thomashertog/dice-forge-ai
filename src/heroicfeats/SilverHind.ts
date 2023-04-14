@@ -1,7 +1,8 @@
-import chalk from "chalk";
 import { CostType } from "../CostType";
 import { Player } from "../Player";
-import { getDieFacesAsPrettyString, questionUntilValidAnswer } from "../util";
+import { CommandLineInterface } from "../cli";
+import { Game } from "../game";
+import { minorBlessing } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { ReinforcementEffect } from "./ReinforcementEffect";
 
@@ -15,16 +16,16 @@ export class SilverHind extends AbstractHeroicFeatCard implements ReinforcementE
         player.reinforcements.push(this);
     }
 
-    async handleReinforcement(currentPlayer: Player): Promise<boolean> {
-        let answer = (await questionUntilValidAnswer(currentPlayer.game, `Do you want to roll your Left die or the Right die or Cancel?`, 'R', 'L', 'C')).toUpperCase();
-
+    async handleReinforcement(game: Game, currentPlayer: Player): Promise<boolean> {
+        const answer = await CommandLineInterface.whichDieToRoll(game);
+        
         if(answer === 'C'){
             return new Promise((resolve) => {resolve(false)});
         }else if(answer === 'L'){
-            await currentPlayer.minorBlessing(currentPlayer.leftDie);
+            await minorBlessing(game, currentPlayer, currentPlayer.leftDie);
             return new Promise((resolve) => {resolve(true)});
         }else{
-            await currentPlayer.minorBlessing(currentPlayer.rightDie);
+            await minorBlessing(game, currentPlayer, currentPlayer.rightDie);
             return new Promise((resolve) => {resolve(true)});
         }
     }

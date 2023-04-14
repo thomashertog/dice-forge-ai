@@ -1,8 +1,9 @@
+import { CommandLineInterface } from "./cli";
 import { DieFace } from "./dice/faces/DieFace";
 import { GameRound } from "./GameRound";
 import { Player } from "./Player";
 import { ResolveMode } from "./ResolveMode";
-import { questionUntilValidAnswer } from "./util";
+import { divineBlessing, doReinforcements, resolveDieRolls } from "./util";
 
 export class PlayerTurn{
 
@@ -17,18 +18,16 @@ export class PlayerTurn{
     async play(): Promise<void> {
         this.round.game.currentPlayerTurn = this;
         await this.start();
-        await this.player.doReinforcements();
+        await doReinforcements(this.round.game, this.player);
 
-        console.log(`${this.player.game}`);
+        console.log(`${this.round.game}`);
 
-        let executed = await this.player.takeTurn();
+        let executed = await CommandLineInterface.takeTurn(this.round.game, this.player);
         if (this.player.sun >= 2 && executed === true) {
             console.clear();
-            let extraTurn =
-                (await questionUntilValidAnswer(this.round.game, `Would you like to perform an extra action for 2 sun shards? Yes / No`, "Y", "N")).toUpperCase();
-            if (extraTurn === "Y") {
+            if (await CommandLineInterface.extraTurn(this.round.game)) {
                 this.player.addSun(-2);
-                await this.player.takeTurn();
+                await CommandLineInterface.takeTurn(this.round.game, this.player);
             }
         }
     }
@@ -45,7 +44,7 @@ export class PlayerTurn{
         let rollsForPlayers = this.everybodyRolls();
 
         for (let player of this.round.game.players) {
-            await player.resolveDieRolls(rollsForPlayers.get(player) as Array<DieFace>, ResolveMode.ADD);
+            await resolveDieRolls(this.round.game, this.player, rollsForPlayers.get(player) as Array<DieFace>, ResolveMode.ADD);
         }
         return rollsForPlayers;
     }
@@ -54,7 +53,7 @@ export class PlayerTurn{
         let rollsForPlayers = new Map<Player, DieFace[]>;
 
         for (let player of this.round.game.players) {
-            let rolls = player.divineBlessing();
+            let rolls = divineBlessing(this.player);
             rollsForPlayers.set(player, rolls);
         }
 

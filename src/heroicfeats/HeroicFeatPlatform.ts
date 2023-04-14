@@ -1,5 +1,6 @@
 import { Player } from "../Player";
-import { countCardsByType } from "../util";
+import { Game } from "../game";
+import { countCardsByType, receiveDivineBlessing } from "../util";
 import { HeroicFeatCard } from "./HeroicFeatCard";
 
 export class HeroicFeatPlatform {
@@ -29,9 +30,9 @@ export class HeroicFeatPlatform {
              }, result)
     }
 
-    async handleEventualOusting(currentPlayer: Player): Promise<void> {
+    async handleEventualOusting(game: Game, currentPlayer: Player): Promise<void> {
         if(this.player !== null && this.player !== currentPlayer){
-            await this.player?.receiveDivineBlessing();
+            await receiveDivineBlessing(game, currentPlayer);
         }
     }
 

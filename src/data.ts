@@ -16,7 +16,7 @@ import { Sun1 } from "./dice/faces/Sun1";
 import { Sun1GP1 } from "./dice/faces/Sun1GP1";
 import { Sun2 } from "./dice/faces/Sun2";
 import { BlackmithsChest } from "./heroicfeats/BlacksmithsChest";
-import { BlacksmithsHammer } from "./heroicfeats/blacksmithsHammer";
+import { BlacksmithsHammer } from "./heroicfeats/BlacksmithsHammer";
 import { Cancer } from "./heroicfeats/Cancer";
 import { Elder } from "./heroicfeats/Elder";
 import { Ferryman } from "./heroicfeats/Ferryman";
