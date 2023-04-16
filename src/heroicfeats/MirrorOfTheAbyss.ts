@@ -1,4 +1,4 @@
-import { CommandLineInterface } from "../cli";
+import { CommandLineInterface } from "../interfaces/cli";
 import { CostType } from "../CostType";
 import { Mirror } from "../dice/faces/Mirror";
 import { Game } from "../game";

@@ -1,4 +1,4 @@
-import { CommandLineInterface } from "../../cli";
+import { CommandLineInterface } from "../../interfaces/cli";
 import { Game } from "../../game";
 import { Player } from "../../Player";
 import { addGoldTo } from "../../util";

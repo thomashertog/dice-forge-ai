@@ -2,7 +2,7 @@ import assert from "assert";
 import { CostType } from "../CostType";
 import { Player } from "../Player";
 import { ResolveMode } from "../ResolveMode";
-import { CommandLineInterface } from "../cli";
+import { CommandLineInterface } from "../interfaces/cli";
 import { DieFace } from "../dice/faces/DieFace";
 import { Game } from "../game";
 import { resolveDieRolls } from "../util";

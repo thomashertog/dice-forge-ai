@@ -1,5 +1,5 @@
 import assert from "assert";
-import { CommandLineInterface } from "./cli";
+import { CommandLineInterface } from "./interfaces/cli";
 import { DieFace } from "./dice/faces/DieFace";
 import { GameRound } from "./GameRound";
 import { Player } from "./Player";

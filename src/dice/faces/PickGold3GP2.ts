@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { Player } from "../../Player";
-import { CommandLineInterface } from "../../cli";
+import { CommandLineInterface } from "../../interfaces/cli";
 import { Game } from "../../game";
 import { GoldenDieFace } from "./GoldenDieFace";
 

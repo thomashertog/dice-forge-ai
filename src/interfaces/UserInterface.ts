@@ -1,11 +1,11 @@
-import { Player } from "./Player";
+import { Player } from "../Player";
 import { PlayerAction } from "./cli";
-import { Die } from "./dice/Die";
-import { DieFace } from "./dice/faces/DieFace";
-import { Game } from "./game";
-import { HeroicFeatCard } from "./heroicfeats/HeroicFeatCard";
-import { HeroicFeatPlatform } from "./heroicfeats/HeroicFeatPlatform";
-import { ReinforcementEffect } from "./heroicfeats/ReinforcementEffect";
+import { Die } from "../dice/Die";
+import { DieFace } from "../dice/faces/DieFace";
+import { Game } from "../game";
+import { HeroicFeatCard } from "../heroicfeats/HeroicFeatCard";
+import { HeroicFeatPlatform } from "../heroicfeats/HeroicFeatPlatform";
+import { ReinforcementEffect } from "../heroicfeats/ReinforcementEffect";
 
 export interface UserInterface{
 

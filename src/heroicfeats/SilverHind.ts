@@ -1,6 +1,6 @@
 import { CostType } from "../CostType";
 import { Player } from "../Player";
-import { CommandLineInterface } from "../cli";
+import { CommandLineInterface } from "../interfaces/cli";
 import { Game } from "../game";
 import { minorBlessing } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";

@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash';
 import { CostType } from './CostType';
 import { Player } from './Player';
 import { ResolveMode } from './ResolveMode';
-import { CommandLineInterface } from './cli';
+import { CommandLineInterface } from './interfaces/cli';
 import { Die } from './dice/Die';
 import { DieFace } from './dice/faces/DieFace';
 import { Game } from './game';
