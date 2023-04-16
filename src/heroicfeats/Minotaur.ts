@@ -1,8 +1,7 @@
 import { CostType } from "../CostType";
 import { Player } from "../Player";
-import { ResolveMode } from "../ResolveMode";
 import { Game } from "../game";
-import { divineBlessing, receiveDivineBlessing, resolveDieRolls } from "../util";
+import { receiveDivineBlessing } from "../util";
 import { AbstractHeroicFeatCard } from "./AbstractHeroicFeatCard";
 import { InstantEffect } from "./InstantEffect";
 
@@ -17,8 +16,7 @@ export class Minotaur extends AbstractHeroicFeatCard implements InstantEffect{
             if(player === currentPlayer){
                 continue;
             }
-            let rolls = divineBlessing(player);
-            await resolveDieRolls(game, player, rolls, ResolveMode.SUBTRACT);
+            await receiveDivineBlessing(game, player, false);
         }
     }
 

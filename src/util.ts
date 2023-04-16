@@ -80,9 +80,9 @@ export function countCardsByType(cards: Array<HeroicFeatCard>): Map<HeroicFeatCa
     }
 }
 
-export async function receiveDivineBlessing(game: Game, player: Player): Promise<void> {
+export async function receiveDivineBlessing(game: Game, player: Player, add: boolean = true): Promise<void> {
     let rolls = divineBlessing(player);
-    await resolveDieRolls(game, player, rolls, ResolveMode.ADD);
+    await resolveDieRolls(game, player, rolls, add ? ResolveMode.ADD : ResolveMode.SUBTRACT);
 }
 
 export function divineBlessing(player: Player): Array<DieFace> {
