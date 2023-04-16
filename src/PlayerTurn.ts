@@ -1,3 +1,4 @@
+import assert from "assert";
 import { CommandLineInterface } from "./cli";
 import { DieFace } from "./dice/faces/DieFace";
 import { GameRound } from "./GameRound";
@@ -22,12 +23,17 @@ export class PlayerTurn{
 
         console.log(`${this.round.game}`);
 
-        let executed = await CommandLineInterface.takeTurn(this.round.game, this.player);
-        if (this.player.sun >= 2 && executed === true) {
+        const playerAction = await CommandLineInterface.chooseAction(this.round.game, this.player);
+        assert(playerAction);
+        await playerAction(this.round.game, this.player);
+        
+        if (this.player.sun >= 2) {
             console.clear();
             if (await CommandLineInterface.extraTurn(this.round.game)) {
                 this.player.addSun(-2);
-                await CommandLineInterface.takeTurn(this.round.game, this.player);
+                const secondPlayerAction = await CommandLineInterface.chooseAction(this.round.game, this.player);
+                assert(secondPlayerAction);
+                await secondPlayerAction(this.round.game, this.player);
             }
         }
     }
@@ -44,7 +50,7 @@ export class PlayerTurn{
         let rollsForPlayers = this.everybodyRolls();
 
         for (let player of this.round.game.players) {
-            await resolveDieRolls(this.round.game, this.player, rollsForPlayers.get(player) as Array<DieFace>, ResolveMode.ADD);
+            await resolveDieRolls(this.round.game, player, rollsForPlayers.get(player) as Array<DieFace>, ResolveMode.ADD);
         }
         return rollsForPlayers;
     }
@@ -53,7 +59,7 @@ export class PlayerTurn{
         let rollsForPlayers = new Map<Player, DieFace[]>;
 
         for (let player of this.round.game.players) {
-            let rolls = divineBlessing(this.player);
+            let rolls = divineBlessing(player);
             rollsForPlayers.set(player, rolls);
         }
 

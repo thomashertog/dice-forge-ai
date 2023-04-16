@@ -11,11 +11,26 @@ import { countCardsByType, forge, getArrayOfNumberStringsUpTo, getDieFacesAsPret
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 
+export type PlayerAction = (game: Game, currentPlayer: Player) => void;
+
 export class CommandLineInterface {
     static terminal = readline.createInterface(input, output);
 
     static async getPlayerCount(): Promise<number> {
         return await CommandLineInterface.questionUntilValidAnswer(null, "How many people you want to play with? (2..4)", "2", "3", "4").then(parseInt);
+    }
+
+    static async chooseAction(game: Game, currentPlayer: Player): Promise<PlayerAction | undefined> {
+        const answer = await CommandLineInterface.questionUntilValidAnswer(game, `
+What do you (${currentPlayer.name}) want to do now?
+Forge die face(s) / perform a Heroic feat / Pass
+`, 'F', 'H', 'P').then(answer => answer.toUpperCase());
+        if(answer === 'F'){
+            return forge;
+        }else if(answer === 'H'){
+            return heroicFeat;
+        }
+        return;
     }
 
     static async takeTurn(game: Game, currentPlayer: Player): Promise<boolean> {
@@ -84,40 +99,51 @@ Do you want to keep forging? (Y/N)`,
 
     static async pickPlatform(game: Game, currentPlayer: Player): Promise<HeroicFeatPlatform> {
         let platformChoice = await (await CommandLineInterface.questionUntilValidAnswer(game, "To which platform do you want to jump?", ...game.heroicFeats.availablePlatformsFor(currentPlayer))).toUpperCase();
-    
+
         let platform = game.heroicFeats.platforms.find(platform => platform!.code === platformChoice);
         assert(platform);
-    
+
         return platform;
     }
 
     static async pickCardToBuy(game: Game, currentPlayer: Player, platform: HeroicFeatPlatform): Promise<HeroicFeatCard> {
         let availableCards = countCardsByType(platform.cards.filter(card => card.isAffordableFor(currentPlayer)));
-    
+
         const cardsWithAmountsAvailable =
             Array.from(availableCards.entries())
                 .map(([card, amount]) => `${card} (${amount})`).join(' | ');
-    
+
         let chosenCardCode = await CommandLineInterface.questionUntilValidAnswer(game,
             `Which card do you want to buy?`,
             ...Array.from(availableCards.keys()).map(card => card.getCode()));
-    
+
         let chosenCard = platform.cards.find(card => card.getCode() === chosenCardCode.toUpperCase());
-    
+
         assert(chosenCard);
         return chosenCard;
     }
-    
 
-    static async chooseResource(game: Game, playerName: string, value: number | null, ...options: string[]): Promise<string>{
-        return (await CommandLineInterface.questionUntilValidAnswer(game, `you (${playerName}) want Gold, Moon shards or Sun Shards? ${value !== null ? `(${value})`: ''}`, ...options)).toUpperCase();
+
+    static async chooseResource(game: Game, playerName: string, value: number | null, ...options: string[]): Promise<string> {
+        return (await CommandLineInterface.questionUntilValidAnswer(game, `you (${playerName}) want ${options.map(option => CommandLineInterface.toOptionString(option)).join(',')}? ${value !== null ? `(${value})` : ''}`, ...options)).toUpperCase();
     }
 
-    static async howMuchGoldForHammer(game: Game, currentPlayer: Player, value: number): Promise<number>{
-        if(currentPlayer.activeHammerCount === 0){
+    private static toOptionString(code: string): string {
+        switch(code){
+            case "G": return "Gold";
+            case "P": return "glory Points";
+            case "M": return "Moon shards";
+            case "S": return "Sun shards";
+            default: return "";
+        }
+        return "";
+    }
+
+    static async howMuchGoldForHammer(game: Game, currentPlayer: Player, value: number): Promise<number> {
+        if (currentPlayer.activeHammerCount === 0 || value < 0) {
             return 0;
         }
-        
+
         const maxGoldForHammer = currentPlayer.activeHammerCount * 30 - currentPlayer.goldForHammer;
 
 
@@ -127,11 +153,11 @@ How much would you like to add to the hammer? (0..${maxGoldForHammer < value ? m
 Everything else will go to your regular gold resource`, '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
     }
 
-    static async whichDieToRoll(game: Game): Promise<string>{
+    static async whichDieToRoll(game: Game, name: string): Promise<string> {
         return await CommandLineInterface.questionUntilValidAnswer(game, `Do you (${name}) want to roll your Left die or the Right die or Cancel?`, 'R', 'L', 'C').then(answer => answer.toUpperCase());
     }
 
-    static async whichReinforcement(game: Game, availableReinforcements: ReinforcementEffect[]): Promise<string>{
+    static async whichReinforcement(game: Game, availableReinforcements: ReinforcementEffect[]): Promise<string> {
         return CommandLineInterface.questionUntilValidAnswer(game, `
 ${availableReinforcements.map(r => r.constructor.name).join(',')}        
 Which reinforcement do you want to use or Pass?`, 'P', ...availableReinforcements.map(r => r.getCode())).then(answer => answer.toUpperCase());
@@ -157,4 +183,3 @@ Which reinforcement do you want to use or Pass?`, 'P', ...availableReinforcement
         return new Promise(resolve => { CommandLineInterface.terminal.question(message, resolve); });
     }
 }
-
