@@ -11,7 +11,7 @@ console.log(chalk.green(figlet.textSync('dice-forge', { horizontalLayout: 'full'
 
 let game: Game;
 
-CommandLineInterface.getPlayerCount().then(count => {
+new CommandLineInterface().getPlayerCount().then(count => {
     game = new Game(count);
     game.start();
 });

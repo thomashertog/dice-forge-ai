@@ -13,8 +13,8 @@ export class MirrorOfTheAbyss extends AbstractHeroicFeatCard implements InstantE
     }
 
     async handleEffect(game: Game, currentPlayer: Player): Promise<void> {
-        const die = await CommandLineInterface.chooseDieToReplaceDieFace(game, currentPlayer, new Mirror());
-        let dieFaceToReplace = await CommandLineInterface.chooseDieFace(die.faces, game);
+        const die = await new CommandLineInterface().chooseDieToReplaceDieFace(game, currentPlayer, new Mirror());
+        let dieFaceToReplace = await new CommandLineInterface().chooseDieFace(die.faces, game);
         
         die.replaceFace(dieFaceToReplace, new Mirror(), game);
     }

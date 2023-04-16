@@ -1,4 +1,3 @@
-import { CommandLineInterface } from "../cli";
 import { Game } from "../game";
 import { shuffle } from "../util";
 import { DieFace } from "./faces/DieFace";

@@ -18,10 +18,10 @@ export class GuardiansOwl extends AbstractHeroicFeatCard implements Reinforcemen
     async handleReinforcement(game: Game, currentPlayer: Player): Promise<boolean> {
         const value = 1;
 
-        let answer = await CommandLineInterface.chooseResource(game, currentPlayer.name, value, 'G', 'M', 'S', 'C');
+        let answer = await new CommandLineInterface().chooseResource(game, currentPlayer.name, value, 'G', 'M', 'S', 'C');
         
         switch(answer){
-            case 'G': const goldForHammer = await CommandLineInterface.howMuchGoldForHammer(game, currentPlayer, value);
+            case 'G': const goldForHammer = await new CommandLineInterface().howMuchGoldForHammer(game, currentPlayer, value);
             currentPlayer.addGoldToHammer(goldForHammer);
             currentPlayer.addGold(value - goldForHammer);
             break;

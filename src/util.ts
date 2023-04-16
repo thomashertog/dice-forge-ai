@@ -117,7 +117,7 @@ async function handleMirrorRollsEventually(game: Game, currentPlayer: Player, ro
     while (rolls.some(roll => DieFace.isMirror(roll))) {
         const options = allRolls.filter(roll => !DieFace.isMirror(roll));
 
-        const replacementChoice = await CommandLineInterface.chooseDieFace(options, game, true)
+        const replacementChoice = await new CommandLineInterface().chooseDieFace(options, game, true)
         const replacementRoll = allRolls.splice(allRolls.findIndex(option => option.is(replacementChoice.code)), 1).at(0);
 
         assert(replacementRoll);
@@ -151,13 +151,13 @@ export async function forge(game: Game, currentPlayer: Player): Promise<void> {
 
     while (userEnd !== true && minimumCost !== -1) {
         console.clear();
-        let bought = await CommandLineInterface.pickDieFace(game, currentPlayer, boughtDieFaces);
+        let bought = await new CommandLineInterface().pickDieFace(game, currentPlayer, boughtDieFaces);
 
         buyDieFace(game, currentPlayer, bought);
         boughtDieFaces.add(bought);
 
-        const die = await CommandLineInterface.chooseDieToReplaceDieFace(game, currentPlayer, bought);
-        let dieFaceToReplace = await CommandLineInterface.chooseDieFace(die.faces, game);
+        const die = await new CommandLineInterface().chooseDieToReplaceDieFace(game, currentPlayer, bought);
+        let dieFaceToReplace = await new CommandLineInterface().chooseDieFace(die.faces, game);
 
         die.replaceFace(dieFaceToReplace, bought, game);
 
@@ -165,11 +165,10 @@ export async function forge(game: Game, currentPlayer: Player): Promise<void> {
 
         if (minimumCost !== -1) {
             console.clear();
-            userEnd = await CommandLineInterface.keepForging(game, boughtDieFaces);
+            userEnd = await new CommandLineInterface().keepForging(game, boughtDieFaces);
         }
     }
 }
-
 
 export function buyDieFace(game: Game, currentPlayer: Player, face: DieFace): void {
     currentPlayer.gold -= face.cost;
@@ -177,10 +176,10 @@ export function buyDieFace(game: Game, currentPlayer: Player, face: DieFace): vo
 }
 
 export async function heroicFeat(game: Game, currentPlayer: Player): Promise<void> {
-    const chosenPlatform = await CommandLineInterface.pickPlatform(game, currentPlayer);
+    const chosenPlatform = await new CommandLineInterface().pickPlatform(game, currentPlayer);
     await jumpTo(game, currentPlayer, chosenPlatform);
 
-    let card = await CommandLineInterface.pickCardToBuy(game, currentPlayer, chosenPlatform);
+    let card = await new CommandLineInterface().pickCardToBuy(game, currentPlayer, chosenPlatform);
     buyCard(currentPlayer, card, chosenPlatform);
 
     if (isInstantEffect(card)) {
@@ -213,7 +212,7 @@ export async function doReinforcements(game: Game, currentPlayer: Player): Promi
         console.clear();
         console.log(`${currentPlayer}\n\n${game.sanctuary}\n\n${game.heroicFeats}`);
 
-        const answer = await CommandLineInterface.whichReinforcement(game, reinforcementsLeftForTurn);
+        const answer = await new CommandLineInterface().whichReinforcement(game, reinforcementsLeftForTurn);
 
         if (answer === 'P') {
             return;
@@ -228,7 +227,7 @@ export async function doReinforcements(game: Game, currentPlayer: Player): Promi
 }
 
 export async function addGoldTo(game: Game, currentPlayer: Player, value: number) {
-    const answer = await CommandLineInterface.howMuchGoldForHammer(game, currentPlayer, value);
+    const answer = await new CommandLineInterface().howMuchGoldForHammer(game, currentPlayer, value);
 
     currentPlayer.addGoldToHammer(answer);
     currentPlayer.addGold(value - answer);

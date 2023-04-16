@@ -13,7 +13,7 @@ export class Sphinx extends AbstractHeroicFeatCard implements InstantEffect{
     }
 
     async handleEffect(game: Game, currentPlayer: Player): Promise<void> {
-        const answer = await CommandLineInterface.whichDieToRoll(game, currentPlayer.name);
+        const answer = await new CommandLineInterface().whichDieToRoll(game, currentPlayer.name);
 
         if(answer === 'L'){
             await minorBlessing(game, currentPlayer, currentPlayer.leftDie);
