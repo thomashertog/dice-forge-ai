@@ -29,12 +29,12 @@ export class Satyrs extends AbstractHeroicFeatCard implements InstantEffect{
 
         const chosenDieFaces: DieFace[] = [];
 
-        const first = await new CommandLineInterface().chooseDieFace(rolls, game, true);
+        const first = await currentPlayer.getUserInterface().chooseDieFace(rolls, game, true);
         let dieface = rolls.splice(rolls.findIndex(roll => roll.code === first.code), 1).at(0);
         assert(dieface);
         chosenDieFaces.push(dieface);
 
-        const second = await new CommandLineInterface().chooseDieFace(rolls, game, true);
+        const second = await currentPlayer.getUserInterface().chooseDieFace(rolls, game, true);
         chosenDieFaces.push(second);
 
         let rollsToResolve = new Array<DieFace>;

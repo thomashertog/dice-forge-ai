@@ -7,8 +7,11 @@ import { Sun1 } from './dice/faces/Sun1';
 import { HeroicFeatCard } from './heroicfeats/HeroicFeatCard';
 import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 import { RIGHT_PADDING_LENGTH, getDieFacesAsPrettyString } from './util';
+import { UserInterface } from './interfaces/UserInterface';
 
 export class Player {
+
+    private userInterface: UserInterface;
 
     private MAX_GOLD = 12;
     private MAX_MOON_SUN = 6;
@@ -27,7 +30,8 @@ export class Player {
     sun: number;
     gloryPoints: number;
 
-    constructor(initialGold: number, name: string) {
+    constructor(userInterface: UserInterface, initialGold: number, name: string) {
+        this.userInterface = userInterface;
         this.name = name;
         this.activeHammerCount = 0;
         this.goldForHammer = 0;
@@ -135,6 +139,10 @@ Reinforcements: ${this.reinforcements}
         }
 
         return result;
+    }
+
+    getUserInterface():UserInterface{
+        return this.userInterface
     }
 
     extraChest(): void {

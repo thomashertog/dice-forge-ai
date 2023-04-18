@@ -17,15 +17,12 @@ export class SilverHind extends AbstractHeroicFeatCard implements ReinforcementE
     }
 
     async handleReinforcement(game: Game, currentPlayer: Player): Promise<boolean> {
-        const answer = await new CommandLineInterface().whichDieToRoll(game, currentPlayer.name);
-        
-        if(answer === 'C'){
+        const die = await currentPlayer.getUserInterface().whichDieToRoll(game, currentPlayer);
+
+        if(die === undefined){
             return new Promise((resolve) => {resolve(false)});
-        }else if(answer === 'L'){
-            await minorBlessing(game, currentPlayer, currentPlayer.leftDie);
-            return new Promise((resolve) => {resolve(true)});
-        }else{
-            await minorBlessing(game, currentPlayer, currentPlayer.rightDie);
+        }else {
+            await minorBlessing(game, currentPlayer, die);
             return new Promise((resolve) => {resolve(true)});
         }
     }

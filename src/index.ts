@@ -13,7 +13,7 @@ let game: Game;
 
 new CommandLineInterface().getPlayerCount().then(count => {
     game = new Game(count);
-    game.start();
+    game.start(count);
 });
 
 exit;

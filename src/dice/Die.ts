@@ -1,5 +1,5 @@
 import { Game } from "../game";
-import { shuffle } from "../util";
+import { getRandomElementOfArray } from "../util";
 import { DieFace } from "./faces/DieFace";
 
 export class Die {
@@ -18,7 +18,7 @@ export class Die {
     }
 
     roll(): DieFace {
-        shuffle(this.faces);
+        getRandomElementOfArray(this.faces);
         return this.faces[0];
     }
 }

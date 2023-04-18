@@ -20,7 +20,7 @@ export class PickGold3GP2 extends GoldenDieFace {
 
     async resolve(game: Game, currentPlayer: Player, multiplier: number): Promise<void> {
         
-        const resource = (await new CommandLineInterface().chooseResource(game, currentPlayer.name, null, 'G', 'P')).toUpperCase();
+        const resource = (await currentPlayer.getUserInterface().chooseResource(game, currentPlayer.name, null, 'G', 'P')).toUpperCase();
 
         if (resource === 'G') {
             await this.resolveGold(game, currentPlayer, multiplier * 3)

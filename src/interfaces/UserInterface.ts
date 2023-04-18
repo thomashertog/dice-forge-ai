@@ -1,20 +1,18 @@
 import { Player } from "../Player";
-import { PlayerAction } from "./cli";
 import { Die } from "../dice/Die";
 import { DieFace } from "../dice/faces/DieFace";
 import { Game } from "../game";
 import { HeroicFeatCard } from "../heroicfeats/HeroicFeatCard";
 import { HeroicFeatPlatform } from "../heroicfeats/HeroicFeatPlatform";
 import { ReinforcementEffect } from "../heroicfeats/ReinforcementEffect";
+import { PlayerAction } from "./cli";
 
 export interface UserInterface{
 
-    getPlayerCount(): Promise<number>;
-
     chooseAction(game: Game, currentPlayer: Player): Promise<PlayerAction | undefined>;
 
-    takeTurn(game: Game, currentPlayer: Player): Promise<boolean>;
-
+    extraTurn(game: Game): Promise<boolean>;
+    
     pickDieFace(game: Game, currentPlayer: Player, boughtDieFaces: Set<DieFace>): Promise<DieFace>;
 
     chooseDieToReplaceDieFace(game: Game, currentPlayer: Player, bought: DieFace): Promise<Die>;
@@ -31,7 +29,7 @@ export interface UserInterface{
 
     howMuchGoldForHammer(game: Game, currentPlayer: Player, value: number): Promise<number>;
 
-    whichDieToRoll(game: Game, name: string): Promise<string>;
+    whichDieToRoll(game: Game, currentPlayer: Player): Promise<Die | undefined>;
 
-    whichReinforcement(game: Game, availableReinforcements: ReinforcementEffect[]): Promise<string>;
+    whichReinforcement(game: Game, availableReinforcements: ReinforcementEffect[]): Promise<ReinforcementEffect | undefined>;
 }

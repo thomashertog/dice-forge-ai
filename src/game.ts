@@ -2,6 +2,7 @@ import { DieFace } from './dice/faces/DieFace';
 import { Sanctuary } from './dice/Sanctuary';
 import { GameRound } from './GameRound';
 import { HeroicFeatIsland } from './heroicfeats/HeroicFeatIsland';
+import { CommandLineInterface } from './interfaces/cli';
 import { Player } from './Player';
 import { PlayerTurn } from './PlayerTurn';
 import { getDieFacesAsPrettyString, RIGHT_PADDING_LENGTH } from './util';
@@ -22,16 +23,17 @@ export class Game {
         this.heroicFeats = new HeroicFeatIsland(playerCount);
 
         this.players = new Array();
-        for (let i = 0; i < playerCount; i++) {
-            this.players.push(new Player(3 - i, `player ${i + 1}`));
-        }
-
         if (playerCount === 3) {
             this.GAME_ROUNDS = 10;
         }
     }
 
-    async start(): Promise<void> {
+    async start(playerCount: number): Promise<void> {
+        for (let i = 0; i < playerCount; i++) {
+            const userInterface = await new CommandLineInterface().botOrHuman(i);
+            this.players.push(new Player(userInterface, 3 - i, `player ${i + 1}`));
+        }
+        
         for (let i = 1; i <= this.GAME_ROUNDS; i++) {
             this.currentRoundNumber = i;
             await new GameRound(i, this).start(this.players);

@@ -21,8 +21,8 @@ export class HeroicFeatIsland{
         return this.platforms.map(platform => platform.toString()).join('\n');
     }
 
-    availablePlatformsFor(player: Player): Array<string> {
-        return this.platforms.filter(platform => platform.cards.filter(card => card.isAffordableFor(player)).length > 0).map(platform => platform.code);
+    availablePlatformsFor(player: Player): Array<HeroicFeatPlatform> {
+        return this.platforms.filter(platform => platform.cards.filter(card => card.isAffordableFor(player)).length > 0);
     }
 
     clearPlayerFromItsCurrentPlatform(player: Player): void {

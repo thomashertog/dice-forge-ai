@@ -23,7 +23,7 @@ export class PickGoldMoonSun1 extends GoldenDieFace{
         const value = multiplier * 1;
         
         const resource = 
-        (await new CommandLineInterface().chooseResource(game, currentPlayer.name, value, 'G', 'M', 'S')).toUpperCase();
+        (await currentPlayer.getUserInterface().chooseResource(game, currentPlayer.name, value, 'G', 'M', 'S')).toUpperCase();
 
         if (resource === 'G') {
             await this.resolveGold(game, currentPlayer, value);

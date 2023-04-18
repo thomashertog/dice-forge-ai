@@ -23,16 +23,20 @@ export class PlayerTurn{
 
         console.log(`${this.round.game}`);
 
-        const playerAction = await new CommandLineInterface().chooseAction(this.round.game, this.player);
-        assert(playerAction);
+        const playerAction = await this.player.getUserInterface().chooseAction(this.round.game, this.player);
+        if(playerAction === undefined){
+            return;
+        }
         await playerAction(this.round.game, this.player);
         
         if (this.player.sun >= 2) {
             console.clear();
-            if (await new CommandLineInterface().extraTurn(this.round.game)) {
+            if (await this.player.getUserInterface().extraTurn(this.round.game)) {
                 this.player.addSun(-2);
-                const secondPlayerAction = await new CommandLineInterface().chooseAction(this.round.game, this.player);
-                assert(secondPlayerAction);
+                const secondPlayerAction = await this.player.getUserInterface().chooseAction(this.round.game, this.player);
+                if(secondPlayerAction === undefined){
+                    return;
+                }
                 await secondPlayerAction(this.round.game, this.player);
             }
         }

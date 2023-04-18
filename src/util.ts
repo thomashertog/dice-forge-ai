@@ -1,6 +1,6 @@
 import assert from 'assert';
 import chalk from 'chalk';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, max } from 'lodash';
 import { CostType } from './CostType';
 import { Player } from './Player';
 import { ResolveMode } from './ResolveMode';
@@ -15,14 +15,19 @@ import { ReinforcementEffect } from './heroicfeats/ReinforcementEffect';
 
 export interface fn { (value: number): void }
 
-export function shuffle(array: Array<DieFace>): Array<DieFace> {
+export function getRandomElementOfArray<Type>(array: Array<Type>): Type {
+    const shuffledArray = shuffle(array);
+    return shuffledArray[0];
+}
+
+function shuffle<Type>(array: Array<Type>): Array<Type> {
     let currentIndex = array.length, randomIndex;
 
     // While there remain elements to shuffle.
     while (currentIndex != 0) {
 
         // Pick a remaining element.
-        randomIndex = Math.floor(Math.random() * currentIndex);
+        randomIndex = randomNumberUpUntil(currentIndex);
         currentIndex--;
 
         // And swap it with the current element.
@@ -31,6 +36,14 @@ export function shuffle(array: Array<DieFace>): Array<DieFace> {
     }
 
     return array;
+}
+
+export function coinToss():boolean{
+    return Math.random() > 0.5;
+}
+
+export function randomNumberUpUntil(maximum: number){
+    return Math.floor(Math.random() * maximum);
 }
 
 export function isInstantEffect(arg: any): arg is InstantEffect {
@@ -117,7 +130,7 @@ async function handleMirrorRollsEventually(game: Game, currentPlayer: Player, ro
     while (rolls.some(roll => DieFace.isMirror(roll))) {
         const options = allRolls.filter(roll => !DieFace.isMirror(roll));
 
-        const replacementChoice = await new CommandLineInterface().chooseDieFace(options, game, true)
+        const replacementChoice = await currentPlayer.getUserInterface().chooseDieFace(options, game, true)
         const replacementRoll = allRolls.splice(allRolls.findIndex(option => option.is(replacementChoice.code)), 1).at(0);
 
         assert(replacementRoll);
@@ -151,13 +164,13 @@ export async function forge(game: Game, currentPlayer: Player): Promise<void> {
 
     while (userEnd !== true && minimumCost !== -1) {
         console.clear();
-        let bought = await new CommandLineInterface().pickDieFace(game, currentPlayer, boughtDieFaces);
+        let bought = await currentPlayer.getUserInterface().pickDieFace(game, currentPlayer, boughtDieFaces);
 
         buyDieFace(game, currentPlayer, bought);
         boughtDieFaces.add(bought);
 
-        const die = await new CommandLineInterface().chooseDieToReplaceDieFace(game, currentPlayer, bought);
-        let dieFaceToReplace = await new CommandLineInterface().chooseDieFace(die.faces, game);
+        const die = await currentPlayer.getUserInterface().chooseDieToReplaceDieFace(game, currentPlayer, bought);
+        let dieFaceToReplace = await currentPlayer.getUserInterface().chooseDieFace(die.faces, game);
 
         die.replaceFace(dieFaceToReplace, bought, game);
 
@@ -165,7 +178,7 @@ export async function forge(game: Game, currentPlayer: Player): Promise<void> {
 
         if (minimumCost !== -1) {
             console.clear();
-            userEnd = await new CommandLineInterface().keepForging(game, boughtDieFaces);
+            userEnd = await currentPlayer.getUserInterface().keepForging(game, boughtDieFaces);
         }
     }
 }
@@ -176,10 +189,10 @@ export function buyDieFace(game: Game, currentPlayer: Player, face: DieFace): vo
 }
 
 export async function heroicFeat(game: Game, currentPlayer: Player): Promise<void> {
-    const chosenPlatform = await new CommandLineInterface().pickPlatform(game, currentPlayer);
+    const chosenPlatform = await currentPlayer.getUserInterface().pickPlatform(game, currentPlayer);
     await jumpTo(game, currentPlayer, chosenPlatform);
 
-    let card = await new CommandLineInterface().pickCardToBuy(game, currentPlayer, chosenPlatform);
+    let card = await currentPlayer.getUserInterface().pickCardToBuy(game, currentPlayer, chosenPlatform);
     buyCard(currentPlayer, card, chosenPlatform);
 
     if (isInstantEffect(card)) {
@@ -212,22 +225,19 @@ export async function doReinforcements(game: Game, currentPlayer: Player): Promi
         console.clear();
         console.log(`${currentPlayer}\n\n${game.sanctuary}\n\n${game.heroicFeats}`);
 
-        const answer = await new CommandLineInterface().whichReinforcement(game, reinforcementsLeftForTurn);
+        const reinforcement = await currentPlayer.getUserInterface().whichReinforcement(game, reinforcementsLeftForTurn);
 
-        if (answer === 'P') {
+        if (reinforcement === undefined) {
             return;
         } else {
-            let currentReinforcement = reinforcementsLeftForTurn.find(reinforcement => reinforcement.getCode() === answer);
-            if (currentReinforcement !== undefined) {
-                await currentReinforcement.handleReinforcement(game, currentPlayer);
-                reinforcementsLeftForTurn.splice(reinforcementsLeftForTurn.findIndex(reinforcement => reinforcement === currentReinforcement), 1);
-            }
+                await reinforcement.handleReinforcement(game, currentPlayer);
+                reinforcementsLeftForTurn.splice(reinforcementsLeftForTurn.findIndex(r => r === reinforcement), 1);
         }
     }
 }
 
 export async function addGoldTo(game: Game, currentPlayer: Player, value: number) {
-    const answer = await new CommandLineInterface().howMuchGoldForHammer(game, currentPlayer, value);
+    const answer = await currentPlayer.getUserInterface().howMuchGoldForHammer(game, currentPlayer, value);
 
     currentPlayer.addGoldToHammer(answer);
     currentPlayer.addGold(value - answer);
