@@ -13,11 +13,13 @@ export interface UserInterface{
 
     extraTurn(game: Game): Promise<boolean>;
     
-    pickDieFace(game: Game, currentPlayer: Player, boughtDieFaces: Set<DieFace>): Promise<DieFace>;
-
+    chooseDieFaceToForge(game: Game, currentPlayer: Player, options: Array<DieFace>, boughtDieFaces: Set<DieFace>): Promise<DieFace>;
+    
     chooseDieToReplaceDieFace(game: Game, currentPlayer: Player, bought: DieFace): Promise<Die>;
-
-    chooseDieFace(options: Array<DieFace>, game: Game, showOptions?: boolean): Promise<DieFace>;
+    
+    chooseDieFaceToReceiveEffect(options: Array<DieFace>, game: Game): Promise<DieFace>;
+    
+    chooseDieFaceToBeReplaced(options: Array<DieFace>, game: Game, newDieFace: DieFace): Promise<DieFace>;
 
     keepForging(game: Game, boughtDieFaces: Set<DieFace>): Promise<boolean>;
 

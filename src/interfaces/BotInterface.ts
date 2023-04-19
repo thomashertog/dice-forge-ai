@@ -31,11 +31,8 @@ export class BotInterface implements UserInterface {
         return new Promise(resolve => resolve(coinToss()));
     }
 
-    pickDieFace(game: Game, currentPlayer: Player, boughtDieFaces: Set<DieFace>): Promise<DieFace> {
-        const buyableDieFaces = game.sanctuary.buyableDieFacesFor(currentPlayer.gold, boughtDieFaces);
-
-        const buy = getRandomElementOfArray(buyableDieFaces);
-        return new Promise(resolve => resolve(buy));
+    chooseDieFaceToForge(_game: Game, _currentPlayer: Player, options: DieFace[], _boughtDieFaces: Set<DieFace>): Promise<DieFace> {
+        return new Promise(resolve => resolve(getRandomElementOfArray(options)));
     }
 
     chooseDieToReplaceDieFace(_game: Game, currentPlayer: Player, _bought: DieFace): Promise<Die> {
@@ -44,7 +41,11 @@ export class BotInterface implements UserInterface {
         return new Promise(resolve => resolve(dieChoice));
     }
 
-    chooseDieFace(options: DieFace[], _game: Game, _showOptions?: boolean | undefined): Promise<DieFace> {
+    chooseDieFaceToReceiveEffect(options: DieFace[], _game: Game): Promise<DieFace> {
+        return new Promise(resolve => resolve(getRandomElementOfArray(options)));
+    }
+
+    chooseDieFaceToBeReplaced(options: DieFace[], _game: Game, _newDieFace: DieFace): Promise<DieFace> {
         return new Promise(resolve => resolve(getRandomElementOfArray(options)));
     }
 

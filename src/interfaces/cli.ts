@@ -16,28 +16,29 @@ import { UserInterface } from './UserInterface';
 export type PlayerAction = (game: Game, currentPlayer: Player) => void;
 
 export class CommandLineInterface implements UserInterface {
-    async botOrHuman(i: number): Promise<UserInterface> {
-        const answer = await this.questionUntilValidAnswer(null, `Do you (player ${i +1}) want to be a Bot or a Human player?`, "B", "H").then(answer => answer.toUpperCase());
-
-        if(answer === "H"){
-            return new Promise(resolve => resolve(new CommandLineInterface()));
-        }else if(answer === "B"){
-            return new Promise(resolve => resolve(new BotInterface()));
-        }
-        return new Promise((resolve, reject) => reject());
-    }
-
+    
     terminal = readline.createInterface(input, output);
 
     async getPlayerCount(): Promise<number> {
         return await this.questionUntilValidAnswer(null, "How many people you want to play with? (2..4)", "2", "3", "4").then(parseInt);
     }
 
+    async botOrHuman(i: number): Promise<UserInterface> {
+        const answer = await this.questionUntilValidAnswer(null, `Do you (player ${i + 1}) want to be a Bot or a Human player?`, "B", "H").then(answer => answer.toUpperCase());
+
+        if (answer === "H") {
+            return new Promise(resolve => resolve(new CommandLineInterface()));
+        } else if (answer === "B") {
+            return new Promise(resolve => resolve(new BotInterface()));
+        }
+        return new Promise((resolve, reject) => reject());
+    }
+
     async chooseAction(game: Game, currentPlayer: Player): Promise<PlayerAction | undefined> {
-        const answer = await this.questionUntilValidAnswer(game, `
-What do you (${currentPlayer.name}) want to do now?
-Forge die face(s) / perform a Heroic feat / Pass
-`, 'F', 'H', 'P').then(answer => answer.toUpperCase());
+        const question = `What do you (${currentPlayer.name}) want to do now?\nForge die face(s) / perform a Heroic feat / Pass`;
+
+        const answer = await this.questionUntilValidAnswer(game, question, 'F', 'H', 'P').then(answer => answer.toUpperCase());
+
         if (answer === 'F') {
             return forge;
         } else if (answer === 'H') {
@@ -50,23 +51,21 @@ Forge die face(s) / perform a Heroic feat / Pass
         return (await this.questionUntilValidAnswer(game, `Would you like to perform an extra action for 2 sun shards? Yes / No`, "Y", "N")).toUpperCase() === 'Y';
     }
 
-    async pickDieFace(game: Game, currentPlayer: Player, boughtDieFaces: Set<DieFace>): Promise<DieFace> {
-        const buyableFaces = game.sanctuary.buyableDieFacesFor(currentPlayer.gold, boughtDieFaces);
+    async chooseDieFaceToForge(game: Game, currentPlayer: Player, options: Array<DieFace>, boughtDieFaces: Set<DieFace>): Promise<DieFace> {
+        const question = `You already bought: ${getDieFacesAsPrettyString('', [...boughtDieFaces])}\nYou have ${chalk.yellow(currentPlayer.gold)} to spend\nWhich die face are you going to buy?`
+        
+        const buyableDieFaces = game.sanctuary.buyableDieFacesFor(currentPlayer.gold, boughtDieFaces);
+        const buyableDieFaceCodes = buyableDieFaces.map(dieFace => dieFace.code);
 
-        const buy = await (await this.questionUntilValidAnswer(game, `
-    you have ${chalk.yellow(currentPlayer.gold)} to spend
-    which die face are you going to buy?`,
-            ...buyableFaces.map(dieface => dieface.code))).toUpperCase();
+        const buy = await (this.questionUntilValidAnswer(game, question, ...buyableDieFaceCodes)).then(answer => answer.toUpperCase());
 
-        const dieFace = buyableFaces.find(face => face.is(buy));
+        const dieFace = buyableDieFaces.find(face => face.is(buy));
         assert(dieFace);
         return dieFace;
     }
 
     async chooseDieToReplaceDieFace(game: Game, currentPlayer: Player, bought: DieFace): Promise<Die> {
-        let leftRight = (await this.questionUntilValidAnswer(game, `on which die you want to forge ${bought}? Left or Right`,
-            'R', 'L'))
-            .toUpperCase();
+        const leftRight = await (this.questionUntilValidAnswer(game, `on which die you want to forge ${bought}? Left or Right`, 'R', 'L')).then(answer => answer.toUpperCase());
 
         if (leftRight === 'R') {
             return new Promise(resolve => resolve(currentPlayer.rightDie));
@@ -77,21 +76,28 @@ Forge die face(s) / perform a Heroic feat / Pass
         }
     }
 
-    async chooseDieFace(options: Array<DieFace>, game: Game, showOptions?: boolean): Promise<DieFace> {
-        showOptions = showOptions || false;
-        const answer = await (await this.questionUntilValidAnswer(game,
-            `${showOptions ? getDieFacesAsPrettyString('', options) : ''}
-    which dieface do you pick?`,
-            ...options.map(option => option.code))).toUpperCase();
+    async chooseDieFaceToReceiveEffect(options: Array<DieFace>, game: Game): Promise<DieFace> {
+        const question = `you may pick 1 of these: ${getDieFacesAsPrettyString('', options)}\nwhich dieface do you pick?`
+
+        const answer = await (this.questionUntilValidAnswer(game, question, ...options.map(option => option.code))).then(answer => answer.toUpperCase());
 
         return options.find(option => option.is(answer)) as DieFace;
     }
 
+    async chooseDieFaceToBeReplaced(options: DieFace[], game: Game, newDieFace: DieFace): Promise<DieFace> {
+        const question = `you have these options: ${getDieFacesAsPrettyString('', options)}\nWhich dieface do you want to replace with ${newDieFace}?`;
+
+        const answer = await (this.questionUntilValidAnswer(game, question, ...options.map(option => option.code))).then(answer => answer.toUpperCase());
+
+        const chosenDieFace = options.find(option => option.is(answer));
+        assert(chosenDieFace);
+        return chosenDieFace;
+    }
+
     async keepForging(game: Game, boughtDieFaces: Set<DieFace>): Promise<boolean> {
-        return (await this.questionUntilValidAnswer(game, `
-You already bought: ${getDieFacesAsPrettyString("", Array.from(boughtDieFaces))}\n
-Do you want to keep forging? (Y/N)`,
-            'Y', 'N')).toUpperCase() === 'N';
+        const question = `You already bought: ${getDieFacesAsPrettyString("", Array.from(boughtDieFaces))}\nDo you want to keep forging? (Y/N)`;
+        
+        return await (this.questionUntilValidAnswer(game, question, 'Y', 'N')).then(answer => answer.toUpperCase()) === 'N';
     }
 
     async pickPlatform(game: Game, currentPlayer: Player): Promise<HeroicFeatPlatform> {
@@ -121,7 +127,8 @@ Do you want to keep forging? (Y/N)`,
     }
 
     async chooseResource(game: Game, playerName: string, value: number | null, ...options: string[]): Promise<string> {
-        return (await this.questionUntilValidAnswer(game, `you (${playerName}) want ${options.map(option => CommandLineInterface.toOptionString(option)).join(',')}? ${value !== null ? `(${value})` : ''}`, ...options)).toUpperCase();
+        const question = `you (${playerName}) want ${options.map(option => CommandLineInterface.toOptionString(option)).join(',')}? ${value !== null ? `(${value})` : ''}`
+        return (await this.questionUntilValidAnswer(game, question, ...options)).toUpperCase();
     }
 
     private static toOptionString(code: string): string {
@@ -142,11 +149,9 @@ Do you want to keep forging? (Y/N)`,
 
         const maxGoldForHammer = currentPlayer.activeHammerCount * 30 - currentPlayer.goldForHammer;
 
+        const question = `You (${currentPlayer.name}) have ${chalk.yellow(value)} to distribute.\nHow much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})\nEverything else will go to your regular gold resource`;
 
-        return parseInt(await this.questionUntilValidAnswer(game, `
-You (${currentPlayer.name}) have ${chalk.yellow(value)} to distribute.
-How much would you like to add to the hammer? (0..${maxGoldForHammer < value ? maxGoldForHammer : value})
-Everything else will go to your regular gold resource`, '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
+        return parseInt(await this.questionUntilValidAnswer(game, question, '0', ...getArrayOfNumberStringsUpTo(maxGoldForHammer < value ? maxGoldForHammer : value)));
     }
 
     async whichDieToRoll(game: Game, currentPlayer: Player): Promise<Die | undefined> {

@@ -14,7 +14,7 @@ export class HelmetOfInvisibility extends AbstractHeroicFeatCard implements Inst
 
     async handleEffect(game: Game, currentPlayer: Player): Promise<void> {
         const die = await currentPlayer.getUserInterface().chooseDieToReplaceDieFace(game, currentPlayer, new Helmet());
-        let dieFaceToReplace = await currentPlayer.getUserInterface().chooseDieFace(die.faces, game);
+        let dieFaceToReplace = await currentPlayer.getUserInterface().chooseDieFaceToBeReplaced(die.faces, game, new Helmet());
         
         die.replaceFace(dieFaceToReplace, new Helmet(), game);
     }

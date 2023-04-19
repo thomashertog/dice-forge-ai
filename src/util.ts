@@ -130,7 +130,7 @@ async function handleMirrorRollsEventually(game: Game, currentPlayer: Player, ro
     while (rolls.some(roll => DieFace.isMirror(roll))) {
         const options = allRolls.filter(roll => !DieFace.isMirror(roll));
 
-        const replacementChoice = await currentPlayer.getUserInterface().chooseDieFace(options, game, true)
+        const replacementChoice = await currentPlayer.getUserInterface().chooseDieFaceToReceiveEffect(options, game)
         const replacementRoll = allRolls.splice(allRolls.findIndex(option => option.is(replacementChoice.code)), 1).at(0);
 
         assert(replacementRoll);
@@ -164,13 +164,15 @@ export async function forge(game: Game, currentPlayer: Player): Promise<void> {
 
     while (userEnd !== true && minimumCost !== -1) {
         console.clear();
-        let bought = await currentPlayer.getUserInterface().pickDieFace(game, currentPlayer, boughtDieFaces);
+        const buyableDieFaces = game.sanctuary.buyableDieFacesFor(currentPlayer.gold, boughtDieFaces);
+        
+        const bought = await currentPlayer.getUserInterface().chooseDieFaceToForge(game, currentPlayer, buyableDieFaces, boughtDieFaces);
 
         buyDieFace(game, currentPlayer, bought);
         boughtDieFaces.add(bought);
 
         const die = await currentPlayer.getUserInterface().chooseDieToReplaceDieFace(game, currentPlayer, bought);
-        let dieFaceToReplace = await currentPlayer.getUserInterface().chooseDieFace(die.faces, game);
+        let dieFaceToReplace = await currentPlayer.getUserInterface().chooseDieFaceToBeReplaced(die.faces, game, bought);
 
         die.replaceFace(dieFaceToReplace, bought, game);
 
